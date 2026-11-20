@@ -58,3 +58,7 @@ Hosted preview dpl_7PCwgGDCDEKwj8hmrooWzTK9CbTE: all six browser scenarios passe
 Authenticated Supabase Realtime delivered the committed encounter update in scripts/realtime-check.mjs. GitHub CI also passed for deployment-source commit ce0ec097352a11d70c14876879cd10483bd9c838 (run 44734969125). Preview error/fatal log query returned no entries during verification.
 
 Production verification identified two issues before final sign-off: a concurrently running Realtime probe globally signed out the shared demo doctor (probe now uses local-session sign-out), and the awaiting-triage count badge failed axe contrast at 3.78:1. The badge now has explicit darker text and a larger font; final rerun results follow below.
+
+## Final hosted release verification
+
+Production source commit `3fc98d87591c59eaa4140823b9ab842a6443393e`, deployment `dpl_9baWgHgsycJ4qynjckqvKoTMWWX5`, reached READY. All six production Playwright scenarios passed in 43.4 seconds after the contrast fix. The corrected preview accessibility check passed in 8.6 seconds. The production login endpoint returned HTTP 200 without a deployment bypass. Latest application-source GitHub CI run 44735530373 passed. Runtime error/fatal query found no entries in the verification window. Temporary automation bypass was revoked after testing. No full master acceptance or clinical validation is claimed.

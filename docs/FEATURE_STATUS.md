@@ -1,6 +1,6 @@
 # Final acceptance matrix
 
-This is a working, database-backed **core prototype**. The complete master specification is **not fully implemented**. A verified Vercel preview exists; see DEPLOYMENT_STATUS.md. All rows below refer to synthetic demonstration workflows, not clinical validation.
+This is a working, database-backed **core prototype**. The complete master specification is **not fully implemented**. Vercel preview and production deployments exist; see DEPLOYMENT_STATUS.md. All rows below refer to synthetic demonstration workflows, not clinical validation.
 
 | Feature                                                  | Implementation status                 | Test status                                                                               | Database integration status                         | Deployment status     | Remaining limitation                                                                                        |
 | -------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------- |
