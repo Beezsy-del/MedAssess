@@ -1,5 +1,18 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+test.afterEach(async ({ page }, info) => {
+  if (info.status !== info.expectedStatus) {
+    const messages = await page.getByRole("alert").allTextContents();
+    const notices = await page.getByRole("status").allTextContents();
+    console.error(
+      "Visible failure diagnostics:",
+      JSON.stringify([...messages, ...notices]).replace(
+        /[a-f0-9]{64}/g,
+        "[redacted capability]",
+      ),
+    );
+  }
+});
 test.beforeEach(async ({ context, baseURL }) => {
   const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
   if (bypass && baseURL)
