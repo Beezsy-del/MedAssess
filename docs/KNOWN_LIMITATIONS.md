@@ -4,7 +4,7 @@
 
 1. The full master feature specification is not complete. Consult FEATURE_STATUS.md rather than assuming every described module is ready.
 2. No clinical validation or approved protocol exists. Operational use and real patient data remain prohibited and disabled.
-3. GitHub is published and CI passes; protected CI integration secrets are not configured.
+3. GitHub is published and CI passes; synthetic CI integration secrets are now environment-scoped and restricted to main; final run results are recorded in DEPLOYMENT_STATUS.md.
 4. Vercel production is deployed; deploy-on-push requires installing the Vercel GitHub integration. See DEPLOYMENT_STATUS.md for verification details.
 
 ## Important implementation gaps

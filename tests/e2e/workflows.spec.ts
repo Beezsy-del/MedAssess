@@ -383,3 +383,71 @@ test("failed refresh and logout report errors without claiming success", async (
   await expect(page.getByRole("status")).toContainText("Sign-out failed");
   await expect(page).toHaveURL(/dashboard/);
 });
+
+test("late snapshot responses cannot overwrite newer workspace data", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  const snapshot = await page.evaluate(() =>
+    fetch("/api/snapshot").then((r) => r.json()),
+  );
+  let releaseOld!: () => void;
+  const oldGate = new Promise<void>((resolve) => {
+    releaseOld = resolve;
+  });
+  let markStarted!: () => void;
+  const started = new Promise<void>((resolve) => {
+    markStarted = resolve;
+  });
+  let requests = 0;
+  await page.route("**/api/snapshot?*", async (route) => {
+    const ordinal = ++requests;
+    if (ordinal === 1) {
+      markStarted();
+      await oldGate;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        ...snapshot,
+        hospital: {
+          ...snapshot.hospital,
+          name:
+            ordinal === 1
+              ? "Synthetic older snapshot"
+              : "Synthetic newest snapshot",
+        },
+      }),
+    });
+  });
+  await page.getByRole("button", { name: "Refresh data", exact: true }).click();
+  await started;
+  await page.getByRole("button", { name: "Refresh data", exact: true }).click();
+  await expect(
+    page.getByText("Synthetic newest snapshot", { exact: true }),
+  ).toBeVisible();
+  const oldResponse = page.waitForResponse(
+    async (response) =>
+      response.url().includes("/api/snapshot?") &&
+      (await response.json()).hospital?.name === "Synthetic older snapshot",
+  );
+  releaseOld();
+  await oldResponse;
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+  await expect(
+    page.getByText("Synthetic older snapshot", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("Synthetic newest snapshot", { exact: true }),
+  ).toBeVisible();
+});
