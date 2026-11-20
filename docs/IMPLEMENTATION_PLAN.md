@@ -14,9 +14,9 @@
 - [x] Strict command validation; persisted reassessment/shortage/follow-up workflows; resource and disposition histories; five remote migrations.
 - [ ] Expanded features from master prompts: detailed gaps are tracked in FEATURE_STATUS.md.
 - [ ] Full translations, reviewed protocols, provider notification channels, advanced offline and operational analytics.
-- [ ] GitHub repository and CI execution: account authentication blocked.
-- [ ] Vercel preview and deployed acceptance: team authorization blocked.
-- [ ] Production: remaining acceptance and requested final deployment approval.
+- [x] GitHub MedAssess repository published and verify CI passed.
+- [x] Vercel preview built and six hosted browser scenarios passed.
+- [ ] Production deployment verification; complete master feature acceptance remains open.
 
 Product brand: MedCipher. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
 

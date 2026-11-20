@@ -1,5 +1,17 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+test.beforeEach(async ({ context, baseURL }) => {
+  const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+  if (bypass && baseURL)
+    await context.route(`${new URL(baseURL).origin}/**`, async (route) => {
+      await route.continue({
+        headers: {
+          ...route.request().headers(),
+          "x-vercel-protection-bypass": bypass,
+        },
+      });
+    });
+});
 test("staff demo, persisted registration, assessment and discharge", async ({
   page,
 }) => {
@@ -225,7 +237,15 @@ test("unauthenticated staff routes redirect and public emergency guidance stays 
       action: "register",
       data: { operation_id: crypto.randomUUID() },
     },
-    headers: { Origin: new URL(page.url()).origin },
+    headers: {
+      Origin: new URL(page.url()).origin,
+      ...(process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+        ? {
+            "x-vercel-protection-bypass":
+              process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+          }
+        : {}),
+    },
   });
   expect(response.status()).toBe(403);
 });

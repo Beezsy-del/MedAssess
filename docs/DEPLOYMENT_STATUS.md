@@ -1,24 +1,18 @@
 # Deployment status
 
-| Item                | Verified status                                                                                                                                                                                                                        |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Local application   | Working at http://localhost:3000 when development server is running                                                                                                                                                                    |
-| Git branch          | main; repository initialized locally                                                                                                                                                                                                   |
-| GitHub remote / URL | Not created. `gh auth status` reports no authenticated hosts. Connector authenticated as Beezsy-del, but does not expose repository creation and currently lists only unrelated repositories. Browser fallback reached GitHub sign-in. |
-| GitHub CI           | Workflow prepared; not run on GitHub because no remote exists                                                                                                                                                                          |
-| Supabase            | MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1; four migrations applied; Auth, persisted workflows and RLS exercised                                                                                                                      |
-| Vercel target       | Intended project medcipher-triage-platform; not yet created                                                                                                                                                                            |
-| Vercel access       | API returned 403 for connected team bloodflow / team_Ed3kxS59lOwvTBcgkFdqsOKB; team authorization required                                                                                                                             |
-| Preview URL         | None; no successful deployment claimed                                                                                                                                                                                                 |
-| Production URL      | None; production acceptance and approval not reached                                                                                                                                                                                   |
+Verified 20 November 2026. This is a synthetic demo deployment; full master acceptance remains incomplete (see MASTER_AUDIT.md).
 
-## Secure next steps
+| Item               | Verified status                                                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| GitHub             | https://github.com/Beezsy-del/MedAssess — main pushed; existing initial commit preserved                                         |
+| Application source | 400655097fcbb72df505d9851e8cd39a7171955a                                                                                         |
+| GitHub CI          | Run 44734399213 passed verify; protected integration job skipped because credentials/flag are not configured                     |
+| Supabase           | MedAssess, kkfqxlwwcwhnmhmsqitx, Mumbai; five migrations applied; 28/28 public tables have RLS                                   |
+| Vercel project     | medcipher-triage-platform / prj_b5W03SkZFPbvjjRhs5JVbupkQalN; team bloodflow                                                     |
+| Preview            | https://medcipher-triage-platform-611uuh1jw-bloodflow.vercel.app — READY; six hosted Playwright scenarios passed in 45.5 seconds |
+| Production         | Pending final deployment verification                                                                                            |
+| Environment        | Supabase public URL/key and synthetic demo account secrets configured through encrypted provider environment variables; Node 24  |
+| Deployment method  | Authenticated direct source upload from the committed tree                                                                       |
+| Git integration    | Vercel GitHub app is not installed for this repository; automatic deploy-on-push is not connected                                |
 
-1. Complete `gh auth login` in the local terminal. Create the private `medcipher-triage-platform` repository, preserve main and push the reviewed commit. Do not paste credentials into chat.
-2. Authorize the intended Vercel team through the connector's short-lived team-consent link, or specify the intended team if bloodflow is not correct. An expired link must be regenerated.
-3. Create/link the Vercel project, import the GitHub repository and set preview environment variables through provider configuration. Use the Supabase publishable key; never expose service-role secrets.
-4. Enable DEMO_MODE only for this synthetic environment. Configure dedicated demo account credentials as server-only encrypted environment variables.
-5. Add preview callback URLs to Supabase Auth. Deploy a preview, verify build status, run browser/integration checks against its actual URL, inspect logs and confirm realtime behavior.
-6. Complete outstanding acceptance gaps in FEATURE_STATUS.md. Production promotion requires the requested final approval and cannot be inferred from preview success.
-
-No billable infrastructure was created. No database resets or force pushes were performed. `vercel.json` targets Mumbai functions; deployment configuration itself is not proof of a deployment.
+Vercel deployment protection remains enabled. Acceptance tests use a temporary automation bypass scoped only to this host. No service-role key was required. No database reset or force push was performed. Supabase password recovery redirect/provider email delivery and leaked-password protection need account-side setup. Browser tests exercise real synthetic Auth, registration, QR intake, clinical workflow, offline recovery, accessibility and hospital access controls; they do not constitute complete master acceptance or clinical validation.

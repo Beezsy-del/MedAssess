@@ -4,8 +4,8 @@
 
 1. The full master feature specification is not complete. Consult FEATURE_STATUS.md rather than assuming every described module is ready.
 2. No clinical validation or approved protocol exists. Operational use and real patient data remain prohibited and disabled.
-3. GitHub remote creation/push is blocked by missing CLI authentication. The available connector cannot create repositories; the browser is also signed out.
-4. Vercel's connected bloodflow team denied API access. No preview or production frontend exists. A team access grant is required before deployment.
+3. GitHub is published and CI passes; protected CI integration secrets are not configured.
+4. Vercel preview is verified; deploy-on-push requires installing the Vercel GitHub integration. See DEPLOYMENT_STATUS.md for the latest production status.
 
 ## Important implementation gaps
 

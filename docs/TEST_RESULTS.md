@@ -52,3 +52,5 @@ Explicit unauthorized hospital IDs now fail closed with HTTP 403 rather than loa
 ## Master audit and workflow extension
 
 20 November 2026: 48 unit/API validation tests passed, 33 hosted integration assertions passed, and the nine-assertion RLS transaction suite passed again. Formatting, lint, typecheck and production build passed. Dependency audit: zero vulnerabilities. Supabase confirms 28/28 public tables have RLS and five migrations are applied. Expanded integration verifies task deduplication/resolution, category preservation during shortages, doctor-only follow-up, and transactional histories. A browser assertion using an invalid empty registration payload was corrected to use a valid operation ID so it continues testing authorization after stricter validation.
+
+Hosted preview dpl_7PCwgGDCDEKwj8hmrooWzTK9CbTE: all six browser scenarios passed (45.5 seconds), including added deterioration and resource-shortage UI actions. Local expanded browser run: six passed (53.1 seconds). GitHub verify CI run 44734399213 passed; protected integration job skipped.
