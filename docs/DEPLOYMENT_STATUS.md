@@ -1,6 +1,6 @@
 # Deployment status
 
-Latest UI release: application source `eb7b7d059e5108089d03a3fdb177d704ac0d34d7`, production `dpl_J3yq3vDTrvcYsTRaMAjXujX7PZ4X`, reached READY at https://medcipher-triage-platform.vercel.app. The deployed sign-in/dashboard and mobile layout were checked; dashboard axe returned no serious/critical findings. See UI_REFINEMENT.md. Database configuration is unchanged. The tables below preserve the preceding readiness-audit deployment evidence.
+Latest UI release: application source `0a5a5ff9315f7d0f3f0e4da6ff5068712330c107`, production `dpl_H9eL1fagaNfsX7pybtat1oUeezzm`, reached READY at https://medcipher-triage-platform.vercel.app. This is the BloodFlow reference remodel; see BLOODFLOW_REMODEL.md. Live sign-in returned HTTP 200. Both dashboard themes passed axe with no serious/critical findings and fit a 390px viewport. No browser page errors or Vercel error/fatal log entries were observed in the release smoke-check window. Database configuration is unchanged. The tables below preserve the preceding readiness-audit deployment evidence.
 
 Verified 20 November 2026. This is a synthetic demonstration, not clinical production readiness. See READINESS_AUDIT.md for separate readiness assessments and outstanding master requirements.
 
@@ -30,3 +30,7 @@ Supabase password-recovery delivery, leaked-password protection, provider log re
 Production dpl_HEYpJneZHUafoWeerHH7KxdHtZPi passed all eight browser scenarios in 53.8 seconds, including forced snapshot response reordering, failed auth/snapshot responses and encrypted offline retention/retry. Public login returned HTTP 200 (0.43 seconds in the availability probe). Error/fatal runtime-log count query returned no entries in the verification window. The preview automation bypass was revoked and its ignored local credential file removed.
 
 Post-promotion GitHub integration verification is recorded in [the main-branch verification runs](https://github.com/Beezsy-del/MedAssess/actions/workflows/ci.yml?query=branch%3Amain); consult the job results for the authoritative status. The latest documentation commits contain audit evidence/tests only; application source remains e14343a. The verify job includes formatting, lint, strict types, 55 unit tests, production build and dependency audit; integration runs 33 hosted assertions plus eight browser scenarios.
+
+## BloodFlow remodel acceptance
+
+Source `0a5a5ff` passed GitHub [run 44783771333](https://github.com/Beezsy-del/MedAssess/actions/runs/44783771333): verify and integration both succeeded, including 55 unit tests, 33 database assertions and nine hosted browser scenarios. Vercel production `dpl_H9eL1fagaNfsX7pybtat1oUeezzm` is READY and serves the canonical host. Local production-build workflows also passed (nine in 45.5 seconds); 16 routes were scanned in both themes at four viewport widths. Subsequent documentation-only commits record the evidence without changing application source.
