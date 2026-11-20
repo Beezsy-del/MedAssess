@@ -1,28 +1,7 @@
 import { readBoundedJson } from "@/lib/request-json";
-import { z } from "zod";
+import { actionSchemas, commandEnvelope } from "@/features/commands/schema";
 import { session } from "@/lib/data";
 import type { Json } from "@/lib/supabase/database.types";
-const schema = z.object({
-  hospital: z.uuid(),
-  action: z.enum([
-    "register",
-    "assess",
-    "transition",
-    "note",
-    "reserve",
-    "release",
-    "alert",
-    "referral",
-    "referral_status",
-    "token",
-    "settings",
-    "department",
-    "resource",
-    "facility",
-    "shift",
-  ]),
-  data: z.record(z.string(), z.json()),
-});
 export async function POST(request: Request) {
   if (request.headers.get("origin") !== new URL(request.url).origin)
     return Response.json({ error: "Invalid origin" }, { status: 403 });
@@ -35,10 +14,16 @@ export async function POST(request: Request) {
       { status: 413, headers: { "Cache-Control": "no-store" } },
     );
   }
-  const parsed = schema.safeParse(body);
+  const parsed = commandEnvelope.safeParse(body);
   if (!parsed.success)
     return Response.json(
       { error: "Check the required fields." },
+      { status: 400 },
+    );
+  const payload = actionSchemas[parsed.data.action].safeParse(parsed.data.data);
+  if (!payload.success)
+    return Response.json(
+      { error: "Check the required fields and values." },
       { status: 400 },
     );
   const s = await session();
@@ -47,7 +32,7 @@ export async function POST(request: Request) {
   const { data, error } = await s.db.rpc("staff_command", {
     p_hospital: parsed.data.hospital,
     p_action: parsed.data.action,
-    p_data: parsed.data.data as Json,
+    p_data: payload.data as Json,
   });
   if (error)
     return Response.json(
@@ -55,7 +40,9 @@ export async function POST(request: Request) {
         error:
           error.code === "PT409"
             ? "Conflict: record changed. Refresh and review."
-            : error.message,
+            : error.code === "42501"
+              ? "Your role cannot perform this action."
+              : "Action rejected. Check the record state, required details and permissions.",
       },
       { status: error.code === "PT409" ? 409 : 400 },
     );

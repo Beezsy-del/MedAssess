@@ -49,6 +49,9 @@ export async function snapshot(hospitalId?: string) {
     protocols,
     shifts,
     vitals,
+    reassessments,
+    shortages,
+    followUps,
   ] = await Promise.all([
     s.db.from("hospitals").select("*").eq("id", h).single(),
     s.db
@@ -115,6 +118,24 @@ export async function snapshot(hospitalId?: string) {
       .eq("hospital_id", h)
       .order("created_at", { ascending: false })
       .limit(500),
+    s.db
+      .from("reassessment_records")
+      .select("*")
+      .eq("hospital_id", h)
+      .order("created_at", { ascending: false })
+      .limit(500),
+    s.db
+      .from("resource_shortages")
+      .select("*")
+      .eq("hospital_id", h)
+      .order("created_at", { ascending: false })
+      .limit(500),
+    s.db
+      .from("follow_up_records")
+      .select("*")
+      .eq("hospital_id", h)
+      .order("created_at", { ascending: false })
+      .limit(500),
   ]);
   const responses = [
     hospital,
@@ -136,6 +157,9 @@ export async function snapshot(hospitalId?: string) {
     protocols,
     shifts,
     vitals,
+    reassessments,
+    shortages,
+    followUps,
   ];
   if (responses.some((x) => x.error))
     throw new Error(
@@ -164,6 +188,9 @@ export async function snapshot(hospitalId?: string) {
     protocols: protocols.data!,
     shifts: shifts.data!,
     vitals: vitals.data!,
+    reassessments: reassessments.data!,
+    shortages: shortages.data!,
+    followUps: followUps.data!,
     loadedAt: new Date().toISOString(),
   };
 }

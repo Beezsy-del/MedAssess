@@ -372,6 +372,179 @@ const deniedArchive = await doctor.rpc("archive_demo_tests", {
 assert.ok(deniedArchive.error);
 pass("Clinical role cannot run administrator demo reset");
 
+assert.equal(
+  (
+    await command(
+      "reassessment",
+      {
+        encounter_id: created.id,
+        reason: "Synthetic deterioration requires clinical reassessment",
+      },
+      nurse,
+    )
+  ).error,
+  null,
+);
+const pending = await doctor
+  .from("reassessment_records")
+  .select("*")
+  .eq("encounter_id", created.id)
+  .is("resolved_at", null);
+assert.equal(pending.data.length, 1);
+assert.equal(
+  (
+    await command(
+      "reassessment",
+      { encounter_id: created.id, reason: "Repeated deterioration report" },
+      nurse,
+    )
+  ).error,
+  null,
+);
+assert.equal(
+  (
+    await doctor
+      .from("reassessment_records")
+      .select("*")
+      .eq("encounter_id", created.id)
+      .is("resolved_at", null)
+  ).data.length,
+  1,
+);
+assert.equal(
+  (
+    await doctor
+      .from("patient_encounters")
+      .select("category")
+      .eq("id", created.id)
+      .single()
+  ).data.category,
+  "RED",
+);
+pass("Deterioration creates one open task without changing urgency");
+assert.equal(
+  (
+    await command("assess", {
+      encounter_id: created.id,
+      category: "RED",
+      reason: "Synthetic reassessment completed",
+      input,
+    })
+  ).error,
+  null,
+);
+assert.equal(
+  (
+    await doctor
+      .from("reassessment_records")
+      .select("*")
+      .eq("encounter_id", created.id)
+      .is("resolved_at", null)
+  ).data.length,
+  0,
+);
+pass("Clinical reassessment resolves the task with preserved history");
+assert.equal(
+  (
+    await command(
+      "shortage",
+      {
+        encounter_id: created.id,
+        kind: "Emergency bed",
+        reason: "Synthetic no suitable bed; coordinator reviewing transfer",
+      },
+      nurse,
+    )
+  ).error,
+  null,
+);
+assert.equal(
+  (
+    await doctor
+      .from("resource_shortages")
+      .select("*")
+      .eq("encounter_id", created.id)
+  ).data.length,
+  1,
+);
+assert.equal(
+  (
+    await doctor
+      .from("patient_encounters")
+      .select("category")
+      .eq("id", created.id)
+      .single()
+  ).data.category,
+  "RED",
+);
+pass("Resource shortage persists without downgrading RED");
+assert.equal(
+  (
+    await command("follow_up", {
+      encounter_id: secondId,
+      due_at: new Date(Date.now() + 86400000).toISOString(),
+      reason: "Synthetic follow-up appointment and instructions",
+    })
+  ).error,
+  null,
+);
+assert.ok(
+  (
+    await command(
+      "follow_up",
+      {
+        encounter_id: secondId,
+        due_at: new Date(Date.now() + 86400000).toISOString(),
+        reason: "Nurse cannot authorize follow-up",
+      },
+      nurse,
+    )
+  ).error,
+);
+assert.equal(
+  (
+    await doctor
+      .from("follow_up_records")
+      .select("*")
+      .eq("encounter_id", secondId)
+  ).data.length,
+  1,
+);
+pass("Follow-up persists on closed encounter and requires doctor");
+assert.equal(
+  (await doctor.from("admissions").select("*").eq("encounter_id", secondId))
+    .data.length,
+  1,
+);
+assert.ok(
+  (
+    await doctor
+      .from("resource_status_history")
+      .select("*")
+      .eq("resource_id", bed.id)
+  ).data.length >= 3,
+);
+assert.ok(
+  (
+    await doctor
+      .from("notification_acknowledgements")
+      .select("*")
+      .eq("notification_id", alert.id)
+  ).data.length >= 3,
+);
+pass("Admission, resource and alert histories persist transactionally");
+assert.ok((await anon.from("follow_up_records").select("*")).error);
+assert.ok(
+  (
+    await doctor.from("reassessment_records").insert({
+      hospital_id: hospital,
+      encounter_id: created.id,
+      reason: "Forbidden direct task",
+      source: "staff",
+    })
+  ).error,
+);
+pass("New workflow tables deny anonymous reads and direct writes");
 console.log(
   `All ${count} integration assertions passed. Synthetic records intentionally retained for audit.`,
 );

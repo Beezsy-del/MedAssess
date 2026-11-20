@@ -37,6 +37,16 @@ test("staff demo, persisted registration, assessment and discharge", async ({
     .getByRole("link", { name: new RegExp(name) })
     .first()
     .click();
+  for (const [button, reason] of [
+    ["Report deterioration", "Synthetic worsening observations require review"],
+    ["Record resource shortage", "Synthetic shortage reviewed by coordinator"],
+  ]) {
+    await page.getByRole("button", { name: button, exact: true }).click();
+    await page.getByLabel("Reason / instructions").fill(reason);
+    await page.getByRole("button", { name: "Save to encounter" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByText(reason, { exact: true }).first()).toBeVisible();
+  }
   await page.getByRole("button", { name: "Assess patient" }).click();
   await page.getByLabel("I have performed a human clinical assessment").check();
   await page.getByLabel("Clinician-confirmed category").selectOption("GREEN");
@@ -210,8 +220,12 @@ test("unauthenticated staff routes redirect and public emergency guidance stays 
     page.getByRole("heading", { name: "Get help from hospital staff now." }),
   ).toBeVisible();
   const response = await request.post("/api/command", {
-    data: { hospital: crypto.randomUUID(), action: "register", data: {} },
-    headers: { Origin: "http://localhost:3000" },
+    data: {
+      hospital: crypto.randomUUID(),
+      action: "register",
+      data: { operation_id: crypto.randomUUID() },
+    },
+    headers: { Origin: new URL(page.url()).origin },
   });
   expect(response.status()).toBe(403);
 });

@@ -29,3 +29,9 @@ This implementation uses a compact schema. Medical history, allergies, medicatio
 Generated types are checked in at `src/lib/supabase/database.types.ts`. Re-generate after migrations through the authenticated Supabase tooling.
 
 Migration filenames were aligned to the server-assigned versions returned by Supabase migration history; SQL bodies are unchanged. This prevents a later CLI push from treating applied migrations as new.
+
+## Workflow history migration
+
+Migration `20261120121022_workflow_records.sql` adds reassessment_records, resource_shortages, resource_status_history, admissions, discharges, follow_up_records, investigation_records, and notification_acknowledgements. All eight use RLS and read-only role grants; mutations pass through transactional authorized RPCs/triggers. Existing documented admission/discharge/investigation notes are backfilled. No missing history is fabricated. Reassessment tasks are unique while open and resolved by a new clinical assessment; waiting time never changes urgency.
+
+The 28-table schema remains smaller than the original normalized schema requirement. Missing entities are an implementation gap, not a migration success claim.

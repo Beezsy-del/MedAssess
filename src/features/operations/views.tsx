@@ -101,7 +101,8 @@ export function Resources() {
   const { data, command, busy } = useWorkspace();
   const [resource, setResource] = useState(""),
     [error, setError] = useState(""),
-    [kind, setKind] = useState("");
+    [kind, setKind] = useState(""),
+    [maintenance, setMaintenance] = useState("");
   async function reserve(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
@@ -204,6 +205,24 @@ export function Resources() {
                       ? "Confirm cleaned & available"
                       : "Release for cleaning"}
                 </button>
+                {[
+                  "resource_manager",
+                  "emergency_coordinator",
+                  "hospital_admin",
+                  "super_admin",
+                ].includes(data.membership.role) &&
+                  ["AVAILABLE", "CLEANING"].includes(r.status) && (
+                    <button
+                      className="button full spaced"
+                      disabled={busy}
+                      onClick={() => {
+                        setMaintenance(r.id);
+                        setError("");
+                      }}
+                    >
+                      Mark for maintenance
+                    </button>
+                  )}
               </section>
             );
           })}
@@ -213,6 +232,34 @@ export function Resources() {
         coordinator and review referral options. Resource shortages never reduce
         clinical priority.
       </p>
+      {maintenance && (
+        <Modal title="Resource maintenance" onClose={() => setMaintenance("")}>
+          <form
+            className="stack-form"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const reason = new FormData(event.currentTarget).get("reason");
+              try {
+                await command("maintenance", {
+                  resource_id: maintenance,
+                  reason,
+                });
+                setMaintenance("");
+              } catch (e) {
+                setError(e instanceof Error ? e.message : "Update failed");
+              }
+            }}
+          >
+            <Field label="Maintenance reason">
+              <textarea name="reason" minLength={5} maxLength={3000} required />
+            </Field>
+            {error && <p role="alert">{error}</p>}
+            <button className="button primary" disabled={busy}>
+              Confirm maintenance
+            </button>
+          </form>
+        </Modal>
+      )}
       {resource && (
         <Modal title="Reserve resource" onClose={() => setResource("")}>
           <form className="stack-form" onSubmit={reserve}>

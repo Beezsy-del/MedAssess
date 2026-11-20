@@ -34,8 +34,9 @@ export function Overview({
   const pending = active.filter((e) => e.category === "ASSESSMENT_REQUIRED");
   const overdue = active.filter(
     (e) =>
-      e.reassessment_due &&
-      Date.parse(e.reassessment_due) < Date.parse(data.loadedAt),
+      e.deteriorating ||
+      (e.reassessment_due !== null &&
+        Date.parse(e.reassessment_due) < Date.parse(data.loadedAt)),
   );
   const displayed = active.filter(
     (e) =>

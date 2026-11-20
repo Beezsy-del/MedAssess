@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      admissions: {
+        Row: {
+          actor: string | null
+          created_at: string
+          encounter_id: string
+          hospital_id: string
+          id: string
+          note: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          encounter_id: string
+          hospital_id: string
+          id?: string
+          note: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          encounter_id?: string
+          hospital_id?: string
+          id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admissions_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "admissions_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -84,6 +126,48 @@ export type Database = {
           },
         ]
       }
+      discharges: {
+        Row: {
+          actor: string | null
+          created_at: string
+          encounter_id: string
+          hospital_id: string
+          id: string
+          instructions: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          encounter_id: string
+          hospital_id: string
+          id?: string
+          instructions: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          encounter_id?: string
+          hospital_id?: string
+          id?: string
+          instructions?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discharges_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "discharges_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       encounter_access_tokens: {
         Row: {
           encounter_id: string
@@ -122,6 +206,51 @@ export type Database = {
           },
           {
             foreignKeyName: "encounter_access_tokens_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follow_up_records: {
+        Row: {
+          actor: string
+          created_at: string
+          due_at: string
+          encounter_id: string
+          hospital_id: string
+          id: string
+          instructions: string
+        }
+        Insert: {
+          actor: string
+          created_at?: string
+          due_at: string
+          encounter_id: string
+          hospital_id: string
+          id?: string
+          instructions: string
+        }
+        Update: {
+          actor?: string
+          created_at?: string
+          due_at?: string
+          encounter_id?: string
+          hospital_id?: string
+          id?: string
+          instructions?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_up_records_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "follow_up_records_hospital_id_fkey"
             columns: ["hospital_id"]
             isOneToOne: false
             referencedRelation: "hospitals"
@@ -267,6 +396,103 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      investigation_records: {
+        Row: {
+          actor: string | null
+          created_at: string
+          encounter_id: string
+          hospital_id: string
+          id: string
+          note: string
+          treatment_record_id: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          encounter_id: string
+          hospital_id: string
+          id?: string
+          note: string
+          treatment_record_id: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          encounter_id?: string
+          hospital_id?: string
+          id?: string
+          note?: string
+          treatment_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investigation_records_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "investigation_records_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investigation_records_treatment_record_id_fkey"
+            columns: ["treatment_record_id"]
+            isOneToOne: true
+            referencedRelation: "treatment_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_acknowledgements: {
+        Row: {
+          actor: string | null
+          created_at: string
+          hospital_id: string
+          id: string
+          notification_id: string
+          reason: string | null
+          status: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          hospital_id: string
+          id?: string
+          notification_id: string
+          reason?: string | null
+          status: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          hospital_id?: string
+          id?: string
+          notification_id?: string
+          reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_acknowledgements_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_acknowledgements_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -540,6 +766,57 @@ export type Database = {
           },
         ]
       }
+      reassessment_records: {
+        Row: {
+          actor: string | null
+          created_at: string
+          encounter_id: string
+          hospital_id: string
+          id: string
+          reason: string
+          resolved_at: string | null
+          resolved_by: string | null
+          source: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          encounter_id: string
+          hospital_id: string
+          id?: string
+          reason: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          encounter_id?: string
+          hospital_id?: string
+          id?: string
+          reason?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reassessment_records_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "reassessment_records_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_facilities: {
         Row: {
           availability_note: string
@@ -687,6 +964,96 @@ export type Database = {
           },
           {
             foreignKeyName: "resource_reservations_resource_id_hospital_id_fkey"
+            columns: ["resource_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_resources"
+            referencedColumns: ["id", "hospital_id"]
+          },
+        ]
+      }
+      resource_shortages: {
+        Row: {
+          actor: string
+          created_at: string
+          encounter_id: string
+          hospital_id: string
+          id: string
+          kind: string
+          reason: string
+        }
+        Insert: {
+          actor: string
+          created_at?: string
+          encounter_id: string
+          hospital_id: string
+          id?: string
+          kind: string
+          reason: string
+        }
+        Update: {
+          actor?: string
+          created_at?: string
+          encounter_id?: string
+          hospital_id?: string
+          id?: string
+          kind?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_shortages_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "resource_shortages_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_status_history: {
+        Row: {
+          actor: string | null
+          created_at: string
+          from_status: string | null
+          hospital_id: string
+          id: string
+          resource_id: string
+          to_status: string
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          from_status?: string | null
+          hospital_id: string
+          id?: string
+          resource_id: string
+          to_status: string
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          from_status?: string | null
+          hospital_id?: string
+          id?: string
+          resource_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_status_history_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_status_history_resource_id_hospital_id_fkey"
             columns: ["resource_id", "hospital_id"]
             isOneToOne: false
             referencedRelation: "hospital_resources"
@@ -1097,4 +1464,3 @@ export const Constants = {
     },
   },
 } as const
-

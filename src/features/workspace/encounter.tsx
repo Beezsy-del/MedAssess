@@ -243,6 +243,65 @@ export function Encounter({ id }: { id: string }) {
         <aside>
           <section className="panel detail-panel">
             <h2>Next step</h2>
+            {clinical && !closed && (
+              <div className="button-row">
+                <button
+                  className="button"
+                  onClick={() => setModal("reassessment")}
+                >
+                  Report deterioration
+                </button>
+                <button
+                  className="button"
+                  onClick={() => setModal("subpriority")}
+                >
+                  Edit clinical subpriority
+                </button>
+                <button className="button" onClick={() => setModal("shortage")}>
+                  Record resource shortage
+                </button>
+              </div>
+            )}
+            {data.membership.role === "doctor" && (
+              <button
+                className="button spaced"
+                onClick={() => setModal("follow_up")}
+              >
+                Schedule follow-up
+              </button>
+            )}
+            {data.reassessments
+              .filter((r) => r.encounter_id === id)
+              .map((r) => (
+                <article className="history-item" key={r.id}>
+                  <strong>
+                    {r.resolved_at
+                      ? "Reassessment completed"
+                      : "Reassessment required"}
+                  </strong>
+                  <p>{r.reason}</p>
+                  <small>{time(r.created_at)}</small>
+                </article>
+              ))}
+            {data.shortages
+              .filter((r) => r.encounter_id === id)
+              .map((r) => (
+                <article className="history-item" key={r.id}>
+                  <strong>Resource shortage: {r.kind}</strong>
+                  <p>{r.reason}</p>
+                  <small>
+                    {time(r.created_at)} · Coordination alert recorded
+                  </small>
+                </article>
+              ))}
+            {data.followUps
+              .filter((r) => r.encounter_id === id)
+              .map((r) => (
+                <article className="history-item" key={r.id}>
+                  <strong>Follow-up: {time(r.due_at)}</strong>
+                  <p>{r.instructions}</p>
+                </article>
+              ))}
             <p>Validated transitions preserve the patient’s care history.</p>
             {!closed && (
               <button
@@ -291,15 +350,24 @@ export function Encounter({ id }: { id: string }) {
       {modal && (
         <Modal
           title={
-            modal === "assessment"
-              ? "Clinical assessment"
-              : modal === "qr"
-                ? "Secure patient pass"
-                : modal === "note"
-                  ? "Add care documentation"
-                  : modal === "referral"
-                    ? "Initiate referral"
-                    : "Update patient flow"
+            ["reassessment", "subpriority", "shortage", "follow_up"].includes(
+              modal,
+            )
+              ? {
+                  reassessment: "Report deterioration",
+                  subpriority: "Edit clinical subpriority",
+                  shortage: "Record resource shortage",
+                  follow_up: "Schedule follow-up",
+                }[modal]!
+              : modal === "assessment"
+                ? "Clinical assessment"
+                : modal === "qr"
+                  ? "Secure patient pass"
+                  : modal === "note"
+                    ? "Add care documentation"
+                    : modal === "referral"
+                      ? "Initiate referral"
+                      : "Update patient flow"
           }
           onClose={() => {
             setModal("");
@@ -315,7 +383,65 @@ export function Encounter({ id }: { id: string }) {
               className="stack-form"
               onSubmit={(event) => void formAction(event, modal)}
             >
-              {modal === "transition" ? (
+              {[
+                "reassessment",
+                "subpriority",
+                "shortage",
+                "follow_up",
+              ].includes(modal) ? (
+                <>
+                  <p className="form-note">
+                    Urgency remains unchanged until a qualified clinician
+                    reassesses. Contact staff directly for immediate help.
+                  </p>
+                  {modal === "subpriority" && (
+                    <Field label="Clinical subpriority (0–10)">
+                      <input
+                        type="number"
+                        name="sub_priority"
+                        min="0"
+                        max="10"
+                        step="1"
+                        required
+                        defaultValue={e.sub_priority}
+                      />
+                    </Field>
+                  )}
+                  {modal === "shortage" && (
+                    <Field label="Unavailable resource">
+                      <select name="kind">
+                        {[
+                          "General bed",
+                          "Emergency bed",
+                          "ICU bed",
+                          "Stretcher",
+                          "Wheelchair",
+                          "Equipment",
+                        ].map((k) => (
+                          <option key={k}>{k}</option>
+                        ))}
+                      </select>
+                    </Field>
+                  )}
+                  {modal === "follow_up" && (
+                    <Field label="Follow-up date and time (include timezone)">
+                      <input
+                        name="due_at"
+                        required
+                        placeholder="2026-12-01T09:00:00+05:30"
+                      />
+                    </Field>
+                  )}
+                  <Field label="Reason / instructions">
+                    <textarea
+                      name="reason"
+                      minLength={5}
+                      maxLength={3000}
+                      required
+                    />
+                  </Field>
+                </>
+              ) : modal === "transition" ? (
                 <>
                   <Field label="Next status">
                     <select name="status" required>

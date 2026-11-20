@@ -19,6 +19,8 @@ Tokens are generated with 32 random bytes and only their SHA-256 digest is store
 
 Database RPCs also include `escalate_alerts` (authenticated hospital member; overdue in-app alerts), and `archive_demo_tests` (demo-hospital administrator only; archives named synthetic test encounters without deleting data).
 
-Known API limits: generic command payload validation is supplemented by SQL checks rather than exhaustive per-operation Zod schemas; token rate limiting is per capability rather than globally distributed per IP; dashboard pagination is capped, not a full cursor API. These must be strengthened before real-world deployment.
+Known API limits: all current staff actions have strict per-operation Zod schemas supplemented by SQL authorization and state checks; token rate limiting is per capability rather than globally distributed per IP; dashboard pagination is capped, not a full cursor API. These must be strengthened before real-world deployment.
 
-Hospital selection is a preference, never an authorization credential. Explicit snapshot hospital IDs must match a current active membership. Requests without an explicit ID use an authorized saved preference or a stable authorized default when the preference has become stale. Every snapshot rechecks membership. Staff command requests enforce a 40,000-byte streamed body limit even without Content-Length; exhaustive action-specific schemas remain pending.
+Hospital selection is a preference, never an authorization credential. Explicit snapshot hospital IDs must match a current active membership. Requests without an explicit ID use an authorized saved preference or a stable authorized default when the preference has become stale. Every snapshot rechecks membership. Staff command requests enforce a 40,000-byte streamed body limit even without Content-Length; all current actions now have explicit schemas.
+
+New actions: reassessment (deterioration task, urgency unchanged), subpriority (0–10 within category), shortage (coordinator alert), maintenance (free resource only), follow_up (doctor with future timezone-aware date). Follow-up may be documented after disposition.

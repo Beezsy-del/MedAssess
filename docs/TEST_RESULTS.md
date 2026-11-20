@@ -48,3 +48,7 @@ Implemented and verified on 20 November 2026:
 - Multiple authorized memberships are covered in unit/API tests. The live browser fixture has one hospital, so a two-hospital UI switching scenario remains unverified.
 
 Explicit unauthorized hospital IDs now fail closed with HTTP 403 rather than loading the first membership. The hospital cookie stores only a preference and cannot grant access. Actual streamed byte limits now protect command and hospital-selection bodies when Content-Length is absent. This does not replace the still-pending action-specific command schemas or distributed rate limiting.
+
+## Master audit and workflow extension
+
+20 November 2026: 48 unit/API validation tests passed, 33 hosted integration assertions passed, and the nine-assertion RLS transaction suite passed again. Formatting, lint, typecheck and production build passed. Dependency audit: zero vulnerabilities. Supabase confirms 28/28 public tables have RLS and five migrations are applied. Expanded integration verifies task deduplication/resolution, category preservation during shortages, doctor-only follow-up, and transactional histories. A browser assertion using an invalid empty registration payload was corrected to use a valid operation ID so it continues testing authorization after stricter validation.

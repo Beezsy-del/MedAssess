@@ -15,8 +15,8 @@
 - Complete staff-interface translation, clinical language review, structured symptom catalog and normalized medical history.
 - Push/SMS delivery providers, specialization policies, background escalation worker, and real external referral/ambulance integration.
 - Full offline refresh capture, encrypted local drafts, automatic retention expiry, service-worker background sync and hospital LAN gateway.
-- Fine-grained department/assigned-patient read restrictions, exhaustive operation schemas, distributed IP abuse prevention and independent security assessment.
-- Full requested normalized schema, follow-up/prescription/protected-document workflows, routing recommendations and detailed staff availability.
+- Fine-grained department/assigned-patient read restrictions, distributed IP abuse prevention and independent security assessment.
+- Full requested normalized schema, prescription/protected-document workflows, routing recommendations and detailed staff availability.
 - Forecasts beyond hourly arrival means; patient-flow durations; complete report filtering and PDF output beyond browser print.
 - Server cursor pagination; dashboard snapshots cap recent encounters at 500, patients at 1000, and history queries at documented limits. This is not verified at large-hospital scale.
 - Hospital switching is implemented for multiple active memberships. Live browser verification currently covers one hospital; two-hospital selector switching still needs an end-to-end fixture. Selection clears unsaved forms, while saved offline drafts remain scoped to their original user and hospital.
