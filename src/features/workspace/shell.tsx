@@ -20,10 +20,15 @@ import {
   LogOut,
   RefreshCw,
   WifiOff,
+  ChevronDown,
+  Grid2X2,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useWorkspace } from "./context";
 import { clearOutbox } from "@/features/offline/outbox";
+import { Modal } from "@/components/ui";
+import { Brand } from "@/components/chrome";
+import { ThemeToggle } from "@/components/theme-toggle";
 const nav = [
   [
     "Workspace",
@@ -58,14 +63,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const navigationToggle = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (open)
-      document
-        .getElementById("workspace-navigation")
-        ?.querySelector<HTMLAnchorElement>("a")
-        ?.focus();
-  }, [open]);
   const [switching, setSwitching] = useState(false);
   async function switchHospital(hospital: string) {
     if (hospital === data.hospital.id) return;
@@ -109,164 +106,95 @@ export function Shell({ children }: { children: React.ReactNode }) {
     router.push("/login");
     router.refresh();
   }
+  const current =
+    nav
+      .map(([, items]) => items.find(([href]) => href === path)?.[1])
+      .find(Boolean) ??
+    (path.startsWith("/encounters") ? "Encounter" : "Workspace");
   return (
     <div className="app-shell">
       <a href="#main" className="skip">
         Skip to content
       </a>
-      <aside
-        id="workspace-navigation"
-        onKeyDown={(event) => {
-          if (event.key === "Escape") {
-            setOpen(false);
-            navigationToggle.current?.focus();
-          }
-        }}
-        className={`sidebar ${open ? "open" : ""}`}
-      >
-        <Link className="brand" href="/dashboard">
-          <span className="brand-symbol">
-            <Activity size={25} />
+      <header className="topbar">
+        <div className="topbar-left">
+          <Brand href="/dashboard" />
+          <button
+            className="workspace-trigger"
+            aria-label="Open navigation: Workspace"
+            aria-expanded={open}
+            aria-haspopup="dialog"
+            onClick={() => setOpen(true)}
+          >
+            <Grid2X2 size={17} />
+            <span>Workspace</span>
+            <ChevronDown size={14} />
+          </button>
+          <span className="breadcrumb">
+            <span>/</span>
+            {current}
           </span>
-          <span>
-            MedCipher<small>Hospital workspace</small>
+        </div>
+        <div className="topbar-actions">
+          <form className="global-search" action="/queues">
+            <Search size={16} />
+            <input
+              name="q"
+              aria-label="Search patients"
+              placeholder="Find an encounter…"
+            />
+          </form>
+          <button
+            className="icon-button"
+            aria-label="Refresh data"
+            onClick={() =>
+              void refresh().catch(() =>
+                setMessage("Refresh failed. Retry when connected."),
+              )
+            }
+          >
+            <RefreshCw size={17} />
+          </button>
+          <Link
+            href="/notifications"
+            className="notification-button"
+            aria-label={`${unread} alerts`}
+          >
+            <Bell size={18} />
+            {unread > 0 && <span>{unread}</span>}
+          </Link>
+          <ThemeToggle />
+          <span className="environment-label">
+            <ShieldCheck size={14} />
+            Synthetic demo
           </span>
-        </Link>
-        <div className="hospital-label">
-          <Building2 size={20} />
-          <div>
-            {data.hospitals.length > 1 ? (
-              <select
-                aria-label="Selected hospital"
-                value={data.hospital.id}
-                disabled={!online || busy || switching}
-                onChange={(event) => void switchHospital(event.target.value)}
-              >
-                {data.hospitals.map((hospital) => (
-                  <option key={hospital.id} value={hospital.id}>
-                    {hospital.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <strong>{data.hospital.name}</strong>
-            )}
-            <small>{data.hospital.location}</small>
-          </div>
-        </div>
-        {nav.map(([group, items]) => (
-          <nav key={group} aria-label={group}>
-            <p>{group}</p>
-            {items.map(([href, label, Icon]) => (
-              <Link
-                key={href}
-                href={href}
-                aria-current={path === href ? "page" : undefined}
-                onClick={() => setOpen(false)}
-                className={
-                  path === href ||
-                  (href === "/triage" && ["/queues", "/nurse"].includes(path))
-                    ? "active"
-                    : ""
-                }
-              >
-                <Icon size={18} />
-                {label}
-                {href === "/emergency-center" &&
-                  data.encounters.some((e) => e.emergency) && (
-                    <span className="nav-dot" />
-                  )}
-              </Link>
-            ))}
-          </nav>
-        ))}
-        <div className="sidebar-bottom">
-          <ShieldCheck size={18} />
-          <div>
-            <strong>Synthetic demo environment</strong>
-            <small>Clinical operations disabled</small>
-          </div>
-        </div>
-      </aside>
-      {open && (
-        <button
-          className="mobile-scrim"
-          aria-label="Close navigation"
-          onClick={() => setOpen(false)}
-        />
-      )}
-      <div className="workspace">
-        <header className="topbar">
-          <div className="topbar-left">
-            <button
-              className="icon-button mobile-only"
-              ref={navigationToggle}
-              aria-label="Open navigation"
-              aria-controls="workspace-navigation"
-              aria-expanded={open}
-              onClick={() => setOpen(!open)}
-            >
-              <Menu size={22} />
-            </button>
-            <span className="breadcrumb">
-              Hospital workspace <span>/</span>{" "}
-              {path.split("/")[1]?.replaceAll("-", " ")}
+          <Link href="/settings" className="user-chip">
+            <span className="avatar">
+              {data.membership.display_name
+                .split(" ")
+                .slice(0, 2)
+                .map((x) => x[0])
+                .join("")}
             </span>
-          </div>
-          <div className="topbar-actions">
-            <form className="global-search" action="/queues">
-              <Search size={16} />
-              <input
-                name="q"
-                aria-label="Search patients"
-                placeholder="Find a patient or encounter…"
-              />
-            </form>
-            <button
-              className="icon-button"
-              aria-label="Refresh data"
-              onClick={() =>
-                void refresh().catch(() =>
-                  setMessage("Refresh failed. Retry when connected."),
-                )
-              }
-            >
-              <RefreshCw size={17} />
-            </button>
-            <Link
-              href="/notifications"
-              className="notification-button"
-              aria-label={`${unread} alerts`}
-            >
-              <Bell size={19} />
-              {unread > 0 && <span>{unread}</span>}
-            </Link>
-            <Link href="/settings" className="user-chip">
-              <span className="avatar">
-                {data.membership.display_name
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((x) => x[0])
-                  .join("")}
-              </span>
-              <span>
-                {data.membership.display_name}
-                <small>{data.membership.role.replaceAll("_", " ")}</small>
-              </span>
-            </Link>
-            <button
-              className="icon-button"
-              onClick={() =>
-                void logout().catch(() =>
-                  setMessage("Sign-out unavailable. Retry when connected."),
-                )
-              }
-              aria-label="Log out and clear local drafts"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
-        </header>
+            <span>
+              {data.membership.display_name}
+              <small>{data.membership.role.replaceAll("_", " ")}</small>
+            </span>
+          </Link>
+          <button
+            className="icon-button"
+            onClick={() =>
+              void logout().catch(() =>
+                setMessage("Sign-out unavailable. Retry when connected."),
+              )
+            }
+            aria-label="Log out and clear local drafts"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </header>
+      <div className="workspace">
         {!online && (
           <div className="connection-banner">
             <WifiOff size={17} />
@@ -275,6 +203,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <main id="main">
+          <div className="hospital-context">
+            <Building2 size={15} />
+            <span>{data.hospital.name}</span>
+            <span className="hospital-location">{data.hospital.location}</span>
+            <span className="clinical-lock">
+              <ShieldCheck size={13} />
+              Clinical operations disabled
+            </span>
+          </div>
           {children}
           <details className="snapshot-note">
             <summary>
@@ -284,10 +221,90 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </details>
         </main>
         <footer className="workspace-footer">
-          <span>MedCipher · Clinical workflow prototype</span>
-          <span>Unvalidated demo protocol · Asia/Kolkata</span>
+          <span>
+            <Activity size={14} />
+            MedCipher
+          </span>
+          <span>Synthetic data only. Unvalidated clinical protocol.</span>
+          <span>Hospital workspace</span>
         </footer>
       </div>
+      <nav className="workspace-dock" aria-label="Quick navigation">
+        {(
+          [
+            ["/dashboard", "Overview", LayoutDashboard],
+            ["/reception", "Reception", ClipboardPlus],
+            ["/doctor", "Clinical", Stethoscope],
+            ["/resources", "Resources", BedDouble],
+          ] as const
+        ).map(([href, label, Icon]) => (
+          <Link
+            key={href}
+            href={href}
+            aria-current={path === href ? "page" : undefined}
+          >
+            <Icon size={19} />
+            <span>{label}</span>
+          </Link>
+        ))}
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="More workspaces"
+          aria-expanded={open}
+          aria-haspopup="dialog"
+        >
+          <Menu size={19} />
+          <span>More</span>
+        </button>
+      </nav>
+      {open && (
+        <Modal title="Workspace navigation" onClose={() => setOpen(false)}>
+          <div className="navigation-hospital">
+            <Building2 size={22} />
+            <div>
+              {data.hospitals.length > 1 ? (
+                <select
+                  aria-label="Selected hospital"
+                  value={data.hospital.id}
+                  disabled={!online || busy || switching}
+                  onChange={(event) => void switchHospital(event.target.value)}
+                >
+                  {data.hospitals.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <strong>{data.hospital.name}</strong>
+              )}
+              <p>{data.hospital.location}</p>
+            </div>
+          </div>
+          <div className="navigation-grid">
+            {nav.map(([group, items]) => (
+              <nav key={group} aria-label={group}>
+                <h3>{group}</h3>
+                {items.map(([href, label, Icon]) => (
+                  <Link
+                    href={href}
+                    key={href}
+                    aria-current={path === href ? "page" : undefined}
+                    onClick={() => setOpen(false)}
+                  >
+                    <Icon size={18} />
+                    <span>{label}</span>
+                  </Link>
+                ))}
+              </nav>
+            ))}
+          </div>
+          <div className="navigation-footer">
+            <ShieldCheck size={15} />
+            Synthetic demo. Clinical operations disabled.
+          </div>
+        </Modal>
+      )}
       {message && (
         <div className="toast" role="status">
           {message}

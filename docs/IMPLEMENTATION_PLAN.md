@@ -29,3 +29,5 @@ Core milestone checks passed as described in TEST_RESULTS.md. The supplied maste
 - [ ] Complete outstanding master functionality, production capacity/DR/privacy controls and qualified clinical review; no blanket readiness claim.
 
 - [x] Apply frontend-design and Emil Design Engineering to the existing hospital UI: typography, navigation, operational hierarchy, plain copy and keyboard navigation; preserve live workflows.
+
+- [x] Remodel the frontend using the user-supplied BloodFlow reference: header navigation, floating dock, live dashboard overview, shared operational components, public/patient screens and light/dark themes. Verification is tracked in BLOODFLOW_REMODEL.md.

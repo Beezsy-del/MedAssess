@@ -41,3 +41,5 @@ The exact master requirement inventory is retained in MASTER_REQUIREMENTS_CHECKL
 Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.
 
 UI refinement: shared staff chrome, queue, login and operational screens now use a quieter workbench design with larger text and explicit keyboard navigation. See UI_REFINEMENT.md; this is not a clinical readiness change.
+
+BloodFlow reference remodel: the shared frontend now uses header/dock navigation, a live encounter overview and persistent light/dark themes across staff and patient screens. See BLOODFLOW_REMODEL.md for scope and evidence. Existing feature and readiness limitations remain applicable.

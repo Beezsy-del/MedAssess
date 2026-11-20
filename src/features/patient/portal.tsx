@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Activity, Mic, ShieldCheck } from "lucide-react";
+import { Brand } from "@/components/chrome";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Mic, ShieldCheck } from "lucide-react";
 import { Field } from "@/components/ui";
 import { translations, type Language } from "./translations";
 type SpeechResult = {
@@ -121,13 +122,9 @@ export function PatientPortal({
       className={`patient-page ${large ? "large-text" : ""}`}
     >
       <header className="patient-header">
-        <Link className="brand" href="/">
-          <span className="brand-symbol">
-            <Activity />
-          </span>
-          MedCipher
-        </Link>
+        <Brand />
         <div className="button-row">
+          <ThemeToggle />
           <select
             aria-label={t.language}
             value={language}

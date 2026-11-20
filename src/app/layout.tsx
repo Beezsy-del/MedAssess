@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   referrer: "no-referrer",
 };
 export const viewport: Viewport = {
-  themeColor: "#651d38",
+  themeColor: "#920942",
   width: "device-width",
   initialScale: 1,
 };
@@ -20,7 +20,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{document.documentElement.dataset.theme=localStorage.getItem("medcipher-theme")==="dark"?"dark":"light"}catch{}',
+          }}
+        />
+      </head>
       <body>
         {children}
         <PWA />

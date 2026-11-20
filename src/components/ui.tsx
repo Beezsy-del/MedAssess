@@ -78,10 +78,17 @@ export function Modal({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const previous = document.activeElement;
+    const dialog = ref.current;
+    dialog?.showModal();
+    return () => {
+      dialog?.close();
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus();
+    };
   }, []);
   return (
-    <dialog ref={ref} onCancel={onClose} className="modal">
+    <dialog ref={ref} onCancel={onClose} className="modal" aria-label={title}>
       <div className="modal-head">
         <h2>{title}</h2>
         <button

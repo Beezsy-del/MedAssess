@@ -269,7 +269,9 @@ test("keyboard and responsive dashboard has no serious accessibility violations"
     path: "output/playwright/dashboard-mobile.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Open navigation" }).click();
+  await page
+    .getByRole("button", { name: "Open navigation: Workspace" })
+    .click();
   await expect(
     page.getByRole("link", { name: "SmartFlow", exact: true }),
   ).toBeVisible();
@@ -463,4 +465,43 @@ test("late snapshot responses cannot overwrite newer workspace data", async ({
   await expect(
     page.getByText("Synthetic newest snapshot", { exact: true }),
   ).toBeVisible();
+});
+
+test("workspace themes persist and navigation supports keyboard dismissal", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Light theme: Switch to dark theme" })
+    .click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  const dark = await new AxeBuilder({ page }).analyze();
+  expect(
+    dark.violations.filter((v) =>
+      ["critical", "serious"].includes(v.impact ?? ""),
+    ),
+  ).toEqual([]);
+  const trigger = page.getByRole("button", {
+    name: "Open navigation: Workspace",
+  });
+  await trigger.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await page
+    .getByRole("navigation", { name: "Quick navigation" })
+    .getByRole("link", { name: "Resources" })
+    .click();
+  await expect(page).toHaveURL(/\/resources$/);
+  await page
+    .getByRole("button", { name: "Dark theme: Switch to light theme" })
+    .click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });

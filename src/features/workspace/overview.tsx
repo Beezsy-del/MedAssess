@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { CareMap } from "@/components/chrome";
 import { ArrowRight, Plus, Clock3, ShieldCheck, Activity } from "lucide-react";
 import { useState } from "react";
 import { useWorkspace } from "./context";
@@ -76,6 +77,70 @@ export function Overview({
           <Plus size={17} /> Register patient
         </Link>
       </div>
+      {!queue && (
+        <section className="coordination-hero">
+          <div className="hero-copy">
+            <p className="hero-kicker">Hospital coordination</p>
+            <h2>
+              Assess urgency.
+              <br />
+              Coordinate the next step.
+            </h2>
+            <p>
+              Review active encounters, reassessment tasks and available
+              resources across your hospital.
+            </p>
+            <div className="button-row">
+              <Link href="/triage" className="button hero-primary">
+                <Activity size={17} />
+                Open triage queue
+              </Link>
+              <Link href="/smartflow" className="button hero-secondary">
+                View patient flow
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+          <div className="hero-network">
+            <CareMap
+              counts={{
+                pending: active.filter((e) => e.status === "TRIAGE_PENDING")
+                  .length,
+                assessment: active.filter((e) => e.status === "ASSESSMENT")
+                  .length,
+                treatment: active.filter((e) => e.status === "TREATMENT")
+                  .length,
+              }}
+            />
+            <div className="hero-workspaces">
+              <Link href="/reception">
+                <span>01</span>
+                <div>
+                  <strong>Patient registration</strong>
+                  <small>Encounters and secure intake passes</small>
+                </div>
+                <ArrowRight size={15} />
+              </Link>
+              <Link href="/doctor">
+                <span>02</span>
+                <div>
+                  <strong>Clinical workspace</strong>
+                  <small>Assessments, care notes and decisions</small>
+                </div>
+                <ArrowRight size={15} />
+              </Link>
+              <Link href="/resources">
+                <span>03</span>
+                <div>
+                  <strong>Resource coordination</strong>
+                  <small>Beds, availability and handovers</small>
+                </div>
+                <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
       <div className="demo-notice">
         <ShieldCheck size={17} />
         <span>

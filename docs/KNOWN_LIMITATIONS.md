@@ -34,3 +34,5 @@
 Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.
 
 The UI refinement preserves the same synthetic-only readiness boundaries. Automated accessibility checks and responsive screenshots do not replace assistive-technology testing with hospital users.
+
+The BloodFlow-inspired frontend remodel does not change these readiness limits. Theme selection is an optional browser-local preference; automated responsive and axe checks do not replace screen-reader and clinical-user usability evaluation. Wide patient tables and the flow board use internal horizontal scrolling on narrow screens.
