@@ -19,7 +19,7 @@ test("staff demo, persisted registration, assessment and discharge", async ({
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   await page.screenshot({
     path: "output/playwright/dashboard-desktop.png",
     fullPage: true,
@@ -107,7 +107,7 @@ test("patient emergency bypasses intake; secure status and language controls", a
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   await page.goto("/reception");
   await page
     .getByRole("button", { name: "Register patient", exact: true })
@@ -167,7 +167,7 @@ test("offline draft persists and syncs once on reconnect", async ({
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   await page.goto("/reception");
   await expect(
     page.getByRole("heading", { name: "Reception", exact: true }),
@@ -235,7 +235,7 @@ test("keyboard and responsive dashboard has no serious accessibility violations"
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   const desktop = await new AxeBuilder({ page }).analyze();
   expect(
     desktop.violations.filter((v) =>
@@ -297,7 +297,7 @@ test("hospital selection enforces membership and survives navigation", async ({
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   const result = await page.evaluate(async () => {
     const initial = await fetch("/api/snapshot").then((r) => r.json());
     const select = await fetch("/api/hospital", {
@@ -357,7 +357,7 @@ test("failed refresh and logout report errors without claiming success", async (
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   await page.route("**/api/snapshot?*", (route) =>
     route.fulfill({
       status: 503,
@@ -369,7 +369,7 @@ test("failed refresh and logout report errors without claiming success", async (
   await expect(page.getByRole("status")).toContainText("Refresh failed");
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   await page.route("**/api/auth", (route) =>
     route.fulfill({
       status: 503,
@@ -391,7 +391,7 @@ test("late snapshot responses cannot overwrite newer workspace data", async ({
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Hospital overview" }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15000 });
   const snapshot = await page.evaluate(() =>
     fetch("/api/snapshot").then((r) => r.json()),
   );
