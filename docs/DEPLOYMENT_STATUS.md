@@ -1,5 +1,7 @@
 # Deployment status
 
+Latest nurse-intake release (21 November 2026): application source `67c7f29fd5d6c8b2846e1886f8bb884562f21e6e`, production `dpl_EigRNPTfyzmKkUUkhVFYAkKtEQc4`, READY at https://medcipher-triage-platform.vercel.app. Immutable URL: https://medcipher-triage-platform-1klrj1m6b-bloodflow.vercel.app. Public sign-in returned HTTP 200; Triage Nurse reached /registration with no browser page errors. The scoped Vercel error/fatal count query returned no entries during the smoke-check window. Both additive intake migrations are applied (eight total), including preserved patient-report history. See NURSE_INTAKE.md for architecture, tests and limits. The older release evidence below is historical.
+
 Latest UI release: application source `0a5a5ff9315f7d0f3f0e4da6ff5068712330c107`, production `dpl_H9eL1fagaNfsX7pybtat1oUeezzm`, reached READY at https://medcipher-triage-platform.vercel.app. This is the BloodFlow reference remodel; see BLOODFLOW_REMODEL.md. Live sign-in returned HTTP 200. Both dashboard themes passed axe with no serious/critical findings and fit a 390px viewport. No browser page errors or Vercel error/fatal log entries were observed in the release smoke-check window. Database configuration is unchanged. The tables below preserve the preceding readiness-audit deployment evidence.
 
 Verified 20 November 2026. This is a synthetic demonstration, not clinical production readiness. See READINESS_AUDIT.md for separate readiness assessments and outstanding master requirements.
@@ -34,3 +36,7 @@ Post-promotion GitHub integration verification is recorded in [the main-branch v
 ## BloodFlow remodel acceptance
 
 Source `0a5a5ff` passed GitHub [run 44783771333](https://github.com/Beezsy-del/MedAssess/actions/runs/44783771333): verify and integration both succeeded, including 55 unit tests, 33 database assertions and nine hosted browser scenarios. Vercel production `dpl_H9eL1fagaNfsX7pybtat1oUeezzm` is READY and serves the canonical host. Local production-build workflows also passed (nine in 45.5 seconds); 16 routes were scanned in both themes at four viewport widths. Subsequent documentation-only commits record the evidence without changing application source.
+
+## Nurse intake hosted acceptance
+
+[GitHub run 44817041177](https://github.com/Beezsy-del/MedAssess/actions/runs/44817041177) passed verify and integration for `67c7f29`: 61 unit tests, 49 hosted database assertions and 13 live browser scenarios in 3.3 minutes, plus formatting/lint/types/build/dependency audit. Production `dpl_EigRNPTfyzmKkUUkhVFYAkKtEQc4` serves the canonical host. Release `v0.3.0-demo` includes the deployment link. Subsequent documentation-only commits record results without changing the deployed application source. GitHub reports a deprecation notice for the pinned actions' Node 20 runtime, which it executes under Node 24; both jobs succeeded. No monitoring/clinical-readiness claims are inferred from the short runtime-log window.
