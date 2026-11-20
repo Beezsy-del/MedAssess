@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from "react";
 import type { Snapshot } from "@/lib/data";
 import { browserClient } from "@/lib/supabase/browser";
@@ -33,7 +34,9 @@ export function WorkspaceProvider({
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [online, setOnline] = useState(true);
+  const refreshSequence = useRef(0);
   const refresh = useCallback(async () => {
+    const sequence = ++refreshSequence.current;
     const response = await fetch(`/api/snapshot?hospital=${data.hospital.id}`, {
       cache: "no-store",
     });
@@ -41,7 +44,8 @@ export function WorkspaceProvider({
       throw new Error(
         "Unable to refresh. Check your connection or sign in again.",
       );
-    setData(await response.json());
+    const next = await response.json();
+    if (sequence === refreshSequence.current) setData(next);
   }, [data.hospital.id]);
   useEffect(() => {
     const update = () => setOnline(navigator.onLine);

@@ -85,7 +85,7 @@ export function PatientPortal({
         ...f,
         symptoms,
         language,
-        emergency: warning === "yes",
+        emergency: warning === "" ? null : warning === "yes",
         consent: f.consent === "on",
       });
       setStatus(await call("status"));
@@ -185,7 +185,6 @@ export function PatientPortal({
               <Field label={t.warning}>
                 <select
                   value={warning}
-                  required
                   onChange={(e) => {
                     setWarning(e.target.value);
                     if (e.target.value === "yes") void emergency();

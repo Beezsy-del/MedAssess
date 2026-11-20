@@ -483,7 +483,9 @@ export function Encounter({ id }: { id: string }) {
                     <select name="kind">
                       <option>Assessment</option>
                       <option>Treatment</option>
-                      <option>Investigation</option>
+                      {data.membership.role === "doctor" && (
+                        <option>Investigation</option>
+                      )}
                       <option>Handover</option>
                     </select>
                   </Field>

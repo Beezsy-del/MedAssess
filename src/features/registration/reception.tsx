@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import QRCode from "qrcode";
@@ -30,6 +30,7 @@ export function QRToken({
 }) {
   const [image, setImage] = useState("");
   const [copied, setCopied] = useState(false);
+  const [qrError, setQrError] = useState("");
   const [url] = useState(
     () => `${window.location.origin}/patient/intake/${token}`,
   );
@@ -38,7 +39,13 @@ export function QRToken({
       width: 240,
       margin: 2,
       errorCorrectionLevel: "M",
-    }).then(setImage);
+    })
+      .then(setImage)
+      .catch(() =>
+        setQrError(
+          "QR image unavailable. Use the intake link or ask reception for assistance.",
+        ),
+      );
   }, [url]);
   return (
     <div className="qr-token">
@@ -55,6 +62,7 @@ export function QRToken({
       )}
       <p>Private encounter link · expires in 24 hours</p>
       <p>No smartphone? Reception can assist you.</p>
+      {qrError && <p role="alert">{qrError}</p>}
       <div className="button-row">
         <button className="button" onClick={() => window.print()}>
           <Printer size={16} /> Print pass
@@ -62,7 +70,14 @@ export function QRToken({
         <button
           className="button"
           onClick={() =>
-            void navigator.clipboard.writeText(url).then(() => setCopied(true))
+            void navigator.clipboard
+              .writeText(url)
+              .then(() => setCopied(true))
+              .catch(() =>
+                setQrError(
+                  "Copy failed. Open the intake link or print the pass.",
+                ),
+              )
           }
         >
           <Copy size={16} />
@@ -86,17 +101,30 @@ export function Reception() {
     [outbox, setOutbox] = useState<OutboxItem[]>([]),
     [syncing, setSyncing] = useState(false),
     [error, setError] = useState("");
-  const load = () => listOutbox().then(setOutbox);
+  const load = useCallback(
+    () => listOutbox(data.userId, data.hospital.id).then(setOutbox),
+    [data.userId, data.hospital.id],
+  );
   useEffect(() => {
-    void load();
-  }, []);
+    void load().catch(() =>
+      setError(
+        "Device drafts could not be opened. Keep this device and ask for support.",
+      ),
+    );
+  }, [load]);
   async function sync() {
     setSyncing(true);
     try {
-      const count = await syncOutbox(data.userId, data.hospital.id);
+      const result = await syncOutbox(data.userId, data.hospital.id);
       await load();
       await refresh();
-      setMessage(`${count} offline registrations synchronized.`);
+      setMessage(
+        `${result.synced} offline registrations synchronized. ${result.failed ? `${result.failed} drafts retained for retry.` : ""}`,
+      );
+    } catch {
+      setError(
+        "Synchronization or refresh unavailable. Unsynchronized drafts remain on this device.",
+      );
     } finally {
       setSyncing(false);
     }

@@ -1,0 +1,35 @@
+{
+  "at": "2026-11-20T13:33:15.544Z",
+  "scope": "Synthetic remote smoke load; not capacity certification",
+  "concurrency": 5,
+  "results": [
+    {
+      "check": "20 registrations, concurrency 5",
+      "pass": true,
+      "success": 20
+    },
+    {
+      "check": "10 simultaneous retries of one operation",
+      "pass": false,
+      "success": 6,
+      "persisted": 1,
+      "errorCodes": ["23505"]
+    },
+    {
+      "check": "10 simultaneous emergency reports",
+      "pass": true,
+      "alerts": 1
+    },
+    {
+      "check": "5 competing resource reservations",
+      "pass": true,
+      "winners": 1
+    }
+  ],
+  "latencyMs": {
+    "samples": 40,
+    "p50": 397,
+    "p95": 1227,
+    "max": 1244
+  }
+}

@@ -188,23 +188,31 @@ export function Resources() {
                     {encounter.reference}
                   </Link>
                 )}
-                <button
-                  disabled={busy}
-                  className={`button full ${r.status === "AVAILABLE" ? "primary" : ""}`}
-                  onClick={() =>
-                    r.status === "AVAILABLE"
-                      ? (setResource(r.id), setError(""))
-                      : void command("release", { resource_id: r.id }).catch(
-                          () => {},
-                        )
-                  }
-                >
-                  {r.status === "AVAILABLE"
-                    ? "Reserve resource"
-                    : r.status === "CLEANING"
-                      ? "Confirm cleaned & available"
-                      : "Release for cleaning"}
-                </button>
+                {[
+                  "doctor",
+                  "nurse",
+                  "emergency_coordinator",
+                  "resource_manager",
+                ].includes(data.membership.role) &&
+                  r.status !== "MAINTENANCE" && (
+                    <button
+                      disabled={busy}
+                      className={`button full ${r.status === "AVAILABLE" ? "primary" : ""}`}
+                      onClick={() =>
+                        r.status === "AVAILABLE"
+                          ? (setResource(r.id), setError(""))
+                          : void command("release", {
+                              resource_id: r.id,
+                            }).catch(() => {})
+                      }
+                    >
+                      {r.status === "AVAILABLE"
+                        ? "Reserve resource"
+                        : r.status === "CLEANING"
+                          ? "Confirm cleaned & available"
+                          : "Release for cleaning"}
+                    </button>
+                  )}
                 {[
                   "resource_manager",
                   "emergency_coordinator",

@@ -183,7 +183,47 @@ test("offline draft persists and syncs once on reconnect", async ({
   await expect(
     page.getByText("1 drafts on this device.", { exact: false }),
   ).toBeVisible();
+  const stored = await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("medcipher-device-capture", 2);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return new Promise<{ encrypted: boolean; plaintext: boolean }>(
+      (resolve) => {
+        const request = db.transaction("outbox").objectStore("outbox").getAll();
+        request.onsuccess = () => {
+          const row = request.result[0];
+          resolve({
+            encrypted: row.ciphertext instanceof ArrayBuffer,
+            plaintext: "data" in row,
+          });
+          db.close();
+        };
+      },
+    );
+  });
+  expect(stored).toEqual({ encrypted: true, plaintext: false });
+  await page.route("**/api/command", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: '{"error":"Synthetic provider outage"}',
+    }),
+  );
   await context.setOffline(false);
+  await expect(
+    page
+      .getByText(
+        "Synchronization failed. Draft retained; retry when connected.",
+      )
+      .first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("1 drafts on this device.", { exact: false }),
+  ).toBeVisible();
+  await page.unroute("**/api/command");
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(
     page.getByText("0 drafts on this device.", { exact: false }),
   ).toBeVisible({ timeout: 30000 });
@@ -308,4 +348,38 @@ test("hospital selection enforces membership and survives navigation", async ({
   ).toBeVisible();
   await page.getByLabel("Filter assignment").selectOption("unassigned");
   await expect(page.getByLabel("Filter assignment")).toHaveValue("unassigned");
+});
+
+test("failed refresh and logout report errors without claiming success", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  await page.route("**/api/snapshot?*", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: '{"error":"Synthetic database outage"}',
+    }),
+  );
+  await page.getByRole("button", { name: "Refresh data", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Refresh failed");
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  await page.route("**/api/auth", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: '{"error":"Synthetic authentication outage"}',
+    }),
+  );
+  await page
+    .getByRole("button", { name: "Log out and clear local drafts" })
+    .click();
+  await expect(page.getByRole("status")).toContainText("Sign-out failed");
+  await expect(page).toHaveURL(/dashboard/);
 });

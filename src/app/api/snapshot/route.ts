@@ -1,5 +1,5 @@
 import { HospitalAccessError } from "@/lib/hospital-selection";
-import { snapshot } from "@/lib/data";
+import { snapshot, AuthenticationRequiredError } from "@/lib/data";
 export async function GET(request: Request) {
   try {
     return Response.json(
@@ -12,7 +12,12 @@ export async function GET(request: Request) {
     return Response.json(
       { error: "Unable to load hospital. Sign in again or retry." },
       {
-        status: error instanceof HospitalAccessError ? 403 : 401,
+        status:
+          error instanceof HospitalAccessError
+            ? 403
+            : error instanceof AuthenticationRequiredError
+              ? 401
+              : 503,
         headers: { "Cache-Control": "private, no-store" },
       },
     );

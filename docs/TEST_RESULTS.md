@@ -62,3 +62,11 @@ Production verification identified two issues before final sign-off: a concurren
 ## Final hosted release verification
 
 Production source commit `3fc98d87591c59eaa4140823b9ab842a6443393e`, deployment `dpl_9baWgHgsycJ4qynjckqvKoTMWWX5`, reached READY. All six production Playwright scenarios passed in 43.4 seconds after the contrast fix. The corrected preview accessibility check passed in 8.6 seconds. The production login endpoint returned HTTP 200 without a deployment bypass. Latest application-source GitHub CI run 44735530373 passed. Runtime error/fatal query found no entries in the verification window. Temporary automation bypass was revoked after testing. No full master acceptance or clinical validation is claimed.
+
+## Independent readiness audit revision
+
+Local full check (format, lint without warnings, strict types, 55 tests, optimized build) passed. Seven browser scenarios passed in 50.6 seconds against live synthetic data, including encrypted draft inspection, simulated 503 retention/retry and explicit failed refresh/logout messages. The existing 33 hosted integration assertions passed. Extended SQL audit passed for eight staff roles and two tenants. Hosted smoke-load results and baseline are retained in AUDIT_LOAD_RESULTS.json and AUDIT_LOAD_BASELINE.json.
+
+Realtime delivered an update, then delivered another after an explicit disconnect/resubscription. The first new harness attempt failed because asynchronous disconnect was not awaited; corrected probe awaits socket shutdown and passed both assertions. This is a controlled reconnect test, not a long-partition resilience certification.
+
+Runtime production dependencies: npm audit reports zero known vulnerabilities. Provider security warnings and untested capacity/DR/privacy controls remain in READINESS_AUDIT.md. Six migrations are applied and 28/28 public tables have RLS.

@@ -87,11 +87,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
   ).length;
   async function logout() {
     await clearOutbox();
-    await fetch("/api/auth", {
+    const response = await fetch("/api/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "logout" }),
     });
+    if (!response.ok) {
+      setMessage(
+        "Sign-out failed. Your local drafts were cleared; retry sign-out when connected.",
+      );
+      return;
+    }
     router.push("/login");
     router.refresh();
   }
@@ -229,7 +235,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </Link>
             <button
               className="icon-button"
-              onClick={() => void logout()}
+              onClick={() =>
+                void logout().catch(() =>
+                  setMessage("Sign-out unavailable. Retry when connected."),
+                )
+              }
               aria-label="Log out and clear local drafts"
             >
               <LogOut size={18} />
@@ -243,7 +253,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
             communication requires direct staff assistance.
           </div>
         )}
-        <main id="main">{children}</main>
+        <main id="main">
+          <p className="muted">{data.coverage}</p>
+          {children}
+        </main>
         <footer className="workspace-footer">
           <span>MedCipher · Clinical workflow prototype</span>
           <span>Unvalidated demo protocol · Asia/Kolkata</span>

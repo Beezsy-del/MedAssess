@@ -14,11 +14,11 @@
 - Full clinician-reviewed configurable rule/scoring engine and protocol approval lifecycle.
 - Complete staff-interface translation, clinical language review, structured symptom catalog and normalized medical history.
 - Push/SMS delivery providers, specialization policies, background escalation worker, and real external referral/ambulance integration.
-- Full offline refresh capture, encrypted local drafts, automatic retention expiry, service-worker background sync and hospital LAN gateway.
+- Full offline refresh capture, automatic retention expiry, service-worker background sync and hospital LAN gateway.
 - Fine-grained department/assigned-patient read restrictions, distributed IP abuse prevention and independent security assessment.
 - Full requested normalized schema, prescription/protected-document workflows, routing recommendations and detailed staff availability.
 - Forecasts beyond hourly arrival means; patient-flow durations; complete report filtering and PDF output beyond browser print.
-- Server cursor pagination; dashboard snapshots cap recent encounters at 500, patients at 1000, and history queries at documented limits. This is not verified at large-hospital scale.
+- Server cursor pagination; active encounters are paged up to an explicit 10,000 demo ceiling; closed encounters are capped at 500 and history queries remain bounded. This is not verified at large-hospital scale.
 - Hospital switching is implemented for multiple active memberships. Live browser verification currently covers one hospital; two-hospital selector switching still needs an end-to-end fixture. Selection clears unsaved forms, while saved offline drafts remain scoped to their original user and hospital.
 - Browser push, microphone recording, recovery email delivery, real multi-device reconnect, and all-route screen-reader testing have not been exercised.
 
@@ -30,3 +30,5 @@
 - The compact clinical input model intentionally has no unreviewed physiological cutoffs. Missing information requires human assessment; no autonomous diagnosis or GREEN classification exists.
 - Automatic in-app escalation currently runs during authenticated snapshot refresh. It is not an independently scheduled emergency paging service.
 - Test records remain auditable. The provided reset archives active `Synthetic …` cases, rather than destructively resetting remote data.
+
+Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.

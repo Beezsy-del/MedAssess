@@ -93,9 +93,71 @@ try {
   console.log(
     "PASS: authenticated Supabase Realtime delivered the committed encounter update.",
   );
+  await db.removeChannel(channel);
+  await db.realtime.disconnect();
+  db.realtime.connect();
+  let resolveReconnect;
+  const afterReconnect = new Promise((resolve) => {
+    resolveReconnect = resolve;
+  });
+  const reconnected = db.channel(`reconnect-${randomUUID()}`).on(
+    "postgres_changes",
+    {
+      event: "UPDATE",
+      schema: "public",
+      table: "patient_encounters",
+      filter: `id=eq.${registered.data.id}`,
+    },
+    (event) => resolveReconnect(event),
+  );
+  await new Promise((resolve, reject) => {
+    const subscriptionTimer = setTimeout(
+      () => reject(Error("Reconnect timed out")),
+      20000,
+    );
+    reconnected.subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        clearTimeout(subscriptionTimer);
+        resolve();
+      }
+      if (["CHANNEL_ERROR", "TIMED_OUT"].includes(status)) {
+        clearTimeout(subscriptionTimer);
+        reject(Error("Reconnect failed"));
+      }
+    });
+  });
+  assert.equal(
+    (
+      await db.rpc("staff_command", {
+        p_hospital: hospital,
+        p_action: "subpriority",
+        p_data: {
+          encounter_id: registered.data.id,
+          sub_priority: 2,
+          reason: "Synthetic reconnect verification",
+        },
+      })
+    ).error,
+    null,
+  );
+  const resumed = await Promise.race([
+    afterReconnect,
+    new Promise((_, reject) => {
+      timer = setTimeout(
+        () => reject(Error("Resumed delivery timed out")),
+        20000,
+      );
+    }),
+  ]);
+  assert.equal(resumed.new.sub_priority, 2);
+  clearTimeout(timer);
+  await db.removeChannel(reconnected);
+  console.log(
+    "PASS: delivery resumed after explicit disconnect and resubscription.",
+  );
 } finally {
   clearTimeout(timer);
   await db.removeChannel(channel);
   await db.auth.signOut({ scope: "local" });
-  db.realtime.disconnect();
+  await db.realtime.disconnect();
 }

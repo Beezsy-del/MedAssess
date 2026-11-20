@@ -87,14 +87,7 @@ export const actionSchemas = {
     ),
   note: z.strictObject({
     ...encounter,
-    kind: z.enum([
-      "Assessment",
-      "Treatment",
-      "Investigation",
-      "Handover",
-      "Discharge",
-      "Admission",
-    ]),
+    kind: z.enum(["Assessment", "Treatment", "Investigation", "Handover"]),
     note: text(5000).min(5),
   }),
   reserve: z.strictObject({ ...encounter, resource_id: uuid }),

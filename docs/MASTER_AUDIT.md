@@ -43,7 +43,7 @@ The following requested tables are still absent (some data currently lives in en
 - Complete staff menus, validation and instructions in Kannada and Hindi; large-text preference.
 - Provider-backed browser push/SMS, delivery attempts, specialized recipient policies and scheduled background escalation.
 - Fine-grained department/assigned-patient read authorization and cursor pagination.
-- Full offline-refresh registration, encrypted local drafts, retention policy, background sync and gateway integration where requested.
+- Full offline-refresh registration, retention policy, background sync and gateway integration where requested.
 - Prescription/protected-document workflows, detailed availability/routing recommendations and scheduled maintenance.
 - Complete date/department reports, patient-flow durations, bed/referral/department forecasts and PDF exports.
 - Full seven-scenario master acceptance coverage, installation/voice hardware checks and all-route accessibility/load tests.
@@ -52,3 +52,5 @@ The following requested tables are still absent (some data currently lives in en
 ## Changes made in this audit
 
 Added eight RLS-protected workflow tables and transactional integration for reassessment, deterioration, shortages, follow-up, resource status, dispositions, investigations and acknowledgements. Added clinical subpriority and maintenance commands, strict payload validation for all current staff operations, and safe HTTP errors. Added new hosted integration and browser coverage. No clinical protocols were approved and no existing records were destructively reset.
+
+Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.
