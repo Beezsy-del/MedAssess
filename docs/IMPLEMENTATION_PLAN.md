@@ -1,0 +1,21 @@
+# Implementation milestones
+
+- [x] Inspect workspace and requirements: empty directory, no existing Git remote; existing empty Supabase project identified.
+- [x] Foundation: Next.js, strict TypeScript, design tokens, responsive shell, core public/staff routes.
+- [x] Core backend: 20-table schema, protected memberships, RLS, transactional commands, generated types.
+- [x] Core registration: separate patient/encounter, secure QR, intake, assisted and unidentified entry.
+- [x] Safe demonstration clinical core: emergency signs, assessment-required handling, human verification, history and decimal score.
+- [x] Core coordination: category-preserving queues, in-app alerts, Realtime plus polling, shared clinical workspace.
+- [x] Core operations: validated SmartFlow, resource locking, referral lifecycle, doctor disposition.
+- [x] Device-level offline capture on open authorized screens and idempotent reconnect sync.
+- [x] Basic administration: aggregate metrics, arrival baseline, configuration, shifts, audit, CSV.
+- [x] Unit, hosted integration, RLS and primary browser scenario verification.
+- [ ] Expanded features from master prompts: detailed gaps are tracked in FEATURE_STATUS.md.
+- [ ] Full translations, reviewed protocols, provider notification channels, advanced offline and operational analytics.
+- [ ] GitHub repository and CI execution: account authentication blocked.
+- [ ] Vercel preview and deployed acceptance: team authorization blocked.
+- [ ] Production: remaining acceptance and requested final deployment approval.
+
+Product brand: MedCipher. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
+
+Core milestone checks passed as described in TEST_RESULTS.md. The supplied master acceptance milestone is not complete; external access and feature-development gaps are explicitly distinguished.

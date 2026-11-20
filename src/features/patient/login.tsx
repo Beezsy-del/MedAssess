@@ -1,0 +1,159 @@
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Activity, ArrowRight, ShieldCheck } from "lucide-react";
+import { Field } from "@/components/ui";
+export function Login({
+  demo = false,
+  reset = false,
+}: {
+  demo?: boolean;
+  reset?: boolean;
+}) {
+  const router = useRouter();
+  const [message, setMessage] = useState(""),
+    [busy, setBusy] = useState(false);
+  async function login(payload: Record<string, unknown>) {
+    setBusy(true);
+    try {
+      const r = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await r.json();
+      if (!r.ok) throw new Error(result.error);
+      if (reset) setMessage(result.message);
+      else {
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "Unable to sign in");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <main className="login-layout">
+      <section className="login-story">
+        <Link href="/" className="brand">
+          <span className="brand-symbol">
+            <Activity size={28} />
+          </span>
+          MedCipher
+        </Link>
+        <div>
+          <p>Intelligent clinical coordination</p>
+          <h1>
+            More clarity.
+            <br />
+            Better coordination.
+            <br />
+            One care journey.
+          </h1>
+          <p>
+            From the first assessment to the next handover, keep your team
+            connected around the patient.
+          </p>
+          <div className="login-flow">
+            <span>Assess</span>
+            <ArrowRight />
+            <span>Coordinate</span>
+            <ArrowRight />
+            <span>Care</span>
+          </div>
+        </div>
+        <small>Clinical workflow prototype · Built for hospital teams</small>
+      </section>
+      <section className="login-form">
+        <div>
+          <p className="page-context">Staff workspace</p>
+          <h2>{reset ? "Reset your password" : "Welcome to MedCipher"}</h2>
+          <p>
+            {reset
+              ? "Request a secure recovery link."
+              : "Sign in with your hospital-issued account."}
+          </p>
+          <form
+            className="stack-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void login({
+                ...Object.fromEntries(new FormData(e.currentTarget)),
+                action: reset ? "reset" : "login",
+              });
+            }}
+          >
+            <Field label="Work email">
+              <input name="email" type="email" autoComplete="email" required />
+            </Field>
+            {!reset && (
+              <Field label="Password">
+                <input
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  minLength={8}
+                />
+              </Field>
+            )}
+            <button className="button primary" disabled={busy}>
+              {busy
+                ? "Please wait…"
+                : reset
+                  ? "Request recovery email"
+                  : "Sign in"}
+              <ArrowRight size={16} />
+            </button>
+          </form>
+          {message && (
+            <p className="form-note" role="status">
+              {message}
+            </p>
+          )}
+          <Link
+            className="text-link"
+            href={reset ? "/login" : "/forgot-password"}
+          >
+            {reset ? "Return to sign in" : "Forgot your password?"}
+          </Link>
+          {demo && !reset && (
+            <div className="demo-login">
+              <div>
+                <ShieldCheck size={18} />
+                <strong>Explore the working demo</strong>
+              </div>
+              <p>
+                Synthetic patients, real persisted workflows. Choose a staff
+                role.
+              </p>
+              <div className="button-row">
+                {["doctor", "nurse", "admin"].map((role) => (
+                  <button
+                    className="button"
+                    key={role}
+                    disabled={busy}
+                    onClick={() => void login({ action: "demo", role })}
+                  >
+                    {role === "admin"
+                      ? "Administrator"
+                      : role === "doctor"
+                        ? "Doctor"
+                        : "Triage nurse"}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <p className="muted">
+            Need emergency assistance?{" "}
+            <Link href="/emergency">Contact nearby staff now.</Link>
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}

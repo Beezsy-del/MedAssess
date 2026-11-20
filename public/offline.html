@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MedCipher — offline</title>
+    <style>
+      body {
+        font: 16px/1.7 system-ui;
+        background: #f5f6f8;
+        color: #252634;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 24px;
+      }
+      h1 {
+        color: #651d38;
+      }
+      a,
+      button {
+        color: #651d38;
+      }
+      button,
+      input,
+      textarea {
+        font: inherit;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+      input,
+      textarea {
+        display: block;
+        width: 90%;
+        margin: 8px 0 20px;
+      }
+      .notice {
+        padding: 16px;
+        background: #fff4d5;
+        border-radius: 8px;
+      }
+      label {
+        display: block;
+      }
+      button {
+        cursor: pointer;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="/icon.svg" alt="" width="48" height="48" />
+    <h1>You’re offline.</h1>
+    <p class="notice">
+      For emergency assistance, contact nearby staff directly. This device
+      cannot notify other devices without a connection.
+    </p>
+    <p>
+      Previously saved registration drafts remain on this device. Return to the
+      still-open Reception screen to capture an authorized offline registration.
+    </p>
+    <p>
+      After a full offline refresh, staff authentication cannot be verified.
+      This public fallback does not collect patient information.
+    </p>
+    <p>
+      Reconnect, sign in, then open Reception and choose “Sync now”. Records use
+      unique operation IDs to avoid duplicate creation.
+    </p>
+    <button onclick="location.reload()">Try reconnecting</button>
+    <p>MedCipher · Synthetic demonstration only</p>
+  </body>
+</html>

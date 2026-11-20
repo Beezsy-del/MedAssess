@@ -1,0 +1,217 @@
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+test("staff demo, persisted registration, assessment and discharge", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "output/playwright/dashboard-desktop.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("link", { name: "Register patient", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Register patient", exact: true })
+    .click();
+  const name = `Synthetic E2E ${Date.now()}`;
+  await page.getByLabel("Full name", { exact: true }).fill(name);
+  await page.getByLabel("Age (if known)").fill("35");
+  await page
+    .getByLabel("Presenting complaint")
+    .fill("Synthetic mild ankle discomfort");
+  await page.getByRole("button", { name: "Create encounter & QR" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Encounter created" }),
+  ).toBeVisible();
+  const href = await page
+    .getByRole("link", { name: "Open intake" })
+    .getAttribute("href");
+  expect(href).toContain("/patient/intake/");
+  await page.getByRole("button", { name: "Close dialog" }).click();
+  await page
+    .getByRole("link", { name: new RegExp(name) })
+    .first()
+    .click();
+  await page.getByRole("button", { name: "Assess patient" }).click();
+  await page.getByLabel("I have performed a human clinical assessment").check();
+  await page.getByLabel("Clinician-confirmed category").selectOption("GREEN");
+  await page
+    .getByLabel("Clinical reasoning / reason for override")
+    .fill(
+      "Synthetic clinician assessment completed; non-immediate category confirmed for software testing.",
+    );
+  await page.getByRole("button", { name: "Save clinical assessment" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  for (const status of [
+    "WAITING",
+    "STAFF_ASSIGNED",
+    "ASSESSMENT",
+    "TREATMENT",
+    "DISPOSITION",
+    "DISCHARGED",
+  ]) {
+    await page.getByRole("button", { name: "Update patient flow" }).click();
+    await page.getByLabel("Next status").selectOption(status);
+    if (status === "STAFF_ASSIGNED")
+      await page
+        .getByLabel("Assign clinician")
+        .selectOption({ label: "Dr. Ananya Rao" });
+    await page
+      .getByLabel("Handover / disposition")
+      .fill(
+        "Synthetic handover and discharge instructions documented. Follow up with staff if symptoms worsen.",
+      );
+    await page.getByRole("button", { name: "Save to encounter" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  }
+  await expect(
+    page.getByText("discharged", { exact: true }).first(),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByText("discharged", { exact: true }).first(),
+  ).toBeVisible();
+});
+test("patient emergency bypasses intake; secure status and language controls", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  await page.goto("/reception");
+  await page
+    .getByRole("button", { name: "Register patient", exact: true })
+    .click();
+  await page
+    .getByLabel("Full name", { exact: true })
+    .fill(`Synthetic portal ${Date.now()}`);
+  await page.getByRole("button", { name: "Create encounter & QR" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Encounter created" }),
+  ).toBeVisible();
+  const href = await page
+    .getByRole("link", { name: "Open intake" })
+    .getAttribute("href");
+  const patient = await context.newPage();
+  await patient.goto(href!);
+  await expect(
+    patient.getByRole("heading", { name: "Your care starts here" }),
+  ).toBeVisible();
+  await patient.getByLabel("Language", { exact: true }).selectOption("hi");
+  await expect(
+    patient.getByRole("heading", { name: "आपकी देखभाल यहाँ शुरू होती है" }),
+  ).toBeVisible();
+  await patient.getByLabel("भाषा", { exact: true }).selectOption("en");
+  await patient
+    .getByRole("button", { name: "Request immediate staff assistance" })
+    .click();
+  await expect(patient.getByRole("status")).toContainText(
+    "Assistance request recorded",
+  );
+  await patient
+    .getByLabel("What is troubling you?")
+    .fill("Synthetic severe breathing difficulty");
+  await patient.getByLabel("I understand this information").check();
+  await patient.getByRole("button", { name: "Send to care team" }).click();
+  await expect(
+    patient.getByRole("heading", {
+      name: "Your information has been received",
+    }),
+  ).toBeVisible();
+  await patient.setViewportSize({ width: 390, height: 844 });
+  await patient.screenshot({
+    path: "output/playwright/patient-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await patient.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+test("offline draft persists and syncs once on reconnect", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  await page.goto("/reception");
+  await expect(
+    page.getByRole("heading", { name: "Reception", exact: true }),
+  ).toBeVisible();
+  await context.setOffline(true);
+  await page
+    .getByRole("button", { name: "Register patient", exact: true })
+    .click();
+  await page
+    .getByLabel("Full name", { exact: true })
+    .fill(`Synthetic offline ${Date.now()}`);
+  await page.getByRole("button", { name: "Save offline registration" }).click();
+  await expect(
+    page.getByText("1 drafts on this device.", { exact: false }),
+  ).toBeVisible();
+  await context.setOffline(false);
+  await expect(
+    page.getByText("0 drafts on this device.", { exact: false }),
+  ).toBeVisible({ timeout: 30000 });
+});
+test("keyboard and responsive dashboard has no serious accessibility violations", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  const desktop = await new AxeBuilder({ page }).analyze();
+  expect(
+    desktop.violations.filter((v) =>
+      ["critical", "serious"].includes(v.impact ?? ""),
+    ),
+  ).toEqual([]);
+  for (const width of [768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(
+      await page.evaluate(() => ({
+        fits: document.documentElement.scrollWidth <= window.innerWidth,
+        width: window.innerWidth,
+        scroll: document.documentElement.scrollWidth,
+      })),
+    ).toMatchObject({ fits: true, width });
+  }
+  await page.screenshot({
+    path: "output/playwright/dashboard-mobile.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(
+    page.getByRole("link", { name: "SmartFlow", exact: true }),
+  ).toBeVisible();
+});
+test("unauthenticated staff routes redirect and public emergency guidance stays available", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/login/);
+  await page.goto("/emergency");
+  await expect(
+    page.getByRole("heading", { name: "Get help from hospital staff now." }),
+  ).toBeVisible();
+  const response = await request.post("/api/command", {
+    data: { hospital: crypto.randomUUID(), action: "register", data: {} },
+    headers: { Origin: "http://localhost:3000" },
+  });
+  expect(response.status()).toBe(403);
+});

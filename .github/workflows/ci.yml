@@ -1,0 +1,55 @@
+name: Verify MedCipher
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: build-placeholder-not-a-secret
+      - run: npm audit --audit-level=high
+  # Database and browser suites use dedicated synthetic infrastructure.
+  # Run only in a protected environment after review; never expose credentials to fork PRs.
+  integration:
+    if: github.event_name == 'push' && vars.RUN_DEMO_INTEGRATION == 'true'
+    runs-on: ubuntu-latest
+    environment: synthetic-demo
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: node scripts/integration-check.mjs
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          DEMO_DOCTOR_EMAIL: ${{ secrets.DEMO_DOCTOR_EMAIL }}
+          DEMO_DOCTOR_PASSWORD: ${{ secrets.DEMO_DOCTOR_PASSWORD }}
+          DEMO_NURSE_EMAIL: ${{ secrets.DEMO_NURSE_EMAIL }}
+          DEMO_NURSE_PASSWORD: ${{ secrets.DEMO_NURSE_PASSWORD }}
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          BASE_URL: ${{ vars.DEMO_PREVIEW_URL }}
