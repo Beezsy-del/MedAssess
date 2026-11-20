@@ -22,3 +22,9 @@ Verified 20 November 2026. This is a synthetic demonstration, not clinical produ
 Preview protection remains enabled. A temporary automation bypass was used only for preview acceptance. Production acceptance uses the public canonical host without a bypass. No real patient data, destructive reset or force push was used.
 
 Supabase password-recovery delivery, leaked-password protection, provider log redaction, operational backup/restore evidence and independent security review remain unresolved. GitHub integration CI tests the configured hosted target: deploying new code is a separate step, so pre-deployment test failures must not be treated as evidence that a newer release is deployed.
+
+## Final hosted acceptance
+
+Production dpl_HEYpJneZHUafoWeerHH7KxdHtZPi passed all eight browser scenarios in 53.8 seconds, including forced snapshot response reordering, failed auth/snapshot responses and encrypted offline retention/retry. Public login returned HTTP 200 (0.43 seconds in the availability probe). Error/fatal runtime-log count query returned no entries in the verification window. The preview automation bypass was revoked and its ignored local credential file removed.
+
+Post-promotion GitHub integration verification is recorded in [run 44748224481](https://github.com/Beezsy-del/MedAssess/actions/runs/44748224481); consult the job results for the authoritative status. The latest documentation commits contain audit evidence/tests only; application source remains e14343a. The verify job includes formatting, lint, strict types, 55 unit tests, production build and dependency audit; integration runs 33 hosted assertions plus eight browser scenarios.
