@@ -215,3 +215,63 @@ test("unauthenticated staff routes redirect and public emergency guidance stays 
   });
   expect(response.status()).toBe(403);
 });
+
+test("hospital selection enforces membership and survives navigation", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  const result = await page.evaluate(async () => {
+    const initial = await fetch("/api/snapshot").then((r) => r.json());
+    const select = await fetch("/api/hospital", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hospital: initial.hospital.id }),
+    });
+    const foreign = "99999999-9999-4999-8999-999999999999";
+    const denied = await fetch(`/api/snapshot?hospital=${foreign}`);
+    const deniedSwitch = await fetch("/api/hospital", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hospital: foreign }),
+    });
+    return {
+      selected: select.status,
+      denied: denied.status,
+      deniedSwitch: deniedSwitch.status,
+      hospital: initial.hospital.id,
+    };
+  });
+  expect(result.selected).toBe(200);
+  expect(result.denied).toBe(403);
+  expect(result.deniedSwitch).toBe(403);
+  await page.goto("/doctor");
+  await expect(
+    page.getByRole("heading", { name: "Clinical workspace" }),
+  ).toBeVisible();
+  await page.getByLabel("Filter assignment").selectOption("mine");
+  const expected = await page.evaluate(async () => {
+    const data = await fetch("/api/snapshot").then((r) => r.json());
+    return {
+      hospital: data.hospital.id,
+      mine: data.encounters.filter(
+        (e: { assigned_to: string | null; status: string }) =>
+          e.assigned_to === data.userId &&
+          !["DISCHARGED", "TRANSFERRED", "CANCELLED", "ADMITTED"].includes(
+            e.status,
+          ),
+      ).length,
+    };
+  });
+  expect(expected.hospital).toBe(result.hospital);
+  await expect(
+    page.getByText(
+      `${expected.mine} encounters · Clinical urgency always comes first`,
+    ),
+  ).toBeVisible();
+  await page.getByLabel("Filter assignment").selectOption("unassigned");
+  await expect(page.getByLabel("Filter assignment")).toHaveValue("unassigned");
+});

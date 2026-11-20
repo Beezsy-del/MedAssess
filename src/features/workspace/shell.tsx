@@ -19,7 +19,6 @@ import {
   Menu,
   LogOut,
   RefreshCw,
-  ChevronDown,
   WifiOff,
 } from "lucide-react";
 import { useState } from "react";
@@ -55,10 +54,34 @@ const nav = [
   ],
 ] as const;
 export function Shell({ children }: { children: React.ReactNode }) {
-  const { data, online, message, setMessage, refresh } = useWorkspace();
+  const { data, online, message, setMessage, refresh, busy } = useWorkspace();
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [switching, setSwitching] = useState(false);
+  async function switchHospital(hospital: string) {
+    if (hospital === data.hospital.id) return;
+    setSwitching(true);
+    try {
+      const response = await fetch("/api/hospital", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hospital }),
+      });
+      if (!response.ok)
+        throw new Error(
+          "Hospital switch failed. Refresh and check your access.",
+        );
+      // A new document clears forms, old requests and prefetched tenant pages.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- tenant switch must discard the entire previous workspace and router cache
+      window.location.assign("/dashboard");
+    } catch (error) {
+      setMessage(
+        error instanceof Error ? error.message : "Hospital switch failed.",
+      );
+      setSwitching(false);
+    }
+  }
   const unread = data.notifications.filter(
     (n) => n.status === "CREATED" || n.status === "ESCALATED",
   ).length;
@@ -89,10 +112,24 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="hospital-label">
           <Building2 size={20} />
           <div>
-            <strong>{data.hospital.name}</strong>
+            {data.hospitals.length > 1 ? (
+              <select
+                aria-label="Selected hospital"
+                value={data.hospital.id}
+                disabled={!online || busy || switching}
+                onChange={(event) => void switchHospital(event.target.value)}
+              >
+                {data.hospitals.map((hospital) => (
+                  <option key={hospital.id} value={hospital.id}>
+                    {hospital.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <strong>{data.hospital.name}</strong>
+            )}
             <small>{data.hospital.location}</small>
           </div>
-          <ChevronDown size={15} />
         </div>
         {nav.map(([group, items]) => (
           <nav key={group} aria-label={group}>

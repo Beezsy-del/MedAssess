@@ -35,3 +35,16 @@ Browser screenshots are in `output/playwright/`. Hosted tests retain synthetic a
 - The demo archive authorization check needed an explicit NULL-membership rejection; corrected before final acceptance and tested for unauthorized clinical roles.
 
 Final verification: formatting, lint, typecheck, all 33 domain tests and production build passed. The full five-scenario Playwright run passed in 27.3 seconds. The latest RLS suite passed after all four migrations; 20/20 public tables have RLS. Hosted integration passed 27 assertions. Dependency audit found zero vulnerabilities. No feature is considered clinically validated by these tests.
+
+## Hospital workspace continuation
+
+Implemented and verified on 20 November 2026:
+
+- 43 Vitest tests passed (33 existing domain tests plus 10 hospital authorization/request-body tests).
+- All six Playwright scenarios passed in 30.7 seconds, including live membership rejection, saved hospital preference across navigation, and assigned/unassigned queue controls.
+- Formatting, TypeScript and production build passed. ESLint passed without warnings after documenting the intentional full-document reload for hospital switching.
+- Existing registration, patient emergency, offline sync, accessibility and responsive scenarios all passed again.
+- No database schema changes were needed. Hosted RPC integration and transaction RLS suites were not rerun in this continuation; their previous results above remain historical.
+- Multiple authorized memberships are covered in unit/API tests. The live browser fixture has one hospital, so a two-hospital UI switching scenario remains unverified.
+
+Explicit unauthorized hospital IDs now fail closed with HTTP 403 rather than loading the first membership. The hospital cookie stores only a preference and cannot grant access. Actual streamed byte limits now protect command and hospital-selection bodies when Content-Length is absent. This does not replace the still-pending action-specific command schemas or distributed rate limiting.

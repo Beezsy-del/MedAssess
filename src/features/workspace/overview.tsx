@@ -25,7 +25,8 @@ export function Overview({
   const { data, online } = useWorkspace();
   const [filter, setFilter] = useState("All patients"),
     [search, setSearch] = useState(initialQuery),
-    [department, setDepartment] = useState("");
+    [department, setDepartment] = useState(""),
+    [assignment, setAssignment] = useState("");
   const active = data.encounters.filter(
     (e) => !terminalStatuses.includes(e.status),
   );
@@ -45,6 +46,10 @@ export function Overview({
             ? overdue.includes(e)
             : e.category === filter)) &&
       (!department || e.department_id === department) &&
+      (!assignment ||
+        (assignment === "mine"
+          ? e.assigned_to === data.userId
+          : e.assigned_to === null)) &&
       (!search ||
         `${data.patients.find((p) => p.id === e.patient_id)?.name} ${e.reference} ${e.symptoms}`
           .toLowerCase()
@@ -175,6 +180,15 @@ export function Overview({
                   {d.name}
                 </option>
               ))}
+            </select>
+            <select
+              aria-label="Filter assignment"
+              value={assignment}
+              onChange={(e) => setAssignment(e.target.value)}
+            >
+              <option value="">All assignments</option>
+              <option value="mine">Assigned to me</option>
+              <option value="unassigned">Unassigned</option>
             </select>
           </div>
           <PatientTable encounters={displayed} />

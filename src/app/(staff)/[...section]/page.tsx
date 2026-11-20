@@ -102,7 +102,7 @@ export default async function StaffPage({
       );
   }
   return (
-    <WorkspaceProvider initial={initial}>
+    <WorkspaceProvider key={initial.hospital.id} initial={initial}>
       <Shell>{content}</Shell>
     </WorkspaceProvider>
   );

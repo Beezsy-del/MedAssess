@@ -19,7 +19,7 @@
 - Full requested normalized schema, follow-up/prescription/protected-document workflows, routing recommendations and detailed staff availability.
 - Forecasts beyond hourly arrival means; patient-flow durations; complete report filtering and PDF output beyond browser print.
 - Server cursor pagination; dashboard snapshots cap recent encounters at 500, patients at 1000, and history queries at documented limits. This is not verified at large-hospital scale.
-- Hospital selector currently displays the selected default membership; switching multiple memberships in the UI remains to implement.
+- Hospital switching is implemented for multiple active memberships. Live browser verification currently covers one hospital; two-hospital selector switching still needs an end-to-end fixture. Selection clears unsaved forms, while saved offline drafts remain scoped to their original user and hospital.
 - Browser push, microphone recording, recovery email delivery, real multi-device reconnect, and all-route screen-reader testing have not been exercised.
 
 ## Known design boundaries

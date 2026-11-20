@@ -10,6 +10,7 @@
 - [x] Device-level offline capture on open authorized screens and idempotent reconnect sync.
 - [x] Basic administration: aggregate metrics, arrival baseline, configuration, shifts, audit, CSV.
 - [x] Unit, hosted integration, RLS and primary browser scenario verification.
+- [x] Membership-checked hospital preference, fail-closed explicit selection, full-document workspace switch, assigned/unassigned queue filters, and bounded command request bodies.
 - [ ] Expanded features from master prompts: detailed gaps are tracked in FEATURE_STATUS.md.
 - [ ] Full translations, reviewed protocols, provider notification channels, advanced offline and operational analytics.
 - [ ] GitHub repository and CI execution: account authentication blocked.

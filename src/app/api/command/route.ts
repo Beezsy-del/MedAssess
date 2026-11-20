@@ -1,3 +1,4 @@
+import { readBoundedJson } from "@/lib/request-json";
 import { z } from "zod";
 import { session } from "@/lib/data";
 import type { Json } from "@/lib/supabase/database.types";
@@ -25,9 +26,16 @@ const schema = z.object({
 export async function POST(request: Request) {
   if (request.headers.get("origin") !== new URL(request.url).origin)
     return Response.json({ error: "Invalid origin" }, { status: 403 });
-  if (Number(request.headers.get("content-length") ?? 0) > 40000)
-    return Response.json({ error: "Request too large" }, { status: 413 });
-  const parsed = schema.safeParse(await request.json().catch(() => null));
+  let body: unknown;
+  try {
+    body = await readBoundedJson(request, 40000);
+  } catch {
+    return Response.json(
+      { error: "Request too large or unreadable." },
+      { status: 413, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+  const parsed = schema.safeParse(body);
   if (!parsed.success)
     return Response.json(
       { error: "Check the required fields." },

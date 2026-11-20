@@ -1,4 +1,6 @@
 import "server-only";
+import { cookies } from "next/headers";
+import { hospitalCookie, selectMembership } from "./hospital-selection";
 import { serverClient } from "./supabase/server";
 import type { Database } from "./supabase/database.types";
 export type Row<T extends keyof Database["public"]["Tables"]> =
@@ -20,12 +22,16 @@ export async function session() {
 export async function snapshot(hospitalId?: string) {
   const s = await session();
   if (!s) throw new Error("Sign in with an authorized hospital account.");
-  const membership =
-    s.memberships.find((x) => x.hospital_id === hospitalId) ?? s.memberships[0];
+  const membership = selectMembership(
+    s.memberships,
+    hospitalId,
+    (await cookies()).get(hospitalCookie)?.value,
+  );
   const h = membership.hospital_id;
   await s.db.rpc("escalate_alerts", { p_hospital: h });
   const [
     hospital,
+    hospitals,
     encounters,
     patients,
     departments,
@@ -45,6 +51,14 @@ export async function snapshot(hospitalId?: string) {
     vitals,
   ] = await Promise.all([
     s.db.from("hospitals").select("*").eq("id", h).single(),
+    s.db
+      .from("hospitals")
+      .select("id, name")
+      .in(
+        "id",
+        s.memberships.map((m) => m.hospital_id),
+      )
+      .order("name"),
     s.db
       .from("patient_encounters")
       .select("*")
@@ -104,6 +118,7 @@ export async function snapshot(hospitalId?: string) {
   ]);
   const responses = [
     hospital,
+    hospitals,
     encounters,
     patients,
     departments,
@@ -130,6 +145,7 @@ export async function snapshot(hospitalId?: string) {
     userId: s.user.id,
     membership,
     memberships: s.memberships,
+    hospitals: hospitals.data!,
     hospital: hospital.data!,
     encounters: encounters.data!,
     patients: patients.data!,
