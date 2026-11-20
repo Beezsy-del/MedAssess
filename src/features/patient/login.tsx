@@ -45,32 +45,35 @@ export function Login({
           MedCipher
         </Link>
         <div>
-          <p>Intelligent clinical coordination</p>
           <h1>
-            More clarity.
+            Patient triage
             <br />
-            Better coordination.
-            <br />
-            One care journey.
+            and hospital flow.
           </h1>
           <p>
-            From the first assessment to the next handover, keep your team
-            connected around the patient.
+            A shared workspace for registration, clinical assessment and
+            handover.
           </p>
-          <div className="login-flow">
-            <span>Assess</span>
-            <ArrowRight />
-            <span>Coordinate</span>
-            <ArrowRight />
-            <span>Care</span>
-          </div>
+          <dl className="login-details">
+            <div>
+              <dt>Reception</dt>
+              <dd>Register an encounter and issue its patient pass.</dd>
+            </div>
+            <div>
+              <dt>Clinical team</dt>
+              <dd>Review urgency, document care and reassess.</dd>
+            </div>
+            <div>
+              <dt>Coordination</dt>
+              <dd>Track beds, referrals and each patient’s next step.</dd>
+            </div>
+          </dl>
         </div>
-        <small>Clinical workflow prototype · Built for hospital teams</small>
+        <small>Synthetic demonstration. Not for clinical use.</small>
       </section>
       <section className="login-form">
         <div>
-          <p className="page-context">Staff workspace</p>
-          <h2>{reset ? "Reset your password" : "Welcome to MedCipher"}</h2>
+          <h2>{reset ? "Reset your password" : "Staff sign in"}</h2>
           <p>
             {reset
               ? "Request a secure recovery link."
@@ -124,11 +127,10 @@ export function Login({
             <div className="demo-login">
               <div>
                 <ShieldCheck size={18} />
-                <strong>Explore the working demo</strong>
+                <strong>Try a staff role</strong>
               </div>
               <p>
-                Synthetic patients, real persisted workflows. Choose a staff
-                role.
+                Explore with synthetic patients. Changes are saved in the demo.
               </p>
               <div className="button-row">
                 {["doctor", "nurse", "admin"].map((role) => (

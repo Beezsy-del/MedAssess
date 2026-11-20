@@ -40,10 +40,8 @@ export function SmartFlow() {
       <div className="page-heading">
         <div>
           <p className="page-context">MedCipher SmartFlow</p>
-          <h1>Every patient. Every next step.</h1>
-          <p>
-            Follow the care journey with accountable, timestamped handovers.
-          </p>
+          <h1>Patient flow</h1>
+          <p>Track each encounter from registration to disposition.</p>
         </div>
         <select
           aria-label="Department filter"
@@ -662,7 +660,7 @@ export function Analytics() {
     <>
       <div className="page-heading">
         <div>
-          <p className="page-context">Operational intelligence</p>
+          <p className="page-context">Hospital activity</p>
           <h1>Analytics & forecasting</h1>
           <p>
             Aggregate hospital activity. No individual clinical predictions.
@@ -837,9 +835,7 @@ export function Settings({ section }: { section: string }) {
                 ? "Staff & shifts"
                 : "Settings"}
           </h1>
-          <p>
-            Trusted roles, explicit review, and hospital-specific operations.
-          </p>
+          <p>Manage hospital settings, staff shifts and resources.</p>
         </div>
       </div>
       <div className="detail-grid">

@@ -19,7 +19,12 @@ export function PatientTable({
       />
     );
   return (
-    <div className="table-wrap">
+    <div
+      className="table-wrap"
+      tabIndex={0}
+      role="region"
+      aria-label="Patient encounter table"
+    >
       <table className="patient-table">
         <thead>
           <tr>
@@ -43,22 +48,11 @@ export function PatientTable({
               <tr key={e.id}>
                 <td>
                   <Link className="patient-cell" href={`/encounters/${e.id}`}>
-                    <span
-                      className={`patient-avatar ${e.category.toLowerCase()}`}
-                    >
-                      {p?.unidentified
-                        ? "?"
-                        : p?.name
-                            .split(" ")
-                            .slice(0, 2)
-                            .map((x) => x[0])
-                            .join("")}
-                    </span>
                     <span>
                       <strong>{p?.name ?? "Patient"}</strong>
                       <small>
                         {e.reference} <span>·</span>{" "}
-                        {p?.age === null ? "Age unknown" : `${p?.age} yrs`}
+                        {p?.age == null ? "Age unknown" : `${p?.age} yrs`}
                       </small>
                     </span>
                   </Link>

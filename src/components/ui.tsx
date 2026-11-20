@@ -1,6 +1,6 @@
 "use client";
 import type { Category } from "@/features/clinical/engine";
-import { X, ArrowUpRight, Inbox } from "lucide-react";
+import { X, Inbox } from "lucide-react";
 import { useEffect, useRef } from "react";
 export function Badge({ category }: { category: Category }) {
   return (
@@ -63,7 +63,7 @@ export function SectionTitle({
   return (
     <div className="section-title">
       <h2>{title}</h2>
-      {children ?? <ArrowUpRight size={17} aria-hidden="true" />}
+      {children}
     </div>
   );
 }

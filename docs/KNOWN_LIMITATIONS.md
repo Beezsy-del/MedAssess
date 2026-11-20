@@ -32,3 +32,5 @@
 - Test records remain auditable. The provided reset archives active `Synthetic …` cases, rather than destructively resetting remote data.
 
 Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.
+
+The UI refinement preserves the same synthetic-only readiness boundaries. Automated accessibility checks and responsive screenshots do not replace assistive-technology testing with hospital users.

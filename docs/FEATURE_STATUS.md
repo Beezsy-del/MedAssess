@@ -39,3 +39,5 @@ A green local build does not mark the master acceptance milestone complete. `KNO
 The exact master requirement inventory is retained in MASTER_REQUIREMENTS_CHECKLIST.md. Full acceptance is not complete; the remaining gaps above are not waived by deployment.
 
 Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.
+
+UI refinement: shared staff chrome, queue, login and operational screens now use a quieter workbench design with larger text and explicit keyboard navigation. See UI_REFINEMENT.md; this is not a clinical readiness change.

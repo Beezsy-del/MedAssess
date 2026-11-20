@@ -27,3 +27,5 @@ Core milestone checks passed as described in TEST_RESULTS.md. The supplied maste
 - [x] Execute eight-role/two-tenant transactional audit, bounded synthetic concurrency load, 10,000-row queue sort, browser outage/recovery scenarios and explicit Realtime resubscription.
 - [x] Publish separate demonstration, pilot, technical and clinical readiness assessment in READINESS_AUDIT.md.
 - [ ] Complete outstanding master functionality, production capacity/DR/privacy controls and qualified clinical review; no blanket readiness claim.
+
+- [x] Apply frontend-design and Emil Design Engineering to the existing hospital UI: typography, navigation, operational hierarchy, plain copy and keyboard navigation; preserve live workflows.

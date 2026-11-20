@@ -21,7 +21,7 @@ import {
   RefreshCw,
   WifiOff,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useWorkspace } from "./context";
 import { clearOutbox } from "@/features/offline/outbox";
 const nav = [
@@ -58,6 +58,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const navigationToggle = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (open)
+      document
+        .getElementById("workspace-navigation")
+        ?.querySelector<HTMLAnchorElement>("a")
+        ?.focus();
+  }, [open]);
   const [switching, setSwitching] = useState(false);
   async function switchHospital(hospital: string) {
     if (hospital === data.hospital.id) return;
@@ -106,13 +114,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <a href="#main" className="skip">
         Skip to content
       </a>
-      <aside className={`sidebar ${open ? "open" : ""}`}>
+      <aside
+        id="workspace-navigation"
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            setOpen(false);
+            navigationToggle.current?.focus();
+          }
+        }}
+        className={`sidebar ${open ? "open" : ""}`}
+      >
         <Link className="brand" href="/dashboard">
           <span className="brand-symbol">
             <Activity size={25} />
           </span>
           <span>
-            MedCipher<small>Connected care. Clear decisions.</small>
+            MedCipher<small>Hospital workspace</small>
           </span>
         </Link>
         <div className="hospital-label">
@@ -144,6 +161,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Link
                 key={href}
                 href={href}
+                aria-current={path === href ? "page" : undefined}
                 onClick={() => setOpen(false)}
                 className={
                   path === href ||
@@ -182,7 +200,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="topbar-left">
             <button
               className="icon-button mobile-only"
+              ref={navigationToggle}
               aria-label="Open navigation"
+              aria-controls="workspace-navigation"
+              aria-expanded={open}
               onClick={() => setOpen(!open)}
             >
               <Menu size={22} />
@@ -254,8 +275,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         )}
         <main id="main">
-          <p className="muted">{data.coverage}</p>
           {children}
+          <details className="snapshot-note">
+            <summary>
+              Data coverage: active encounters and recent history
+            </summary>
+            <p>{data.coverage}</p>
+          </details>
         </main>
         <footer className="workspace-footer">
           <span>MedCipher · Clinical workflow prototype</span>

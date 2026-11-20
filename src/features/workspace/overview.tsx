@@ -1,13 +1,6 @@
 "use client";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Plus,
-  Clock3,
-  ShieldCheck,
-  BedDouble,
-  Activity,
-} from "lucide-react";
+import { ArrowRight, Plus, Clock3, ShieldCheck, Activity } from "lucide-react";
 import { useState } from "react";
 import { useWorkspace } from "./context";
 import { PatientTable } from "./patient-table";
@@ -72,14 +65,12 @@ export function Overview({
             <span className="live-label">
               <span />{" "}
               {online
-                ? "Connected to hospital"
+                ? `Updated ${new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }).format(new Date(data.loadedAt))}`
                 : "Offline — last received data"}
             </span>
           </p>
           <h1>{title}</h1>
-          <p>
-            A clear view of your patients, priorities, and hospital capacity.
-          </p>
+          <p>Review the queue, assess patients and coordinate the next step.</p>
         </div>
         <Link href="/reception" className="button primary">
           <Plus size={17} /> Register patient
@@ -88,8 +79,8 @@ export function Overview({
       <div className="demo-notice">
         <ShieldCheck size={17} />
         <span>
-          Synthetic demonstration data. Clinical decisions require qualified
-          staff. This protocol is not validated.
+          Synthetic demo only. Clinical use is disabled; the protocol is not
+          validated.
         </span>
         <Link href="/settings/triage-protocol">
           View protocol <ArrowRight size={14} />
@@ -98,7 +89,7 @@ export function Overview({
       <div className="metrics">
         <Metric
           label="Active encounters"
-          value={active.length.toString().padStart(2, "0")}
+          value={active.length.toString()}
           detail="Across all departments"
         />
         <Metric
@@ -106,28 +97,24 @@ export function Overview({
           value={
             <>
               <span className="critical-number">
-                {critical.length.toString().padStart(2, "0")}
+                {critical.length.toString()}
               </span>
               <span className="metric-divider">/</span>
-              {active
-                .filter((e) => e.category === "YELLOW")
-                .length.toString()
-                .padStart(2, "0")}
+              {active.filter((e) => e.category === "YELLOW").length.toString()}
             </>
           }
           detail="Red / yellow clinical categories"
         />
         <Metric
           label="Awaiting assessment"
-          value={pending.length.toString().padStart(2, "0")}
+          value={pending.length.toString()}
           detail="Human triage required"
         />
         <Metric
           label="Available beds"
           value={data.resources
             .filter((r) => r.kind.includes("bed") && r.status === "AVAILABLE")
-            .length.toString()
-            .padStart(2, "0")}
+            .length.toString()}
           detail={`${data.resources.filter((r) => r.kind.includes("bed")).length} beds in registered inventory`}
         />
       </div>
@@ -208,48 +195,55 @@ export function Overview({
             <section className="attention-panel">
               <div className="section-title">
                 <h2>
-                  <Activity size={17} /> Needs attention
+                  <Activity size={17} /> Review flags
                 </h2>
                 <span className="count-label">
                   {critical.length + overdue.length}
                 </span>
               </div>
-              {critical.map((e) => (
-                <Link
-                  key={e.id}
-                  href={`/encounters/${e.id}`}
-                  className="attention-item"
-                >
-                  <span className="alert-line" />
-                  <div>
-                    <strong>Emergency assessment</strong>
-                    <p>
-                      {data.patients.find((p) => p.id === e.patient_id)?.name}
-                    </p>
-                    <small>{e.symptoms}</small>
-                  </div>
-                  <ArrowRight size={15} />
-                </Link>
-              ))}
-              {overdue.map((e) => (
-                <Link
-                  key={e.id}
-                  href={`/encounters/${e.id}`}
-                  className="attention-item"
-                >
-                  <Clock3 size={18} />
-                  <div>
-                    <strong>Reassessment overdue</strong>
-                    <p>
-                      {data.patients.find((p) => p.id === e.patient_id)?.name}
-                    </p>
-                    <small>Review observations and current priority</small>
-                  </div>
-                </Link>
-              ))}
-              {!critical.length && !overdue.length && (
-                <Empty title="No current review flags" />
-              )}
+              <div
+                className="attention-list"
+                tabIndex={0}
+                role="region"
+                aria-label="Clinical review flags"
+              >
+                {critical.map((e) => (
+                  <Link
+                    key={e.id}
+                    href={`/encounters/${e.id}`}
+                    className="attention-item"
+                  >
+                    <span className="alert-line" />
+                    <div>
+                      <strong>Critical assessment</strong>
+                      <p>
+                        {data.patients.find((p) => p.id === e.patient_id)?.name}
+                      </p>
+                      <small>{e.symptoms}</small>
+                    </div>
+                    <ArrowRight size={15} />
+                  </Link>
+                ))}
+                {overdue.map((e) => (
+                  <Link
+                    key={e.id}
+                    href={`/encounters/${e.id}`}
+                    className="attention-item"
+                  >
+                    <Clock3 size={18} />
+                    <div>
+                      <strong>Reassessment overdue</strong>
+                      <p>
+                        {data.patients.find((p) => p.id === e.patient_id)?.name}
+                      </p>
+                      <small>Review observations and current priority</small>
+                    </div>
+                  </Link>
+                ))}
+                {!critical.length && !overdue.length && (
+                  <Empty title="No current review flags" />
+                )}
+              </div>
               <Link href="/emergency-center" className="rail-link">
                 Open coordination centre <ArrowRight size={15} />
               </Link>
@@ -282,23 +276,13 @@ export function Overview({
                 Manage departments <ArrowRight size={15} />
               </Link>
             </section>
-            <div className="handover-note">
-              <BedDouble size={21} />
-              <div>
-                <strong>Keep the next step clear.</strong>
-                <p>Record every handover and disposition in SmartFlow.</p>
-                <Link href="/smartflow">
-                  Open SmartFlow <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
           </aside>
         )}
       </div>
       <section className="flow-summary">
         <div>
-          <h2>The patient journey</h2>
-          <p>Every transition recorded. Every handover accountable.</p>
+          <h2>Patient flow</h2>
+          <p>Encounters by recorded stage.</p>
         </div>
         <div className="flow-steps">
           {[
@@ -307,9 +291,8 @@ export function Overview({
             ["ASSESSMENT", "Assessment"],
             ["TREATMENT", "Treatment"],
             ["DISCHARGED", "Discharged"],
-          ].map(([status, label], i) => (
+          ].map(([status, label]) => (
             <Link key={status} href="/smartflow">
-              <span className="step-index">{i + 1}</span>
               <span>
                 {label}
                 <strong>
