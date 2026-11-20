@@ -35,17 +35,32 @@ export function WorkspaceProvider({
     [message, setMessage] = useState(""),
     [online, setOnline] = useState(true);
   const refreshSequence = useRef(0);
+  const latestRefresh = useRef<Promise<void> | null>(null);
   const refresh = useCallback(async () => {
     const sequence = ++refreshSequence.current;
-    const response = await fetch(`/api/snapshot?hospital=${data.hospital.id}`, {
-      cache: "no-store",
-    });
-    if (!response.ok)
-      throw new Error(
-        "Unable to refresh. Check your connection or sign in again.",
+    const pending = (async () => {
+      const response = await fetch(
+        `/api/snapshot?hospital=${data.hospital.id}`,
+        {
+          cache: "no-store",
+        },
       );
-    const next = await response.json();
-    if (sequence === refreshSequence.current) setData(next);
+      if (!response.ok)
+        throw new Error(
+          "Unable to refresh. Check your connection or sign in again.",
+        );
+      const next = await response.json();
+      if (sequence === refreshSequence.current) setData(next);
+    })();
+    latestRefresh.current = pending;
+    await pending;
+    // A command cannot finish on an ignored response: wait for the newer
+    // snapshot before allowing the next versioned mutation.
+    let settled = pending;
+    while (latestRefresh.current && latestRefresh.current !== settled) {
+      settled = latestRefresh.current;
+      await settled;
+    }
   }, [data.hospital.id]);
   useEffect(() => {
     const update = () => setOnline(navigator.onLine);
