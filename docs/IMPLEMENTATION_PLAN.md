@@ -16,7 +16,8 @@
 - [ ] Full translations, reviewed protocols, provider notification channels, advanced offline and operational analytics.
 - [x] GitHub MedAssess repository published and verify CI passed.
 - [x] Vercel preview built and six hosted browser scenarios passed.
-- [ ] Production deployment verification; complete master feature acceptance remains open.
+- [x] Production deployment reached READY; see TEST_RESULTS.md for hosted verification.
+- [ ] Complete master feature acceptance: remaining requirements are inventoried in MASTER_AUDIT.md and MASTER_REQUIREMENTS_CHECKLIST.md.
 
 Product brand: MedCipher. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
 

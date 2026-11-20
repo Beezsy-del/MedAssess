@@ -1,6 +1,6 @@
 # Supabase setup
 
-Existing target verified: MedAssess / `kkfqxlwwcwhnmhmsqitx`, organization MedCypher, Mumbai `ap-south-1`, PostgreSQL 17.12. The public schema was empty before implementation. Four migrations have been applied via authenticated Supabase tooling.
+Existing target verified: MedAssess / `kkfqxlwwcwhnmhmsqitx`, organization MedCypher, Mumbai `ap-south-1`, PostgreSQL 17.12. The public schema was empty before implementation. Five migrations have been applied via authenticated Supabase tooling.
 
 Set `NEXT_PUBLIC_SUPABASE_URL` and the project's publishable key in environment configuration. The application does not require a service-role key for its current workflow; staff commands execute using the user's authenticated JWT, and patient access uses a narrowly scoped token gateway.
 

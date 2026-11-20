@@ -7,8 +7,8 @@ Run date: 20 November 2026 (Asia/Kolkata). All records used are synthetic.
 | Strict TypeScript                          | Passed in final verification                                                                      |
 | ESLint                                     | Passed with zero errors and zero warnings                                                         |
 | Production build                           | Passed with Next.js 16.4.6                                                                        |
-| Domain tests                               | 33 passed                                                                                         |
-| Hosted integration                         | 27 assertions passed against kkfqxlwwcwhnmhmsqitx                                                 |
+| Domain tests                               | 48 passed (33 domain + 15 validation)                                                             |
+| Hosted integration                         | 33 assertions passed against kkfqxlwwcwhnmhmsqitx                                                 |
 | RLS transaction suite                      | 9 isolation/permission assertions passed; fixtures rolled back                                    |
 | Browser routine workflow                   | Registration → QR → human assessment → discharge passed                                           |
 | Browser patient emergency/intake           | Passed after correcting ambiguous SQL variable                                                    |
@@ -17,10 +17,10 @@ Run date: 20 November 2026 (Asia/Kolkata). All records used are synthetic.
 | Responsive page overflow                   | Passed at 768, 390 and 320 pixels after fixing scroll-container positioning                       |
 | Anonymous-route/browser emergency guidance | Passed                                                                                            |
 | Dependency audit                           | Zero vulnerabilities                                                                              |
-| Supabase migrations                        | Four applied successfully                                                                         |
+| Supabase migrations                        | Five applied successfully                                                                         |
 | Supabase security advisor                  | Privileged-gateway warnings and disabled leaked-password protection remain; see SECURITY_AUDIT.md |
-| GitHub Actions                             | Not run: repository creation/authentication blocked                                               |
-| Hosted frontend acceptance                 | Not run: Vercel team authorization blocked                                                        |
+| GitHub Actions                             | Verify jobs passed on GitHub; protected integration job skipped                                   |
+| Hosted frontend acceptance                 | Six preview browser scenarios passed; production result below                                     |
 | Clinical validation                        | Not performed; clinical operation disabled                                                        |
 
 Browser screenshots are in `output/playwright/`. Hosted tests retain synthetic audit records. The archive command can remove active test cases from queues without deleting histories.
@@ -34,7 +34,7 @@ Browser screenshots are in `output/playwright/`. Hosted tests retain synthetic a
 - Admission initially reserved a bed without changing occupancy; added transactional occupancy trigger.
 - The demo archive authorization check needed an explicit NULL-membership rejection; corrected before final acceptance and tested for unauthorized clinical roles.
 
-Final verification: formatting, lint, typecheck, all 33 domain tests and production build passed. The full five-scenario Playwright run passed in 27.3 seconds. The latest RLS suite passed after all four migrations; 20/20 public tables have RLS. Hosted integration passed 27 assertions. Dependency audit found zero vulnerabilities. No feature is considered clinically validated by these tests.
+Initial core milestone verification (historical): formatting, lint, typecheck, all 33 domain tests and production build passed. The full five-scenario Playwright run passed in 27.3 seconds. The latest RLS suite passed after all four migrations; 20/20 public tables have RLS. Hosted integration passed 27 assertions. Dependency audit found zero vulnerabilities. No feature is considered clinically validated by these tests.
 
 ## Hospital workspace continuation
 
@@ -54,3 +54,7 @@ Explicit unauthorized hospital IDs now fail closed with HTTP 403 rather than loa
 20 November 2026: 48 unit/API validation tests passed, 33 hosted integration assertions passed, and the nine-assertion RLS transaction suite passed again. Formatting, lint, typecheck and production build passed. Dependency audit: zero vulnerabilities. Supabase confirms 28/28 public tables have RLS and five migrations are applied. Expanded integration verifies task deduplication/resolution, category preservation during shortages, doctor-only follow-up, and transactional histories. A browser assertion using an invalid empty registration payload was corrected to use a valid operation ID so it continues testing authorization after stricter validation.
 
 Hosted preview dpl_7PCwgGDCDEKwj8hmrooWzTK9CbTE: all six browser scenarios passed (45.5 seconds), including added deterioration and resource-shortage UI actions. Local expanded browser run: six passed (53.1 seconds). GitHub verify CI run 44734399213 passed; protected integration job skipped.
+
+Authenticated Supabase Realtime delivered the committed encounter update in scripts/realtime-check.mjs. GitHub CI also passed for deployment-source commit ce0ec097352a11d70c14876879cd10483bd9c838 (run 44734969125). Preview error/fatal log query returned no entries during verification.
+
+Production verification identified two issues before final sign-off: a concurrently running Realtime probe globally signed out the shared demo doctor (probe now uses local-session sign-out), and the awaiting-triage count badge failed axe contrast at 3.78:1. The badge now has explicit darker text and a larger font; final rerun results follow below.

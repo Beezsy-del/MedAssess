@@ -5,12 +5,12 @@ Verified 20 November 2026. This is a synthetic demo deployment; full master acce
 | Item               | Verified status                                                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
 | GitHub             | https://github.com/Beezsy-del/MedAssess — main pushed; existing initial commit preserved                                         |
-| Application source | 400655097fcbb72df505d9851e8cd39a7171955a                                                                                         |
-| GitHub CI          | Run 44734399213 passed verify; protected integration job skipped because credentials/flag are not configured                     |
+| Application source | ce0ec097352a11d70c14876879cd10483bd9c838                                                                                         |
+| GitHub CI          | Run 44734969125 passed verify; protected integration job skipped because credentials/flag are not configured                     |
 | Supabase           | MedAssess, kkfqxlwwcwhnmhmsqitx, Mumbai; five migrations applied; 28/28 public tables have RLS                                   |
 | Vercel project     | medcipher-triage-platform / prj_b5W03SkZFPbvjjRhs5JVbupkQalN; team bloodflow                                                     |
 | Preview            | https://medcipher-triage-platform-611uuh1jw-bloodflow.vercel.app — READY; six hosted Playwright scenarios passed in 45.5 seconds |
-| Production         | Pending final deployment verification                                                                                            |
+| Production         | https://medcipher-triage-platform.vercel.app — READY; dpl_Bikr9hyMB9cvRC2XTRmC754znZmg                                           |
 | Environment        | Supabase public URL/key and synthetic demo account secrets configured through encrypted provider environment variables; Node 24  |
 | Deployment method  | Authenticated direct source upload from the committed tree                                                                       |
 | Git integration    | Vercel GitHub app is not installed for this repository; automatic deploy-on-push is not connected                                |

@@ -1,6 +1,6 @@
 # Database schema
 
-The remote public schema contains 20 tables. Every exposed table has RLS. Authenticated clients have read grants only; all mutations use audited RPCs. Anonymous clients have no table grants.
+The remote public schema contains 28 tables. Every exposed table has RLS. Authenticated clients have read grants only; all mutations use audited RPCs. Anonymous clients have no table grants.
 
 | Area               | Tables                                                                        | Integrity boundaries                                                                                                                              |
 | ------------------ | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |

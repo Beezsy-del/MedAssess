@@ -59,7 +59,7 @@ This demo-only administrator operation archives encounters named `Synthetic …`
 
 ## Infrastructure
 
-Supabase project: **MedAssess**, reference `kkfqxlwwcwhnmhmsqitx`, Mumbai (`ap-south-1`). The project was inspected empty before migrations. Four migrations are applied. Git is initialized on `main`; remote repository and Vercel deployments are not yet created because account access is blocked. See [deployment status](docs/DEPLOYMENT_STATUS.md).
+Supabase project: **MedAssess**, reference `kkfqxlwwcwhnmhmsqitx`, Mumbai (`ap-south-1`). Five migrations are applied and all 28 public tables have RLS. Code is published to [GitHub MedAssess](https://github.com/Beezsy-del/MedAssess); the synthetic prototype is hosted at [MedCipher](https://medcipher-triage-platform.vercel.app). See [deployment status](docs/DEPLOYMENT_STATUS.md) and [master acceptance gaps](docs/MASTER_AUDIT.md). Full master-prompt acceptance remains incomplete.
 
 ## Documentation
 

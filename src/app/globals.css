@@ -600,7 +600,8 @@ hr {
   font-weight: 650;
 }
 .tabs button span {
-  font-size: 8px;
+  color: #50515d;
+  font-size: 10px;
   display: inline-block;
   background: #eee8ec;
   margin-left: 5px;
