@@ -66,6 +66,11 @@ export function Encounter({ id }: { id: string }) {
       <Link href="/queues" className="back-link">
         <ArrowLeft size={16} /> Patient queue
       </Link>
+      {clinical && (
+        <Link className="button" href={`/beds/${e.id}`}>
+          Review bed placement
+        </Link>
+      )}
       <div className="page-heading">
         <div>
           <p className="page-context">

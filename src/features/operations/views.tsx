@@ -96,7 +96,11 @@ export function SmartFlow() {
   );
 }
 export function Resources() {
-  const { data, command, busy } = useWorkspace();
+  const { data: snapshot, command, busy } = useWorkspace();
+  const data = {
+    ...snapshot,
+    resources: snapshot.resources.filter((r) => !r.kind.endsWith("bed")),
+  };
   const [resource, setResource] = useState(""),
     [error, setError] = useState(""),
     [kind, setKind] = useState(""),
@@ -118,7 +122,7 @@ export function Resources() {
       <div className="page-heading">
         <div>
           <p className="page-context">Hospital operations</p>
-          <h1>Beds & resources</h1>
+          <h2>Other hospital resources</h2>
           <p>
             Reserve safely. Release after handover. Confirm cleaning before
             reuse.

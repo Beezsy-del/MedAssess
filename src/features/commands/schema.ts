@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { capabilities, bedKinds } from "@/features/beds/model";
 import { emergencySigns } from "@/features/clinical/engine";
 const uuid = z.uuid();
 const text = (max = 3000) => z.string().trim().max(max);
@@ -94,7 +95,71 @@ export const intakeSchema = z
     if (v.date_of_birth && v.age !== null)
       issue("age", "Enter date of birth or age, not both.");
   });
+const bedOperation = { operation_id: uuid, reason };
+const bedEncounter = { encounter_id: uuid, version: integer(1, 2147483647) };
+const bedResource = { resource_id: uuid, bed_version: integer(1, 2147483647) };
 export const actionSchemas = {
+  bed_refresh: z.strictObject({}),
+  bed_plan: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    decision: z.enum(["BED_REQUIRED", "NO_BED", "AWAITING", "OTHER"]),
+    ward_id: optionalId,
+    bed_kind: z.union([z.enum(bedKinds), z.literal("")]),
+    required_capabilities: z.array(z.enum(capabilities)).max(6),
+    reviewed: z.literal(true),
+  }),
+  bed_assign: z.strictObject({
+    plan_reviewed_at: z.iso.datetime({ offset: true }),
+    expected_reservation_id: z.union([uuid, z.literal("")]),
+    ...bedOperation,
+    ...bedEncounter,
+    ...bedResource,
+    confirmed: z.literal(true),
+    reassign: z.boolean(),
+    hold: z.boolean(),
+  }),
+  bed_release: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    ...bedResource,
+  }),
+  bed_status: z.strictObject({
+    ...bedOperation,
+    ...bedResource,
+    status: z.enum(["AVAILABLE", "CLEANING", "MAINTENANCE", "BLOCKED"]),
+    checks_confirmed: z.boolean(),
+  }),
+  bed_ward: z.strictObject({
+    ...bedOperation,
+    name: text(100).min(1),
+    department_id: uuid,
+    zone: z.enum([
+      "critical",
+      "high",
+      "standard",
+      "ambulatory",
+      "unconfigured",
+    ]),
+    categories: z
+      .array(z.enum(["RED", "YELLOW", "GREEN"]))
+      .min(1)
+      .max(3),
+    display_order: integer(0, 100),
+  }),
+  bed_configure: z.strictObject({
+    ...bedOperation,
+    resource_id: optionalId,
+    bed_version: integer(1, 2147483647).optional(),
+    name: text(100).min(1),
+    kind: z.enum(bedKinds),
+    ward_id: uuid,
+    row_number: integer(1, 30),
+    column_number: integer(1, 12),
+    capabilities: z.array(z.enum(capabilities)).max(6),
+    verified: z.boolean(),
+    restrictions: text(1000),
+  }),
   intake: intakeSchema,
   register: z.strictObject({
     operation_id: uuid,

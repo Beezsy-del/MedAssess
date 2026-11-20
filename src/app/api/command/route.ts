@@ -43,17 +43,21 @@ export async function POST(request: Request) {
       {
         code: error.code,
         error:
-          error.code === "PT422"
-            ? "Possible existing patient. Search and verify the matching record, or document why this is a different person."
-            : error.code === "PT423"
-              ? "This patient has an active visit. Resume it, or explain why a new encounter is needed."
-              : error.code === "23505"
-                ? "This patient identifier already exists. Search for and select that patient."
-                : error.code === "PT409"
-                  ? "Conflict: record changed. Refresh and review."
-                  : error.code === "42501"
-                    ? "Your role cannot perform this action."
-                    : "Action rejected. Check the record state, required details and permissions.",
+          error.code === "PT428"
+            ? "Review placement requirements, compatible ward and equipment in Bed management before allocating this bed."
+            : error.code === "PT422"
+              ? "Possible existing patient. Search and verify the matching record, or document why this is a different person."
+              : error.code === "PT423"
+                ? "This patient has an active visit. Resume it, or explain why a new encounter is needed."
+                : error.code === "23505"
+                  ? parsed.data.action.startsWith("bed_")
+                    ? "This bed identifier, map position or active allocation is already in use. Refresh and choose another."
+                    : "This patient identifier already exists. Search for and select that patient."
+                  : error.code === "PT409"
+                    ? "Conflict: record changed. Refresh and review."
+                    : error.code === "42501"
+                      ? "Your role cannot perform this action."
+                      : "Action rejected. Check the record state, required details and permissions.",
       },
       {
         status:

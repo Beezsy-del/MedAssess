@@ -94,6 +94,222 @@ export type Database = {
           },
         ]
       }
+      bed_allocation_events: {
+        Row: {
+          action: string
+          actor: string | null
+          created_at: string
+          details: Json
+          encounter_id: string | null
+          hospital_id: string
+          id: string
+          resource_id: string | null
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          created_at?: string
+          details?: Json
+          encounter_id?: string | null
+          hospital_id: string
+          id?: string
+          resource_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          created_at?: string
+          details?: Json
+          encounter_id?: string | null
+          hospital_id?: string
+          id?: string
+          resource_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bed_allocation_events_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "bed_allocation_events_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bed_allocation_events_resource_id_hospital_id_fkey"
+            columns: ["resource_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_resources"
+            referencedColumns: ["id", "hospital_id"]
+          },
+        ]
+      }
+      bed_placement_plans: {
+        Row: {
+          actor: string
+          bed_kind: string | null
+          decision: string
+          encounter_id: string
+          encounter_version: number
+          hospital_id: string
+          reason: string
+          required_capabilities: string[]
+          reviewed_at: string
+          ward_id: string | null
+        }
+        Insert: {
+          actor: string
+          bed_kind?: string | null
+          decision: string
+          encounter_id: string
+          encounter_version: number
+          hospital_id: string
+          reason: string
+          required_capabilities?: string[]
+          reviewed_at?: string
+          ward_id?: string | null
+        }
+        Update: {
+          actor?: string
+          bed_kind?: string | null
+          decision?: string
+          encounter_id?: string
+          encounter_version?: number
+          hospital_id?: string
+          reason?: string
+          required_capabilities?: string[]
+          reviewed_at?: string
+          ward_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bed_placement_plans_encounter_id_hospital_id_fkey"
+            columns: ["encounter_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "patient_encounters"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "bed_placement_plans_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bed_placement_plans_ward_id_hospital_id_fkey"
+            columns: ["ward_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "bed_wards"
+            referencedColumns: ["id", "hospital_id"]
+          },
+        ]
+      }
+      bed_profiles: {
+        Row: {
+          capabilities: string[]
+          column_number: number
+          hospital_id: string
+          resource_id: string
+          restrictions: string
+          row_number: number
+          verified: boolean
+          ward_id: string
+        }
+        Insert: {
+          capabilities?: string[]
+          column_number: number
+          hospital_id: string
+          resource_id: string
+          restrictions?: string
+          row_number: number
+          verified?: boolean
+          ward_id: string
+        }
+        Update: {
+          capabilities?: string[]
+          column_number?: number
+          hospital_id?: string
+          resource_id?: string
+          restrictions?: string
+          row_number?: number
+          verified?: boolean
+          ward_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bed_profiles_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bed_profiles_resource_id_hospital_id_fkey"
+            columns: ["resource_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospital_resources"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "bed_profiles_ward_id_hospital_id_fkey"
+            columns: ["ward_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "bed_wards"
+            referencedColumns: ["id", "hospital_id"]
+          },
+        ]
+      }
+      bed_wards: {
+        Row: {
+          categories: Database["public"]["Enums"]["triage_category"][]
+          department_id: string
+          display_order: number
+          hospital_id: string
+          id: string
+          name: string
+          zone: string
+        }
+        Insert: {
+          categories?: Database["public"]["Enums"]["triage_category"][]
+          department_id: string
+          display_order?: number
+          hospital_id: string
+          id?: string
+          name: string
+          zone: string
+        }
+        Update: {
+          categories?: Database["public"]["Enums"]["triage_category"][]
+          department_id?: string
+          display_order?: number
+          hospital_id?: string
+          id?: string
+          name?: string
+          zone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bed_wards_department_id_hospital_id_fkey"
+            columns: ["department_id", "hospital_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id", "hospital_id"]
+          },
+          {
+            foreignKeyName: "bed_wards_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           capacity: number
@@ -302,6 +518,7 @@ export type Database = {
           location: string
           name: string
           status: string
+          version: number
         }
         Insert: {
           department_id?: string | null
@@ -311,6 +528,7 @@ export type Database = {
           location?: string
           name: string
           status?: string
+          version?: number
         }
         Update: {
           department_id?: string | null
@@ -320,6 +538,7 @@ export type Database = {
           location?: string
           name?: string
           status?: string
+          version?: number
         }
         Relationships: [
           {
@@ -933,8 +1152,10 @@ export type Database = {
           actor: string
           created_at: string
           encounter_id: string
+          hold_until: string | null
           hospital_id: string
           id: string
+          is_bed: boolean
           released_at: string | null
           resource_id: string
         }
@@ -942,8 +1163,10 @@ export type Database = {
           actor: string
           created_at?: string
           encounter_id: string
+          hold_until?: string | null
           hospital_id: string
           id?: string
+          is_bed?: boolean
           released_at?: string | null
           resource_id: string
         }
@@ -951,8 +1174,10 @@ export type Database = {
           actor?: string
           created_at?: string
           encounter_id?: string
+          hold_until?: string | null
           hospital_id?: string
           id?: string
+          is_bed?: boolean
           released_at?: string | null
           resource_id?: string
         }

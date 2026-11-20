@@ -7,6 +7,7 @@ import {
   useState,
   useRef,
 } from "react";
+import { liveRefreshScheduler } from "./live-refresh";
 import type { Snapshot } from "@/lib/data";
 import { browserClient } from "@/lib/supabase/browser";
 export type CommandData = Record<string, unknown>;
@@ -34,6 +35,7 @@ export function WorkspaceProvider({
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [online, setOnline] = useState(true);
+  const commandDepth = useRef(0);
   const refreshSequence = useRef(0);
   const latestRefresh = useRef<Promise<void> | null>(null);
   const refresh = useCallback(async () => {
@@ -74,10 +76,12 @@ export function WorkspaceProvider({
   }, []);
   useEffect(() => {
     const db = browserClient();
-    const reload = () =>
-      void refresh().catch(() =>
-        setMessage("Live refresh paused. Retry when connected."),
-      );
+    const live = liveRefreshScheduler(
+      refresh,
+      () => commandDepth.current > 0,
+      () => setMessage("Live refresh paused. Retry when connected."),
+    );
+    const reload = live.request;
     const channel = db
       .channel(`hospital-${data.hospital.id}`)
       .on(
@@ -110,16 +114,50 @@ export function WorkspaceProvider({
         },
         reload,
       )
-      .subscribe();
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "bed_placement_plans",
+          filter: `hospital_id=eq.${data.hospital.id}`,
+        },
+        reload,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "bed_profiles",
+          filter: `hospital_id=eq.${data.hospital.id}`,
+        },
+        reload,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "bed_wards",
+          filter: `hospital_id=eq.${data.hospital.id}`,
+        },
+        reload,
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") reload();
+      });
     const timer = setInterval(reload, 30000);
     window.addEventListener("online", reload);
     return () => {
+      live.dispose();
       void db.removeChannel(channel);
       clearInterval(timer);
       window.removeEventListener("online", reload);
     };
   }, [data.hospital.id, refresh]);
   const command = async (action: string, payload: CommandData) => {
+    commandDepth.current += 1;
     setBusy(true);
     try {
       const response = await fetch("/api/command", {
@@ -151,7 +189,8 @@ export function WorkspaceProvider({
       setMessage(e instanceof Error ? e.message : "Action failed.");
       throw e;
     } finally {
-      setBusy(false);
+      commandDepth.current -= 1;
+      setBusy(commandDepth.current > 0);
     }
   };
   return (

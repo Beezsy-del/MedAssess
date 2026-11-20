@@ -1,3 +1,4 @@
+import { prepareBed, bedAction } from "./bed-helpers.mjs";
 import { createClient } from "@supabase/supabase-js";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -150,7 +151,8 @@ const { data: resources } = await doctor
   .select("*")
   .eq("status", "AVAILABLE");
 assert.ok(resources.length);
-const resource = resources[0];
+const resource = resources.find((r) => !r.kind.endsWith("bed"));
+assert.ok(resource);
 const concurrent = await Promise.all([
   command("reserve", { resource_id: resource.id, encounter_id: created.id }),
   command(
@@ -254,11 +256,17 @@ const nurseDischarge = await command(
 );
 assert.ok(nurseDischarge.error);
 pass("Discharge requires doctor approval");
-const bed = resources.find((r) => r.kind.includes("bed"));
+const bed = resources.find((r) => r.kind === "General bed");
 assert.ok(bed);
+assert.equal((await prepareBed(doctor, hospital, secondId, bed)).error, null);
 assert.equal(
-  (await command("reserve", { resource_id: bed.id, encounter_id: secondId }))
-    .error,
+  (
+    await bedAction(doctor, hospital, "bed_assign", bed.id, secondId, {
+      confirmed: true,
+      reassign: false,
+      hold: true,
+    })
+  ).error,
   null,
 );
 assert.equal(
@@ -285,8 +293,19 @@ const closed = await command("note", {
 });
 assert.ok(closed.error);
 pass("Closed encounters reject further mutation");
-await command("release", { resource_id: bed.id });
-await command("release", { resource_id: bed.id });
+assert.equal(
+  (await bedAction(doctor, hospital, "bed_release", bed.id, secondId)).error,
+  null,
+);
+assert.equal(
+  (
+    await bedAction(doctor, hospital, "bed_status", bed.id, null, {
+      status: "AVAILABLE",
+      checks_confirmed: true,
+    })
+  ).error,
+  null,
+);
 const settingsDenied = await command("settings", {
   reassessment_minutes: 15,
   alert_minutes: 5,

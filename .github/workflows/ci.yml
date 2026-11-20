@@ -44,6 +44,7 @@ jobs:
       - run: |
           node scripts/integration-check.mjs
           node scripts/intake-check.mjs
+          node scripts/bed-check.mjs
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}

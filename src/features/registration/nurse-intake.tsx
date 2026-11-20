@@ -1,4 +1,5 @@
 "use client";
+import { BedManagement } from "@/features/beds/bed-management";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -391,6 +392,9 @@ export function NurseIntake() {
         <p className="form-note" role="status">
           {notice}
         </p>
+      )}
+      {receipt && (
+        <BedManagement key={receipt.id} encounterId={receipt.id} embedded />
       )}
       {receipt ? (
         <section

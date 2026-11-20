@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { snapshot, session } from "@/lib/data";
 import { WorkspaceProvider } from "@/features/workspace/context";
 import { Shell } from "@/features/workspace/shell";
+import { BedManagement } from "@/features/beds/bed-management";
 import { Overview } from "@/features/workspace/overview";
 import { NurseIntake } from "@/features/registration/nurse-intake";
 import { Reception } from "@/features/registration/reception";
@@ -38,6 +39,7 @@ export default async function StaffPage({
       "queues",
       "smartflow",
       "resources",
+      "beds",
       "departments",
       "referrals",
       "analytics",
@@ -67,8 +69,19 @@ export default async function StaffPage({
     case "smartflow":
       content = <SmartFlow />;
       break;
+    case "beds":
+      content = <BedManagement encounterId={id} />;
+      break;
     case "resources":
-      content = <Resources />;
+      content = (
+        <>
+          <BedManagement />
+          <details className="panel panel-copy spaced">
+            <summary>Stretchers, wheelchairs & other equipment</summary>
+            <Resources />
+          </details>
+        </>
+      );
       break;
     case "emergency-center":
     case "notifications":

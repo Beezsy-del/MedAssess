@@ -33,3 +33,5 @@ Core milestone checks passed as described in TEST_RESULTS.md. The supplied maste
 - [x] Remodel the frontend using the user-supplied BloodFlow reference: header navigation, floating dock, live dashboard overview, shared operational components, public/patient screens and light/dark themes. Verification is tracked in BLOODFLOW_REMODEL.md.
 
 - [x] Implement nurse-first registration with patient lookup, direct initial assessment, explicit priority confirmation, transactional persistence and device draft recovery. See NURSE_INTAKE.md for integration and verification evidence.
+
+21 November 2026 — Visual bed management: extend existing resources/reservations with physical wards, bed capabilities and clinician-reviewed placement; replace the generic bed reservation path; integrate automatic intake handoff, realtime map, holds/reassignment/turnover and attributable history. Database assertions and role/tenant fixture passed; browser/hosted verification in progress. See BED_MANAGEMENT.md.

@@ -45,3 +45,5 @@ UI refinement: shared staff chrome, queue, login and operational screens now use
 BloodFlow reference remodel: the shared frontend now uses header/dock navigation, a live encounter overview and persistent light/dark themes across staff and patient screens. See BLOODFLOW_REMODEL.md for scope and evidence. Existing feature and readiness limitations remain applicable.
 
 Nurse intake update: /registration is the nursing landing page, with identity search, optional demographics, direct assessment, explicit priority confirmation, atomic new/resumed encounter persistence, audited decisions and encrypted manual-review drafts. See NURSE_INTAKE.md. Doctor/admin landings and existing queue/QR workflows are preserved; clinical use remains disabled.
+
+Visual bed allocation: implemented physical care-zone/ward grids, reviewed compatibility recommendations, automatic intake handoff, persistent alternative destinations, reservations, reassignment and cleaning lifecycle. Four additive migrations applied; database assertions and multi-role/tenant fixture passed. Browser/deployment acceptance pending. Synthetic clinical boundary remains unchanged. See BED_MANAGEMENT.md.

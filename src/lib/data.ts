@@ -32,6 +32,24 @@ export async function snapshot(hospitalId?: string) {
     (await cookies()).get(hospitalCookie)?.value,
   );
   const h = membership.hospital_id;
+  if (
+    [
+      "nurse",
+      "triage_nurse",
+      "doctor",
+      "resource_manager",
+      "emergency_coordinator",
+      "hospital_admin",
+      "super_admin",
+    ].includes(membership.role)
+  ) {
+    const beds = await s.db.rpc("staff_command", {
+      p_hospital: h,
+      p_action: "bed_refresh",
+      p_data: {},
+    });
+    if (beds.error) throw new Error("Bed availability could not be refreshed.");
+  }
   const escalation = await s.db.rpc("escalate_alerts", { p_hospital: h });
   if (escalation.error)
     throw new Error(
@@ -59,6 +77,10 @@ export async function snapshot(hospitalId?: string) {
     reassessments,
     shortages,
     followUps,
+    wards,
+    bedProfiles,
+    bedPlans,
+    bedEvents,
   ] = await Promise.all([
     s.db.from("hospitals").select("*").eq("id", h).single(),
     s.db
@@ -164,6 +186,19 @@ export async function snapshot(hospitalId?: string) {
       .eq("hospital_id", h)
       .order("created_at", { ascending: false })
       .limit(500),
+    s.db
+      .from("bed_wards")
+      .select("*")
+      .eq("hospital_id", h)
+      .order("display_order"),
+    s.db.from("bed_profiles").select("*").eq("hospital_id", h),
+    s.db.from("bed_placement_plans").select("*").eq("hospital_id", h),
+    s.db
+      .from("bed_allocation_events")
+      .select("*")
+      .eq("hospital_id", h)
+      .order("created_at", { ascending: false })
+      .limit(300),
   ]);
   const responses = [
     hospital,
@@ -187,6 +222,10 @@ export async function snapshot(hospitalId?: string) {
     reassessments,
     shortages,
     followUps,
+    wards,
+    bedProfiles,
+    bedPlans,
+    bedEvents,
   ];
   if (responses.some((x) => x.error))
     throw new Error(
@@ -231,6 +270,10 @@ export async function snapshot(hospitalId?: string) {
     reassessments: reassessments.data!,
     shortages: shortages.data!,
     followUps: followUps.data!,
+    wards: wards.data!,
+    bedProfiles: bedProfiles.data!,
+    bedPlans: bedPlans.data!,
+    bedEvents: bedEvents.data!,
     loadedAt: new Date().toISOString(),
   };
 }
