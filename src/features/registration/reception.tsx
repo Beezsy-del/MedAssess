@@ -102,7 +102,10 @@ export function Reception() {
     [syncing, setSyncing] = useState(false),
     [error, setError] = useState("");
   const load = useCallback(
-    () => listOutbox(data.userId, data.hospital.id).then(setOutbox),
+    () =>
+      listOutbox(data.userId, data.hospital.id).then((items) =>
+        setOutbox(items.filter((item) => item.kind !== "intake-draft")),
+      ),
     [data.userId, data.hospital.id],
   );
   useEffect(() => {

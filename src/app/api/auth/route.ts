@@ -1,5 +1,6 @@
 import { serverClient } from "@/lib/supabase/server";
 import { readBoundedJson } from "@/lib/request-json";
+import { staffLanding } from "@/lib/landing-server";
 import { z } from "zod";
 const schema = z.discriminatedUnion("action", [
   z.strictObject({ action: z.literal("logout") }),
@@ -59,7 +60,9 @@ export async function POST(request: Request) {
         );
       const { error } = await db.auth.signInWithPassword({ email, password });
       return Response.json(
-        error ? { error: "Demo sign-in unavailable." } : { ok: true },
+        error
+          ? { error: "Demo sign-in unavailable." }
+          : { ok: true, redirect: await staffLanding() },
         { status: error ? 401 : 200 },
       );
     }
@@ -84,7 +87,7 @@ export async function POST(request: Request) {
     return Response.json(
       error
         ? { error: "Sign-in failed. Check your credentials." }
-        : { ok: true },
+        : { ok: true, redirect: await staffLanding() },
       { status: error ? 401 : 200 },
     );
   } catch {

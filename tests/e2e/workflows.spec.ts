@@ -119,7 +119,7 @@ test("patient emergency bypasses intake; secure status and language controls", a
   await page.goto("/login");
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Patient registration", exact: true }),
   ).toBeVisible({ timeout: 15000 });
   await page.goto("/reception");
   await page
@@ -179,7 +179,7 @@ test("offline draft persists and syncs once on reconnect", async ({
   await page.goto("/login");
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Patient registration", exact: true }),
   ).toBeVisible({ timeout: 15000 });
   await page.goto("/reception");
   await expect(

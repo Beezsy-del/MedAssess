@@ -3,6 +3,7 @@ import { snapshot, session } from "@/lib/data";
 import { WorkspaceProvider } from "@/features/workspace/context";
 import { Shell } from "@/features/workspace/shell";
 import { Overview } from "@/features/workspace/overview";
+import { NurseIntake } from "@/features/registration/nurse-intake";
 import { Reception } from "@/features/registration/reception";
 import { Encounter } from "@/features/workspace/encounter";
 import {
@@ -29,6 +30,7 @@ export default async function StaffPage({
     ![
       "dashboard",
       "reception",
+      "registration",
       "triage",
       "nurse",
       "doctor",
@@ -52,6 +54,10 @@ export default async function StaffPage({
   const { q } = await searchParams;
   let content: React.ReactNode;
   switch (route) {
+    case "registration":
+    case "nurse":
+      content = <NurseIntake />;
+      break;
     case "reception":
       content = <Reception />;
       break;

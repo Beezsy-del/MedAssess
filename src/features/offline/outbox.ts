@@ -8,6 +8,7 @@ export type OutboxItem = {
   createdAt: string;
   attempts: number;
   error?: string;
+  kind?: "registration" | "intake-draft";
 };
 type StoredDraft = Omit<OutboxItem, "data"> & {
   iv: Uint8Array<ArrayBuffer>;
@@ -97,6 +98,7 @@ export function syncOutbox(user: string, hospital: string) {
     let synced = 0,
       failed = 0;
     for (const item of items) {
+      if (item.kind === "intake-draft") continue;
       try {
         const response = await fetch("/api/command", {
           method: "POST",
@@ -129,5 +131,14 @@ export function syncOutbox(user: string, hospital: string) {
       }
     }
     return { synced, failed };
+  });
+}
+
+export function removeDraft(id: string, user: string, hospital: string) {
+  return exclusively(async () => {
+    const database = await db();
+    const item = await database.get("outbox", id);
+    if (item?.user === user && item?.hospital === hospital)
+      await database.delete("outbox", id);
   });
 }

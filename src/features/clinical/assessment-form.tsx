@@ -50,6 +50,66 @@ export function AssessmentForm({
         Demonstration protocol. Enter actual observations only in an approved
         clinical deployment. Blank vital signs remain unknown.
       </p>
+      <ClinicalFields input={input} setInput={setInput} />
+      <div className="assessment-result">
+        <Badge category={result.category} />
+        <ul>
+          {result.reasons.map((r) => (
+            <li key={r}>{r}</li>
+          ))}
+        </ul>
+        <strong>
+          Demo score:{" "}
+          {result.score === null
+            ? "Not available — insufficient information"
+            : `${result.score.toFixed(2)} / 100`}
+        </strong>
+        <p>
+          Unvalidated. Never used to override clinical category or rank
+          patients.
+        </p>
+        {result.breakdown.map((b) => (
+          <small key={b.label}>
+            {b.label}: {b.value.toFixed(2)}
+            <br />
+          </small>
+        ))}
+      </div>
+      <Field label="Clinician-confirmed category">
+        <select name="category" required defaultValue="">
+          <option value="" disabled>
+            Select a category
+          </option>
+          <option value="ASSESSMENT_REQUIRED">Assessment required</option>
+          <option value="RED">RED — Critical / emergency</option>
+          <option value="YELLOW">YELLOW — Urgent assessment</option>
+          <option value="GREEN">GREEN — Non-immediate</option>
+        </select>
+      </Field>
+      <Field label="Clinical reasoning / reason for override">
+        <textarea name="reason" required minLength={5} maxLength={3000} />
+      </Field>
+      {error && (
+        <p role="alert" className="error-text">
+          {error}
+        </p>
+      )}
+      <button className="button primary" disabled={busy}>
+        {busy ? "Saving…" : "Save clinical assessment"}
+      </button>
+    </form>
+  );
+}
+
+export function ClinicalFields({
+  input,
+  setInput,
+}: {
+  input: ClinicalInput;
+  setInput: (input: ClinicalInput) => void;
+}) {
+  return (
+    <>
       <fieldset>
         <legend>Reported or observed emergency signs</legend>
         <div className="check-grid">
@@ -79,7 +139,7 @@ export function AssessmentForm({
           maxLength={3000}
         />
       </Field>
-      <div className="form-grid">
+      <div className="form-grid clinical-vitals">
         {(
           [
             ["pulse", "Pulse / min", 0, 400],
@@ -150,49 +210,6 @@ export function AssessmentForm({
         I have performed a human clinical assessment of the available
         information.
       </label>
-      <div className="assessment-result">
-        <Badge category={result.category} />
-        <ul>
-          {result.reasons.map((r) => (
-            <li key={r}>{r}</li>
-          ))}
-        </ul>
-        <strong>
-          Demo score:{" "}
-          {result.score === null
-            ? "Not available — insufficient information"
-            : `${result.score.toFixed(2)} / 100`}
-        </strong>
-        <p>
-          Unvalidated. Never used to override clinical category or rank
-          patients.
-        </p>
-        {result.breakdown.map((b) => (
-          <small key={b.label}>
-            {b.label}: {b.value.toFixed(2)}
-            <br />
-          </small>
-        ))}
-      </div>
-      <Field label="Clinician-confirmed category">
-        <select name="category" required defaultValue={encounter.category}>
-          <option value="ASSESSMENT_REQUIRED">Assessment required</option>
-          <option value="RED">RED — Critical / emergency</option>
-          <option value="YELLOW">YELLOW — Urgent assessment</option>
-          <option value="GREEN">GREEN — Non-immediate</option>
-        </select>
-      </Field>
-      <Field label="Clinical reasoning / reason for override">
-        <textarea name="reason" required minLength={5} maxLength={3000} />
-      </Field>
-      {error && (
-        <p role="alert" className="error-text">
-          {error}
-        </p>
-      )}
-      <button className="button primary" disabled={busy}>
-        {busy ? "Saving…" : "Save clinical assessment"}
-      </button>
-    </form>
+    </>
   );
 }

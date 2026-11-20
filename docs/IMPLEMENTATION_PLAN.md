@@ -31,3 +31,5 @@ Core milestone checks passed as described in TEST_RESULTS.md. The supplied maste
 - [x] Apply frontend-design and Emil Design Engineering to the existing hospital UI: typography, navigation, operational hierarchy, plain copy and keyboard navigation; preserve live workflows.
 
 - [x] Remodel the frontend using the user-supplied BloodFlow reference: header navigation, floating dock, live dashboard overview, shared operational components, public/patient screens and light/dark themes. Verification is tracked in BLOODFLOW_REMODEL.md.
+
+- [x] Implement nurse-first registration with patient lookup, direct initial assessment, explicit priority confirmation, transactional persistence and device draft recovery. See NURSE_INTAKE.md for integration and verification evidence.

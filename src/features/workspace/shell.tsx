@@ -34,6 +34,7 @@ const nav = [
     "Workspace",
     [
       ["/dashboard", "Overview", LayoutDashboard],
+      ["/registration", "Patient registration", ClipboardPlus],
       ["/reception", "Reception", ClipboardPlus],
       ["/triage", "Triage & queues", HeartPulse],
       ["/doctor", "Clinical workspace", Stethoscope],
@@ -79,7 +80,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         );
       // A new document clears forms, old requests and prefetched tenant pages.
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- tenant switch must discard the entire previous workspace and router cache
-      window.location.assign("/dashboard");
+      window.location.assign("/");
     } catch (error) {
       setMessage(
         error instanceof Error ? error.message : "Hospital switch failed.",
@@ -118,7 +119,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </a>
       <header className="topbar">
         <div className="topbar-left">
-          <Brand href="/dashboard" />
+          <Brand
+            href={
+              data.membership.role === "triage_nurse" ||
+              data.membership.role === "nurse"
+                ? "/registration"
+                : "/dashboard"
+            }
+          />
           <button
             className="workspace-trigger"
             aria-label="Open navigation: Workspace"
@@ -233,7 +241,17 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {(
           [
             ["/dashboard", "Overview", LayoutDashboard],
-            ["/reception", "Reception", ClipboardPlus],
+            [
+              data.membership.role === "triage_nurse" ||
+              data.membership.role === "nurse"
+                ? "/registration"
+                : "/reception",
+              data.membership.role === "triage_nurse" ||
+              data.membership.role === "nurse"
+                ? "Register"
+                : "Reception",
+              ClipboardPlus,
+            ],
             ["/doctor", "Clinical", Stethoscope],
             ["/resources", "Resources", BedDouble],
           ] as const

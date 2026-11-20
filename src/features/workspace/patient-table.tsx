@@ -7,8 +7,10 @@ import { rankQueue, queueExplanation } from "@/features/queue/rank";
 import type { Row } from "@/lib/data";
 export function PatientTable({
   encounters,
+  preserveOrder = false,
 }: {
   encounters: Row<"patient_encounters">[];
+  preserveOrder?: boolean;
 }) {
   const { data } = useWorkspace();
   if (!encounters.length)
@@ -39,7 +41,7 @@ export function PatientTable({
           </tr>
         </thead>
         <tbody>
-          {rankQueue(encounters).map((e) => {
+          {(preserveOrder ? encounters : rankQueue(encounters)).map((e) => {
             const p = data.patients.find((p) => p.id === e.patient_id);
             const overdue =
               e.reassessment_due &&

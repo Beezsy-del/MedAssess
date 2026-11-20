@@ -1,4 +1,4 @@
-const CACHE = "medcipher-public-shell-v1";
+const CACHE = "medcipher-public-shell-v2";
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches

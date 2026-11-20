@@ -172,6 +172,31 @@ export function Encounter({ id }: { id: string }) {
                     <small>{time(a.created_at)}</small>
                   </div>
                   <p>{a.reason}</p>
+                  {a.input &&
+                    typeof a.input === "object" &&
+                    !Array.isArray(a.input) &&
+                    "medical_history" in a.input && (
+                      <details>
+                        <summary>Staff intake observations</summary>
+                        <dl>
+                          {Object.entries(a.input)
+                            .filter(([key]) =>
+                              [
+                                "arrival_method",
+                                "medical_history",
+                                "allergies",
+                                "staff_notes",
+                              ].includes(key),
+                            )
+                            .map(([key, value]) => (
+                              <div key={key}>
+                                <dt>{key.replaceAll("_", " ")}</dt>
+                                <dd>{String(value || "Not recorded")}</dd>
+                              </div>
+                            ))}
+                        </dl>
+                      </details>
+                    )}
                   <small>
                     Original recommendation: {a.proposed_category} ·{" "}
                     {

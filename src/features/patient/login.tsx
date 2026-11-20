@@ -27,7 +27,9 @@ export function Login({
       if (!r.ok) throw new Error(result.error);
       if (reset) setMessage(result.message);
       else {
-        router.push("/dashboard");
+        router.push(
+          result.redirect === "/registration" ? "/registration" : "/dashboard",
+        );
         router.refresh();
       }
     } catch (e) {

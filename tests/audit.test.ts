@@ -13,6 +13,9 @@ const auth = vi.hoisted(() => ({
 vi.mock("@/lib/supabase/server", () => ({
   serverClient: async () => ({ auth }),
 }));
+vi.mock("@/lib/landing-server", () => ({
+  staffLanding: async () => "/dashboard",
+}));
 import { POST } from "../src/app/api/auth/route";
 const req = (body: string) =>
   new Request("https://test.local/api/auth", {

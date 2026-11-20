@@ -132,7 +132,12 @@ export function WorkspaceProvider({
         }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "Action failed");
+      if (!response.ok)
+        throw new CommandError(
+          result.error ?? "Action failed",
+          response.status,
+          result.code,
+        );
       try {
         await refresh();
         setMessage("Saved to hospital records.");
@@ -156,6 +161,15 @@ export function WorkspaceProvider({
       {children}
     </Context.Provider>
   );
+}
+export class CommandError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public code?: string,
+  ) {
+    super(message);
+  }
 }
 export function useWorkspace() {
   const context = useContext(Context);

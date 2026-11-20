@@ -43,3 +43,5 @@ Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current featu
 UI refinement: shared staff chrome, queue, login and operational screens now use a quieter workbench design with larger text and explicit keyboard navigation. See UI_REFINEMENT.md; this is not a clinical readiness change.
 
 BloodFlow reference remodel: the shared frontend now uses header/dock navigation, a live encounter overview and persistent light/dark themes across staff and patient screens. See BLOODFLOW_REMODEL.md for scope and evidence. Existing feature and readiness limitations remain applicable.
+
+Nurse intake update: /registration is the nursing landing page, with identity search, optional demographics, direct assessment, explicit priority confirmation, atomic new/resumed encounter persistence, audited decisions and encrypted manual-review drafts. See NURSE_INTAKE.md. Doctor/admin landings and existing queue/QR workflows are preserved; clinical use remains disabled.

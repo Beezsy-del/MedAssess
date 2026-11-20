@@ -729,8 +729,11 @@ export type Database = {
         Row: {
           age: number | null
           created_at: string
+          date_of_birth: string | null
+          emergency_contact: string | null
           hospital_id: string
           id: string
+          identifier: string | null
           name: string
           phone: string | null
           sex: string | null
@@ -739,8 +742,11 @@ export type Database = {
         Insert: {
           age?: number | null
           created_at?: string
+          date_of_birth?: string | null
+          emergency_contact?: string | null
           hospital_id: string
           id?: string
+          identifier?: string | null
           name: string
           phone?: string | null
           sex?: string | null
@@ -749,8 +755,11 @@ export type Database = {
         Update: {
           age?: number | null
           created_at?: string
+          date_of_birth?: string | null
+          emergency_contact?: string | null
           hospital_id?: string
           id?: string
+          identifier?: string | null
           name?: string
           phone?: string | null
           sex?: string | null
@@ -1303,6 +1312,28 @@ export type Database = {
     Functions: {
       archive_demo_tests: { Args: { p_hospital: string }; Returns: number }
       escalate_alerts: { Args: { p_hospital: string }; Returns: number }
+      find_patients: {
+        Args: { p_hospital: string; p_query: string }
+        Returns: {
+          age: number | null
+          created_at: string
+          date_of_birth: string | null
+          emergency_contact: string | null
+          hospital_id: string
+          id: string
+          identifier: string | null
+          name: string
+          phone: string | null
+          sex: string | null
+          unidentified: boolean
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "patients"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       patient_portal: {
         Args: { p_action: string; p_data?: Json; p_token: string }
         Returns: Json
