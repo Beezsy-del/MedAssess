@@ -24,3 +24,5 @@ Evidence is captured locally in output/ui-audit (ignored; synthetic data only). 
 Clinical categories, priority algorithm, authentication, RLS, persistence and emergency assistance remain unchanged. This UI pass does not resolve the production, clinical or master-spec limitations in READINESS_AUDIT.md.
 
 Additional verification: dashboard, reception, resources, patient flow, analytics and settings have no serious/critical axe findings after correcting analytics empty-state contrast (initially 4.17:1). Page-level overflow checks passed at 1024, 768, 390 and 320px. Mobile navigation opened, Escape closed it and focus returned to the toggle. Reduced-motion screenshots were inspected. Real screen-reader/hardware evaluation remains outside these automated checks.
+
+Release: eb7b7d059e5108089d03a3fdb177d704ac0d34d7 is deployed to the public canonical Vercel host. Live desktop/mobile screenshots are retained in output/ui-audit/live-*.png. Live dashboard axe found no serious/critical violations; no page-level overflow at 390px. CI source verification is [run 44774817324](https://github.com/Beezsy-del/MedAssess/actions/runs/44774817324).

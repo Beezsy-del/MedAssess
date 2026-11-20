@@ -1,5 +1,7 @@
 # Deployment status
 
+Latest UI release: application source `eb7b7d059e5108089d03a3fdb177d704ac0d34d7`, production `dpl_J3yq3vDTrvcYsTRaMAjXujX7PZ4X`, reached READY at https://medcipher-triage-platform.vercel.app. The deployed sign-in/dashboard and mobile layout were checked; dashboard axe returned no serious/critical findings. See UI_REFINEMENT.md. Database configuration is unchanged. The tables below preserve the preceding readiness-audit deployment evidence.
+
 Verified 20 November 2026. This is a synthetic demonstration, not clinical production readiness. See READINESS_AUDIT.md for separate readiness assessments and outstanding master requirements.
 
 | Item                     | Verified status                                                                                                                                                                                                                  |
