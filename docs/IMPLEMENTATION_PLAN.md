@@ -35,3 +35,16 @@ Core milestone checks passed as described in TEST_RESULTS.md. The supplied maste
 - [x] Implement nurse-first registration with patient lookup, direct initial assessment, explicit priority confirmation, transactional persistence and device draft recovery. See NURSE_INTAKE.md for integration and verification evidence.
 
 21 November 2026 — Visual bed management: extend existing resources/reservations with physical wards, bed capabilities and clinician-reviewed placement; replace the generic bed reservation path; integrate automatic intake handoff, realtime map, holds/reassignment/turnover and attributable history. Database assertions and role/tenant fixture passed; four new preview scenarios passed and the matching frontend is deployed. Full browser acceptance encountered provider authentication timeouts; CI results are recorded separately. See BED_MANAGEMENT.md.
+
+## Patient portal and role-workflow upgrade — active
+
+Baseline and target confirmation: PORTAL_UPGRADE_BASELINE.md. Feature branch: feat/patient-portal-role-workflows.
+
+1. Preserve production; establish isolated database testing before changing existing permissions.
+2. Implement shared role/route/action policy and database-backed operational privacy views.
+3. Add versioned adaptive questionnaire, saved progress, symptom updates and limited patient status cards.
+4. Add reviewed configuration, attributable preliminary assessments/escalations and scheduled reassessment tasks; retain unknown findings and clinical-use lock.
+5. Add nurse briefs/quick actions/OPD routes and doctor department referrals with transactional lifecycle records.
+6. Reorganize admin directory/resources with sticky summaries and safe staff/department management.
+7. Cover synthetic acceptance A–J, tenant/role/token abuse, migration compatibility, load/reconnection, accessibility and regression.
+8. Push logical commits; verify isolated preview; promote only after required checks pass; publish exact results and remaining external clinical review needs.
