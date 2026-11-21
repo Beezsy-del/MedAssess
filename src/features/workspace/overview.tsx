@@ -1,4 +1,5 @@
 "use client";
+import { canRegister } from "@/features/access/policy";
 import Link from "next/link";
 import { CareMap } from "@/components/chrome";
 import { ArrowRight, Plus, Clock3, ShieldCheck, Activity } from "lucide-react";
@@ -73,9 +74,11 @@ export function Overview({
           <h1>{title}</h1>
           <p>Review the queue, assess patients and coordinate the next step.</p>
         </div>
-        <Link href="/reception" className="button primary">
-          <Plus size={17} /> Register patient
-        </Link>
+        {canRegister(data.membership.role) && (
+          <Link href="/reception" className="button primary">
+            <Plus size={17} /> Register patient
+          </Link>
+        )}
       </div>
       {!queue && (
         <section className="coordination-hero">
@@ -113,14 +116,16 @@ export function Overview({
               }}
             />
             <div className="hero-workspaces">
-              <Link href="/reception">
-                <span>01</span>
-                <div>
-                  <strong>Patient registration</strong>
-                  <small>Encounters and secure intake passes</small>
-                </div>
-                <ArrowRight size={15} />
-              </Link>
+              {canRegister(data.membership.role) && (
+                <Link href="/reception">
+                  <span>01</span>
+                  <div>
+                    <strong>Patient registration</strong>
+                    <small>Encounters and secure intake passes</small>
+                  </div>
+                  <ArrowRight size={15} />
+                </Link>
+              )}
               <Link href="/doctor">
                 <span>02</span>
                 <div>

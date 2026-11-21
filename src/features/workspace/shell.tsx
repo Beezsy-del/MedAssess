@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { canVisit } from "@/features/access/policy";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Activity,
@@ -255,16 +256,18 @@ export function Shell({ children }: { children: React.ReactNode }) {
             ["/doctor", "Clinical", Stethoscope],
             ["/resources", "Resources", BedDouble],
           ] as const
-        ).map(([href, label, Icon]) => (
-          <Link
-            key={href}
-            href={href}
-            aria-current={path === href ? "page" : undefined}
-          >
-            <Icon size={19} />
-            <span>{label}</span>
-          </Link>
-        ))}
+        )
+          .filter(([href]) => canVisit(data.membership.role, href))
+          .map(([href, label, Icon]) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={path === href ? "page" : undefined}
+            >
+              <Icon size={19} />
+              <span>{label}</span>
+            </Link>
+          ))}
         <button
           onClick={() => setOpen(true)}
           aria-label="More workspaces"
@@ -300,22 +303,28 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="navigation-grid">
-            {nav.map(([group, items]) => (
-              <nav key={group} aria-label={group}>
-                <h3>{group}</h3>
-                {items.map(([href, label, Icon]) => (
-                  <Link
-                    href={href}
-                    key={href}
-                    aria-current={path === href ? "page" : undefined}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Icon size={18} />
-                    <span>{label}</span>
-                  </Link>
-                ))}
-              </nav>
-            ))}
+            {nav
+              .filter(([, items]) =>
+                items.some(([href]) => canVisit(data.membership.role, href)),
+              )
+              .map(([group, items]) => (
+                <nav key={group} aria-label={group}>
+                  <h3>{group}</h3>
+                  {items
+                    .filter(([href]) => canVisit(data.membership.role, href))
+                    .map(([href, label, Icon]) => (
+                      <Link
+                        href={href}
+                        key={href}
+                        aria-current={path === href ? "page" : undefined}
+                        onClick={() => setOpen(false)}
+                      >
+                        <Icon size={18} />
+                        <span>{label}</span>
+                      </Link>
+                    ))}
+                </nav>
+              ))}
           </div>
           <div className="navigation-footer">
             <ShieldCheck size={15} />

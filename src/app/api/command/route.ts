@@ -1,3 +1,4 @@
+import { canCommand } from "@/features/access/policy";
 import { readBoundedJson } from "@/lib/request-json";
 import { actionSchemas, commandEnvelope } from "@/features/commands/schema";
 import { session } from "@/lib/data";
@@ -33,6 +34,14 @@ export async function POST(request: Request) {
   const s = await session();
   if (!s || !s.memberships.some((m) => m.hospital_id === parsed.data.hospital))
     return Response.json({ error: "Unauthorized" }, { status: 403 });
+  const membership = s.memberships.find(
+    (m) => m.hospital_id === parsed.data.hospital,
+  );
+  if (!membership || !canCommand(membership.role, parsed.data.action))
+    return Response.json(
+      { error: "Your role cannot perform this action." },
+      { status: 403, headers: { "Cache-Control": "no-store" } },
+    );
   const { data, error } = await s.db.rpc("staff_command", {
     p_hospital: parsed.data.hospital,
     p_action: parsed.data.action,

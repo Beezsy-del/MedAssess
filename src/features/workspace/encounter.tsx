@@ -1,4 +1,5 @@
 "use client";
+import { canRegister } from "@/features/access/policy";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -88,9 +89,11 @@ export function Encounter({ id }: { id: string }) {
         <div className="button-row">
           {!closed && (
             <>
-              <button className="button" onClick={() => void rotate()}>
-                <QrCode size={16} /> New patient pass
-              </button>
+              {canRegister(data.membership.role) && (
+                <button className="button" onClick={() => void rotate()}>
+                  <QrCode size={16} /> New patient pass
+                </button>
+              )}
               {clinical && (
                 <button
                   className="button primary"

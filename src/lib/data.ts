@@ -1,11 +1,12 @@
 import "server-only";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { hospitalCookie, selectMembership } from "./hospital-selection";
 import { serverClient } from "./supabase/server";
 import type { Database } from "./supabase/database.types";
 export type Row<T extends keyof Database["public"]["Tables"]> =
   Database["public"]["Tables"][T]["Row"];
-export async function session() {
+export const session = cache(async function session() {
   const db = await serverClient();
   const {
     data: { user },
@@ -18,7 +19,7 @@ export async function session() {
     .eq("active", true);
   if (error || !memberships?.length) return null;
   return { db, user, memberships };
-}
+});
 export class AuthenticationRequiredError extends Error {}
 export async function snapshot(hospitalId?: string) {
   const s = await session();

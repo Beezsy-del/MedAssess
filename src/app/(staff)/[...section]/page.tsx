@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+import { canVisit } from "@/features/access/policy";
+import { hospitalCookie, selectMembership } from "@/lib/hospital-selection";
 import { redirect, notFound } from "next/navigation";
 import { snapshot, session } from "@/lib/data";
 import { WorkspaceProvider } from "@/features/workspace/context";
@@ -51,7 +54,14 @@ export default async function StaffPage({
     ].includes(route)
   )
     notFound();
-  if (!(await session())) redirect("/login");
+  const current = await session();
+  if (!current) redirect("/login");
+  const membership = selectMembership(
+    current.memberships,
+    undefined,
+    (await cookies()).get(hospitalCookie)?.value,
+  );
+  if (!canVisit(membership.role, section.join("/"))) notFound();
   const initial = await snapshot();
   const { q } = await searchParams;
   let content: React.ReactNode;
