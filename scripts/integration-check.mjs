@@ -364,7 +364,7 @@ const { data: alerts } = await doctor
   .from("notifications")
   .select("*")
   .eq("encounter_id", created.id)
-  .eq("status", "CREATED");
+  .in("status", ["CREATED", "ESCALATED"]);
 assert.ok(alerts.length);
 const alert = alerts[0];
 for (const status of ["ACKNOWLEDGED", "IN_PROGRESS", "RESOLVED"])

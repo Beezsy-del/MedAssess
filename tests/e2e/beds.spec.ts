@@ -84,7 +84,9 @@ test("intake opens physical bed map; reviewed compatible allocation updates anot
       "I verified this patient, ward, required equipment and bed suitability.",
     )
     .check();
-  const observer = await browser.newContext();
+  const observer = await browser.newContext({
+    storageState: process.env.PLAYWRIGHT_STORAGE_STATE,
+  });
   const other = await observer.newPage();
   await signIn(other, "Doctor");
   await other.goto("/resources");

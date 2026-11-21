@@ -6,6 +6,7 @@ export default defineConfig({
   timeout: 90000,
   expect: { timeout: 15000 },
   use: {
+    storageState: process.env.PLAYWRIGHT_STORAGE_STATE,
     baseURL: process.env.BASE_URL ?? "http://localhost:3000",
     browserName: "chromium",
     channel: process.env.CI ? undefined : "chrome",
