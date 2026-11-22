@@ -66,3 +66,5 @@ Supabase project: **MedAssess**, reference `kkfqxlwwcwhnmhmsqitx`, Mumbai (`ap-s
 [Architecture](docs/ARCHITECTURE.md) · [Database](docs/DATABASE_SCHEMA.md) · [API](docs/API.md) · [Permissions](docs/ROLE_PERMISSIONS.md) · [Clinical safety](docs/CLINICAL_SAFETY.md) · [Test results](docs/TEST_RESULTS.md) · [Security audit](docs/SECURITY_AUDIT.md) · [Demo guide](docs/DEMO_GUIDE.md) · [Limitations](docs/KNOWN_LIMITATIONS.md)
 
 GitHub repository: [MedAssess](https://github.com/Beezsy-del/MedAssess). Product brand: MedCipher.
+
+Latest verified release: [technical-gap fixes and acceptance evidence](docs/TECHNICAL_GAP_RELEASE.md). The report separates implemented prototype workflows, unfinished technical scope, external provider configuration and required clinical review.

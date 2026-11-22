@@ -32,3 +32,16 @@ The original broader master specification still has technical work: push/SMS ada
 Hackathon demonstration: tested synthetic workflows. Supervised pilot: not ready. Production technical readiness: not certified. Clinical/regulatory readiness: not validated.
 
 Final local evidence: full browser run **23/23 passed** after correcting the locator. Final review then extended stale-response protection to initial session loading; all three focused reliability scenarios passed, including the new initial-session race (24 distinct browser scenarios covered across the runs). Lint, typecheck, all 94 unit tests and production build passed again after that fix. Hosted RLS recheck: 40 public tables, zero without RLS, one active review job. No new database migration is required.
+
+## Verified hosted release
+
+- Repository: https://github.com/Beezsy-del/MedAssess ; branch `feat/patient-portal-role-workflows`.
+- Deployed source: `733a0fb2c38d470224388a949da8c7b8f3c31287` (preceding implementation commit `b6d33d12d723fbd4ff71a0d74b31c78ea17e6c1f`).
+- Final preview: https://medcipher-triage-platform-6k4qrp9me-bloodflow.vercel.app/ ; `dpl_Bpe9Chc7Z8dYF3Pkj4BCuGAMzGmk`, READY. All eight hosted acceptance groups passed. The preceding preview also passed real staff credential-change acceptance. Preview protection remained enabled; temporary test credential revoked and local credential file removed.
+- Production: https://medcipher-triage-platform.vercel.app/ ; `dpl_78iEQbudkBW51NsfVtepXqYvGSoa`, READY, canonical alias assigned, Next.js/Node 24/Mumbai; build approximately 43 seconds.
+- Current-production acceptance: all eight hosted workflow groups passed, plus staff form creation, persistence after reload, nurse sign-in, administrator denial, password-page availability, password change, old-password rejection, new-password login, duplicate and non-admin provisioning denial, and disabled-membership session denial. Synthetic test memberships were disabled afterward. No credentials were printed.
+- Exact-source CI: https://github.com/Beezsy-del/MedAssess/actions/runs/45049791964 — success. Verify and local-integration jobs passed, including all **94 unit tests and 24 browser tests**, SQL/role/tenant assertions, database workflow suites, load and Realtime reconnect. Main-only hosted integration was skipped by its existing policy; independent hosted acceptance above was actually run.
+- No database migration needed; no reset or removal of existing patient records. Existing 16 migrations retained; all 40 public tables have RLS and the workflow cron is active.
+- Runtime error/fatal count query returned no groups for the deployed release during the short post-release observation window. No external monitoring drain has been configured; this is not a reliability guarantee.
+
+Subsequent documentation-only commits do not change the deployed application source. This release fixes concrete defects; it does not claim all broader master-specification technical gaps have been completed.
