@@ -160,6 +160,15 @@ export function AdaptivePortal() {
       active = false;
     };
   }, []);
+  useEffect(() => {
+    // A QR link may navigate within this same document. Reload to re-run the
+    // capability exchange without retaining another encounter's unsaved state.
+    const openChangedPass = () => {
+      if (window.location.hash) window.location.reload();
+    };
+    window.addEventListener("hashchange", openChangedPass);
+    return () => window.removeEventListener("hashchange", openChangedPass);
+  }, []);
   const hasSession = status !== null;
   useEffect(() => {
     if (!hasSession) return;

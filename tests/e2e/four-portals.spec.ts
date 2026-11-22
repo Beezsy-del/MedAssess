@@ -84,6 +84,8 @@ test("new patient route opens QR fragment for the correct encounter and rejects 
   const context = await browser.newContext({ baseURL });
   try {
     const patient = await context.newPage();
+    await patient.goto("/patient-portal");
+    await expect(patient.getByLabel("Private access token")).toBeVisible();
     await patient.goto(`/patient-portal#${created.token}`);
     await expect(
       patient.getByRole("heading", { name: "About you", exact: true }),
