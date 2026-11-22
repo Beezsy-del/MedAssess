@@ -84,3 +84,5 @@ The login now includes Administrator, Doctor, Triage Nurse and Patient Portal op
 ## Isolated patient demonstration
 
 `/patient-portal/demo` provides a token-free, interactive fictional patient journey. Presentation scenarios select simulated outcomes; they are not clinical rules. All demo state stays in memory, and no real patient APIs or alerts are used. The separate Real Patient Access option retains existing capability validation. See PATIENT_DEMO_MODE.md.
+
+Patient Demo Mode release verified: source `fd580e6`, production `/patient-portal/demo`, 102 unit tests and 28 local/CI browser tests passed; both hosted demo tests and nine real-workflow acceptance groups passed on preview and production. See PATIENT_DEMO_MODE.md for URLs, deployment IDs and limits.
