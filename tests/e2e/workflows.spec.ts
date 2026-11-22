@@ -56,7 +56,7 @@ test("staff demo, persisted registration, assessment and discharge", async ({
   const href = await page
     .getByRole("link", { name: "Open intake" })
     .getAttribute("href");
-  expect(href).toContain("/patient/portal#");
+  expect(href).toContain("/patient-portal#");
   await page.getByRole("button", { name: "Close dialog" }).click();
   await page
     .getByRole("link", { name: new RegExp(name) })

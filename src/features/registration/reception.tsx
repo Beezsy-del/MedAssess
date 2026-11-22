@@ -32,7 +32,7 @@ export function QRToken({
   const [copied, setCopied] = useState(false);
   const [qrError, setQrError] = useState("");
   const [url] = useState(
-    () => `${window.location.origin}/patient/portal#${token}`,
+    () => `${window.location.origin}/patient-portal#${token}`,
   );
   useEffect(() => {
     void QRCode.toDataURL(url, {

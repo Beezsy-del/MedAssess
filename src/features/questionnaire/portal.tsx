@@ -348,6 +348,25 @@ export function AdaptivePortal() {
             }}
           >
             <h1>{t("Open your patient pass")}</h1>
+            <div className="patient-entry-instructions">
+              <h2>{t("Scan your QR code")}</h2>
+              <p>
+                {t(
+                  "Open your phone camera, point it at the QR code on your patient pass, then tap the link. It opens your private encounter.",
+                )}
+              </p>
+              <h2>{t("Or enter your private token")}</h2>
+              <p>
+                {t(
+                  "Type the private access token printed on your pass below. Your encounter number alone cannot open a record.",
+                )}
+              </p>
+              <p>
+                {t(
+                  "No pass or need help? Ask reception or a triage nurse to register you or help complete the questionnaire. No smartphone is required for staff-assisted care.",
+                )}
+              </p>
+            </div>
             <TextField
               label="Private access token"
               value={pass}
@@ -439,7 +458,7 @@ export function AdaptivePortal() {
                       })
                     }
                   >
-                    {t("Report a symptom change")}
+                    {t("MY SYMPTOMS HAVE CHANGED")}
                   </button>
                 )
               )}

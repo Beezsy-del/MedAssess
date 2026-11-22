@@ -64,3 +64,7 @@ Compared the newly attached prompt to the prior attachment: identical content. R
 ### Technical gap fixes and regression release
 
 Implemented authenticated individual-staff password recovery/update, provider/error validation, stale patient-status race protection, reconnect recovery, localized patient status/validation messages and verbatim free-text review. Added credential-change and delayed-response browser regressions plus password authorization and review-value unit checks. All database workflow suites and load/Realtime checks passed; browser coverage is recorded in TECHNICAL_GAP_RELEASE.md. No schema change is required for these fixes. Broader remaining technical work is explicitly distinguished from external configuration and clinical review.
+
+### Fourth portal on the existing login
+
+Added the fourth Patient Portal option alongside the three existing staff portals, preserving staff authentication. The public `/patient-portal` route reuses the integrated adaptive intake; new QR links use it and old routes remain supported. Added multilingual QR/token/assisted-care instructions and regression tests for four-option navigation, mobile accessibility, QR/manual encounter equivalence and guessed-token rejection. See FOUR_PORTAL_RELEASE.md for acceptance mapping and deployment evidence. No schema modification required.

@@ -3548,3 +3548,68 @@ dd {
   margin: 0.3rem 0 0.3rem 1rem;
   overflow-wrap: anywhere;
 }
+
+.portal-picker {
+  margin-bottom: 30px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--border);
+}
+.portal-picker > p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.portal-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.portal-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  gap: 10px;
+}
+.portal-option > svg {
+  color: var(--brand);
+}
+.portal-option h3 {
+  font-size: 15px;
+  line-height: 1.4;
+}
+.portal-option p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  flex: 1;
+}
+.portal-option .button {
+  width: 100%;
+  min-height: 44px;
+  white-space: normal;
+  text-align: center;
+  font-size: 12px;
+}
+.portal-option-patient {
+  border-color: var(--brand);
+}
+.patient-entry-instructions {
+  margin: 20px 0;
+}
+.patient-entry-instructions h2 {
+  font-size: 18px;
+  margin: 18px 0 8px;
+}
+.patient-entry-instructions p {
+  margin: 8px 0;
+  line-height: 1.7;
+}
+@media (max-width: 480px) {
+  .portal-options {
+    grid-template-columns: 1fr;
+  }
+}

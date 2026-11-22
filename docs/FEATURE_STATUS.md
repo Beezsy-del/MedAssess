@@ -76,3 +76,7 @@ Checkpoint verification: formatting, lint, strict typecheck and 87 unit tests pa
 ## Current technical-gap release
 
 See [TECHNICAL_GAP_RELEASE.md](TECHNICAL_GAP_RELEASE.md): individual-staff credential changes, patient reconnect/race safety, localized patient workflow messages and verbatim answer review are implemented. Static checks, 94 unit tests and all database workflow suites pass; new browser regressions pass. The report distinguishes historical test evidence, current deployment verification and unfinished technical scope.
+
+## Fourth login portal
+
+The login now includes Administrator, Doctor, Triage Nurse and Patient Portal options. `/patient-portal` reuses existing secure questionnaire, assessments, staff notifications and database workflows. New QR passes target that route. See FOUR_PORTAL_RELEASE.md for test/deployment evidence and device/clinical-review limitations.

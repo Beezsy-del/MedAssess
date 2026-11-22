@@ -1,5 +1,26 @@
 // Prototype translations; native-language and clinical review remain required.
 export const statusCopy: Record<string, [string, string]> = {
+  "Scan your QR code": ["ನಿಮ್ಮ QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ", "अपना QR कोड स्कैन करें"],
+  "Open your phone camera, point it at the QR code on your patient pass, then tap the link. It opens your private encounter.":
+    [
+      "ಫೋನ್ ಕ್ಯಾಮರಾ ತೆರೆಯಿರಿ, ರೋಗಿ ಪಾಸ್‌ನ QR ಕೋಡ್ ಕಡೆ ತೋರಿಸಿ, ನಂತರ ಲಿಂಕ್ ಒತ್ತಿ. ನಿಮ್ಮ ಖಾಸಗಿ ಭೇಟಿ ತೆರೆಯುತ್ತದೆ.",
+      "फ़ोन कैमरा खोलें, रोगी पास के QR कोड पर रखें और लिंक पर टैप करें। आपकी निजी मुलाकात खुल जाएगी।",
+    ],
+  "Or enter your private token": [
+    "ಅಥವಾ ನಿಮ್ಮ ಖಾಸಗಿ ಟೋಕನ್ ನಮೂದಿಸಿ",
+    "या अपना निजी टोकन दर्ज करें",
+  ],
+  "Type the private access token printed on your pass below. Your encounter number alone cannot open a record.":
+    [
+      "ಪಾಸ್‌ನಲ್ಲಿ ಮುದ್ರಿಸಿರುವ ಖಾಸಗಿ ಪ್ರವೇಶ ಟೋಕನ್ ಕೆಳಗೆ ನಮೂದಿಸಿ. ಭೇಟಿ ಸಂಖ್ಯೆಯಿಂದ ಮಾತ್ರ ದಾಖಲೆ ತೆರೆಯುವುದಿಲ್ಲ.",
+      "पास पर छपा निजी पहुँच टोकन नीचे लिखें। केवल मुलाकात संख्या से रिकॉर्ड नहीं खुलेगा।",
+    ],
+  "No pass or need help? Ask reception or a triage nurse to register you or help complete the questionnaire. No smartphone is required for staff-assisted care.":
+    [
+      "ಪಾಸ್ ಇಲ್ಲವೇ ಅಥವಾ ಸಹಾಯ ಬೇಕೇ? ನೋಂದಣಿ ಅಥವಾ ಪ್ರಶ್ನಾವಳಿ ತುಂಬಲು ಸ್ವಾಗತ ಸಿಬ್ಬಂದಿ ಅಥವಾ ಟ್ರಯಾಜ್ ನರ್ಸ್‌ರನ್ನು ಕೇಳಿ. ಸಿಬ್ಬಂದಿ ನೆರವಿನ ಆರೈಕೆಗೆ ಸ್ಮಾರ್ಟ್‌ಫೋನ್ ಅಗತ್ಯವಿಲ್ಲ.",
+      "पास नहीं है या मदद चाहिए? पंजीकरण या प्रश्नावली भरने के लिए स्वागत कक्ष या ट्रायेज नर्स से पूछें। कर्मचारी की सहायता से देखभाल के लिए स्मार्टफ़ोन आवश्यक नहीं है।",
+    ],
+  "MY SYMPTOMS HAVE CHANGED": ["ನನ್ನ ಲಕ್ಷಣಗಳು ಬದಲಾಗಿವೆ", "मेरे लक्षण बदल गए हैं"],
   "Enter the private token from your patient pass. You can always ask a nurse for assistance.":
     [
       "ನಿಮ್ಮ ರೋಗಿ ಪಾಸ್‌ನ ಖಾಸಗಿ ಟೋಕನ್ ನಮೂದಿಸಿ. ಸಹಾಯಕ್ಕಾಗಿ ನರ್ಸ್‌ರನ್ನು ಕೇಳಬಹುದು.",

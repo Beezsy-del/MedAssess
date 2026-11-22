@@ -52,3 +52,5 @@ Bed-release verification observed intermittent slow Supabase authentication/read
 Historical bed-release failures were followed by the portal release's successful full browser and database runs. See PORTAL_RELEASE.md and TECHNICAL_GAP_RELEASE.md for current evidence; the old failure does not represent the current test status.
 
 The patient-portal migrations and staff lifecycles are now deployed. The earlier in-progress portal checkpoint is superseded by PORTAL_UPGRADE_VERIFICATION.md. Hosted Supabase branching remains unavailable on the connected plan; no paid-plan change was made.
+
+Fourth portal: phone-camera QR instructions and opening generated QR URLs are covered; physical camera scanning across Android/iPhone models still requires device acceptance. The new entry point does not establish clinical protocol or translation validation. See FOUR_PORTAL_RELEASE.md.

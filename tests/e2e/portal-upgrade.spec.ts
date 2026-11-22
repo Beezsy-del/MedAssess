@@ -31,7 +31,11 @@ test("patient manual access, adaptive report, saved progress, staff brief and dy
   const created = await createdResponse.json();
   const patientContext = await browser.newContext({ baseURL });
   const patient = await patientContext.newPage();
-  await patient.goto("/patient/start");
+  await patient.goto("/login");
+  await patient
+    .getByRole("link", { name: "Enter Patient Portal", exact: true })
+    .click();
+  await expect(patient).toHaveURL(/\/patient-portal$/);
   await patient.getByLabel("Private access token").fill(created.manual_token);
   await patient
     .getByRole("button", { name: "Open encounter", exact: true })
@@ -120,7 +124,7 @@ test("patient manual access, adaptive report, saved progress, staff brief and dy
     page.getByText("Synthetic allergy", { exact: false }).first(),
   ).toBeVisible();
   await patient
-    .getByRole("button", { name: "Report a symptom change" })
+    .getByRole("button", { name: "MY SYMPTOMS HAVE CHANGED" })
     .click();
   await patient.getByLabel("How has it changed?").selectOption("worsening");
   for (let i = 1; i < 7; i++)

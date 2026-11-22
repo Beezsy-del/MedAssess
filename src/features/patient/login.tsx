@@ -2,7 +2,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  ShieldCheck,
+  Stethoscope,
+  HeartPulse,
+  UserRound,
+} from "lucide-react";
 import { Field } from "@/components/ui";
 import { PublicHeader, CareMap } from "@/components/chrome";
 export function Login({
@@ -73,6 +79,74 @@ export function Login({
         </section>
         <section className="login-form">
           <div>
+            {!reset && (
+              <section
+                className="portal-picker"
+                aria-label="Choose your portal"
+              >
+                <h2>Choose your portal</h2>
+                <p>
+                  {demo
+                    ? "Staff options open the synthetic demonstration. Use your own credentials below for your staff account."
+                    : "Staff use their hospital-issued credentials below. Patients use a private encounter pass."}
+                </p>
+                <div className="portal-options">
+                  {[
+                    {
+                      role: "admin",
+                      title: "Administrator Portal",
+                      action: "Administrator",
+                      description:
+                        "Patient directory, staff and hospital resources.",
+                      Icon: ShieldCheck,
+                    },
+                    {
+                      role: "doctor",
+                      title: "Doctor Portal",
+                      action: "Doctor",
+                      description:
+                        "Assigned patients, assessments and clinical care.",
+                      Icon: Stethoscope,
+                    },
+                    {
+                      role: "nurse",
+                      title: "Triage Nurse Portal",
+                      action: "Triage nurse",
+                      description:
+                        "Patient intake, reassessment and care coordination.",
+                      Icon: HeartPulse,
+                    },
+                  ].map(({ role, title, action, description, Icon }) => (
+                    <article className="portal-option" key={role}>
+                      <Icon size={23} aria-hidden="true" />
+                      <h3>{title}</h3>
+                      <p>{description}</p>
+                      <button
+                        className="button"
+                        disabled={busy}
+                        onClick={() => {
+                          if (demo) void login({ action: "demo", role });
+                          else document.getElementById("staff-email")?.focus();
+                        }}
+                      >
+                        {action}
+                      </button>
+                    </article>
+                  ))}
+                  <article className="portal-option portal-option-patient">
+                    <UserRound size={23} aria-hidden="true" />
+                    <h3>PATIENT PORTAL</h3>
+                    <p>
+                      Register, enter your symptoms and receive your preliminary
+                      care priority.
+                    </p>
+                    <Link className="button primary" href="/patient-portal">
+                      Enter Patient Portal
+                    </Link>
+                  </article>
+                </div>
+              </section>
+            )}
             <h2>{reset ? "Reset your password" : "Staff sign in"}</h2>
             <p>
               {reset
@@ -91,6 +165,7 @@ export function Login({
             >
               <Field label="Work email">
                 <input
+                  id="staff-email"
                   name="email"
                   type="email"
                   autoComplete="email"
@@ -128,34 +203,6 @@ export function Login({
             >
               {reset ? "Return to sign in" : "Forgot your password?"}
             </Link>
-            {demo && !reset && (
-              <div className="demo-login">
-                <div>
-                  <ShieldCheck size={18} />
-                  <strong>Try a staff role</strong>
-                </div>
-                <p>
-                  Explore with synthetic patients. Changes are saved in the
-                  demo.
-                </p>
-                <div className="button-row">
-                  {["doctor", "nurse", "admin"].map((role) => (
-                    <button
-                      className="button"
-                      key={role}
-                      disabled={busy}
-                      onClick={() => void login({ action: "demo", role })}
-                    >
-                      {role === "admin"
-                        ? "Administrator"
-                        : role === "doctor"
-                          ? "Doctor"
-                          : "Triage nurse"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
             <p className="muted">
               Need emergency assistance?{" "}
               <Link href="/emergency">Contact nearby staff now.</Link>
