@@ -1,5 +1,7 @@
 # Patient portal and role-workflow verification — 22 November 2026
 
+**Hosted release update:** Deployment was subsequently authorized. See [PORTAL_RELEASE.md](PORTAL_RELEASE.md) for migration, deployment and live verification evidence; earlier deferral statements below are historical.
+
 Target: [Beezsy-del/MedAssess](https://github.com/Beezsy-del/MedAssess), branch `feat/patient-portal-role-workflows`. Product remains MedCipher. The user explicitly chose **continue locally; defer hosted deployment**. This report covers the latest patient-portal/role-workflow specification. Historical master-specification gaps remain recorded separately; this is not a blanket production-readiness certificate.
 
 ## Environment and migration status

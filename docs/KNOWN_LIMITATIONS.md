@@ -1,5 +1,7 @@
 # Known limitations and remaining work
 
+**Hosted release update:** Deployment was subsequently authorized. See [PORTAL_RELEASE.md](PORTAL_RELEASE.md) for migration, deployment and live verification evidence; earlier deferral statements below are historical.
+
 **22 November local upgrade:** See [PORTAL_UPGRADE_VERIFICATION.md](PORTAL_UPGRADE_VERIFICATION.md) for the current patient-portal, role, resource, protocol and referral implementation. Hosted deployment was explicitly deferred by the user; older hosted-status statements below describe the previous release. The new local implementation supersedes older gaps for staff role editing, department RLS, adaptive history/medicines/allergies, internal referrals and scheduled reassessment. It does not establish clinical validation or production readiness.
 
 ## Release blockers

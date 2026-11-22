@@ -42,3 +42,7 @@ Source `0a5a5ff` passed GitHub [run 44783771333](https://github.com/Beezsy-del/M
 ## Nurse intake hosted acceptance
 
 [GitHub run 44817041177](https://github.com/Beezsy-del/MedAssess/actions/runs/44817041177) passed verify and integration for `67c7f29`: 61 unit tests, 49 hosted database assertions and 13 live browser scenarios in 3.3 minutes, plus formatting/lint/types/build/dependency audit. Production `dpl_EigRNPTfyzmKkUUkhVFYAkKtEQc4` serves the canonical host. Release `v0.3.0-demo` includes the deployment link. Subsequent documentation-only commits record results without changing the deployed application source. GitHub reports a deprecation notice for the pinned actions' Node 20 runtime, which it executes under Node 24; both jobs succeeded. No monitoring/clinical-readiness claims are inferred from the short runtime-log window.
+
+## Patient portal and role-workflow release — 22 November 2026
+
+The user explicitly authorized the previously deferred hosted upgrade. Application commit `1eddbb9` is now READY on https://medcipher-triage-platform.vercel.app/, production deployment `dpl_FLZiRSZmm68HwkCAg5SUhfJQr8AP`. Both pending migrations were applied to the existing MedAssess project; 40/40 public tables have RLS and the scheduler ran successfully. Preview and canonical-production acceptance each passed eight real hosted groups; all 33 hosted core database assertions passed. Full evidence, remaining staff-provisioning secret configuration, security-advisor context and monitoring limits: [PORTAL_RELEASE.md](PORTAL_RELEASE.md).

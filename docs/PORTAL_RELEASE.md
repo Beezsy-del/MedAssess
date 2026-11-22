@@ -1,0 +1,35 @@
+# MedCipher patient-portal release — 22 November 2026
+
+The user authorized deployment to the existing site after local and CI acceptance. This supersedes the earlier hosted-deployment deferral.
+
+- Repository: https://github.com/Beezsy-del/MedAssess
+- Application source: `1eddbb981c5319a83c17d37348359351cc56a02f`, branch `feat/patient-portal-role-workflows`.
+- Verified CI: https://github.com/Beezsy-del/MedAssess/actions/runs/45042011033 (87 unit tests, 21 browser scenarios, SQL/integration/load/Realtime checks, production build).
+- Supabase project: MedAssess, `kkfqxlwwcwhnmhmsqitx`.
+- Existing 14 migrations preserved. Applied `patient_portal_role_workflows` and `staff_workflows_and_snapshot` from the committed files; hosted migration history assigns versions `20261122164944` and `20261122164954` respectively. Match these by name/content when reconciling with local migration filenames; do not apply them twice.
+- After migration: all 40 public tables have RLS; no security-definer function lacks a configured search path; portal and snapshot RPCs exist; the workflow cron is active and its observed execution succeeded. The 283 pre-existing encounters remained present before verification created additional synthetic records.
+- Preview: https://medcipher-triage-platform-pv78941aj-bloodflow.vercel.app (`dpl_9gkRJZBY3jSH5jKgVnu8MWr22zbH`), READY. Eight real hosted acceptance groups passed: three-role sign-in, real snapshots, patient draft/submission, doctor registration denial, admin privacy, nurse medical brief, live emergency update and patient-session logout. All 33 core integration assertions also passed against hosted Supabase.
+- Production build: `dpl_FLZiRSZmm68HwkCAg5SUhfJQr8AP`, immutable URL https://medcipher-triage-platform-ku466535b-bloodflow.vercel.app. Final production verification is appended below.
+
+## Remaining configuration and readiness
+
+`SUPABASE_SECRET_KEY` is not configured in Vercel. The new synthetic staff-account provisioning endpoint therefore returns an explicit configuration error; it does not falsely claim account creation. The user was asked to configure that server-only variable for Preview and Production without sharing its value in chat. Existing staff sign-in, membership management and other tested workflows work without it. A new deployment is needed after adding the variable.
+
+No medically validated protocol or symptom-condition mapping has been supplied. Unreviewed/missing data remains assessment-required. Qualified clinical and language review remains necessary; clinical operational use stays disabled. This deployment is a synthetic demonstration, not production or clinical certification. The remaining feature and operational limits are described in PORTAL_UPGRADE_VERIFICATION.md.
+
+Supabase security advisors report deliberate deny-all RLS on private receipts/drafts and explicitly callable, capability-/membership-checked security-definer RPCs. These do not justify relaxing access checks. Leaked-password protection remains disabled: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection. Future production work must resolve the identity/security controls and independent review requirements.
+
+## Final production verification
+
+- **URL:** https://medcipher-triage-platform.vercel.app/
+- **Target / status:** production / READY. Vercel confirms that the canonical alias points to `dpl_FLZiRSZmm68HwkCAg5SUhfJQr8AP`.
+- **Application commit:** `1eddbb981c5319a83c17d37348359351cc56a02f`.
+- **Framework / region:** Next.js / Mumbai (`bom1`), Node 24.
+- **Build duration:** approximately 42 seconds from provider building/ready timestamps.
+- **Public availability:** HTTP 200, 0.68 seconds in the observed probe.
+- **Production acceptance:** all eight hosted acceptance groups passed on the canonical public URL, without a protection bypass.
+- **Runtime error scan:** no error/fatal log groups returned for this deployment in the post-release 10-minute query window. This is a short observation window, not a reliability guarantee.
+- **Drains / monitoring:** no external drains configured; provider runtime logs are available, but broader production monitoring remains a readiness gap.
+- **Temporary access:** preview automation bypass revoked and its local credential file removed after verification.
+
+The deployed application does not include subsequent documentation-only commits. No database reset, force push, clinical enablement or change of Vercel project was performed.
