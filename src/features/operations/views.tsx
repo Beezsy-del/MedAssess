@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { canCommand, canVisit, canRegister } from "@/features/access/policy";
 import { useState } from "react";
 import {
   Plus,
@@ -185,7 +186,7 @@ export function Resources() {
                 <p>
                   {r.location} · {r.kind}
                 </p>
-                {encounter && (
+                {encounter && canVisit(data.membership.role, "/encounters") && (
                   <Link href={`/encounters/${encounter.id}`}>
                     {encounter.reference}
                   </Link>
@@ -193,6 +194,7 @@ export function Resources() {
                 {[
                   "doctor",
                   "nurse",
+                  "triage_nurse",
                   "emergency_coordinator",
                   "resource_manager",
                 ].includes(data.membership.role) &&
@@ -203,9 +205,17 @@ export function Resources() {
                       onClick={() =>
                         r.status === "AVAILABLE"
                           ? (setResource(r.id), setError(""))
-                          : void command("release", {
-                              resource_id: r.id,
-                            }).catch(() => {})
+                          : void command(
+                              r.status === "CLEANING"
+                                ? "resource_clean"
+                                : "release",
+                              {
+                                resource_id: r.id,
+                                ...(r.status === "CLEANING"
+                                  ? { checks_confirmed: true }
+                                  : {}),
+                              },
+                            ).catch(() => {})
                       }
                     >
                       {r.status === "AVAILABLE"
@@ -214,6 +224,38 @@ export function Resources() {
                           ? "Confirm cleaned & available"
                           : "Release for cleaning"}
                     </button>
+                  )}
+                {r.status === "MAINTENANCE" &&
+                  canCommand(data.membership.role, "resource_restore") && (
+                    <form
+                      onSubmit={async (event) => {
+                        event.preventDefault();
+                        const form = new FormData(event.currentTarget);
+                        try {
+                          await command("resource_restore", {
+                            resource_id: r.id,
+                            checks_confirmed: form.get("checked") === "on",
+                            reason: form.get("reason"),
+                          });
+                        } catch (e) {
+                          setError(
+                            e instanceof Error ? e.message : "Clearance failed",
+                          );
+                        }
+                      }}
+                    >
+                      <label className="field">
+                        Maintenance clearance note
+                        <input name="reason" required minLength={5} />
+                      </label>
+                      <label>
+                        <input name="checked" type="checkbox" required /> Repair
+                        and safety checks completed
+                      </label>
+                      <button className="button" disabled={busy}>
+                        Send for cleaning
+                      </button>
+                    </form>
                   )}
                 {[
                   "resource_manager",
@@ -552,9 +594,11 @@ export function Referrals() {
           <h1>Referrals & transfers</h1>
           <p>Document acceptance and transport at every step.</p>
         </div>
-        <Link href="/doctor" className="button primary">
-          Open clinical workspace
-        </Link>
+        {canVisit(data.membership.role, "/doctor") && (
+          <Link href="/doctor" className="button primary">
+            Open clinical workspace
+          </Link>
+        )}
       </div>
       <div className="detail-grid">
         <section className="panel detail-panel">
@@ -576,17 +620,18 @@ export function Referrals() {
                 <Link className="button" href={`/encounters/${r.encounter_id}`}>
                   View encounter
                 </Link>
-                {next[r.status] && (
-                  <button
-                    className="button primary"
-                    onClick={() => {
-                      setSelected(r.id);
-                      setError("");
-                    }}
-                  >
-                    Record {next[r.status].toLowerCase()}
-                  </button>
-                )}
+                {next[r.status] &&
+                  canCommand(data.membership.role, "referral_status") && (
+                    <button
+                      className="button primary"
+                      onClick={() => {
+                        setSelected(r.id);
+                        setError("");
+                      }}
+                    >
+                      Record {next[r.status].toLowerCase()}
+                    </button>
+                  )}
               </div>
             </article>
           ))}
@@ -929,9 +974,11 @@ export function Settings({ section }: { section: string }) {
             administrator provisioning; self-assigned staff roles are
             prohibited.
           </p>
-          <Link href="/reception" className="back-link">
-            Manage device drafts <ArrowRight size={15} />
-          </Link>
+          {canRegister(data.membership.role) && (
+            <Link href="/reception" className="back-link">
+              Manage device drafts <ArrowRight size={15} />
+            </Link>
+          )}
         </section>
       </div>
       {!data.hospital.is_demo && <ProfileSettings />}

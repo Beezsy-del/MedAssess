@@ -32,7 +32,7 @@ export function QRToken({
   const [copied, setCopied] = useState(false);
   const [qrError, setQrError] = useState("");
   const [url] = useState(
-    () => `${window.location.origin}/patient/intake/${token}`,
+    () => `${window.location.origin}/patient/portal#${token}`,
   );
   useEffect(() => {
     void QRCode.toDataURL(url, {
@@ -62,6 +62,11 @@ export function QRToken({
       )}
       <p>Private encounter link · expires in 24 hours</p>
       <p>No smartphone? Reception can assist you.</p>
+      <label className="field">
+        Manual access token
+        <input readOnly value={token} aria-label="Manual access token" />
+      </label>
+      <p>Enter this private token at /patient/start. Keep this pass private.</p>
       {qrError && <p role="alert">{qrError}</p>}
       <div className="button-row">
         <button className="button" onClick={() => window.print()}>

@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
+import { ClinicalBrief } from "./clinical-brief";
 import { ArrowUpRight, Clock3 } from "lucide-react";
 import { Badge, Empty, Status, minutes } from "@/components/ui";
 import { useWorkspace } from "./context";
@@ -58,6 +60,9 @@ export function PatientTable({
                       </small>
                     </span>
                   </Link>
+                  {["nurse", "triage_nurse", "doctor"].includes(
+                    data.membership.role,
+                  ) && <QueueBrief encounter={e} />}
                 </td>
                 <td title={queueExplanation(e)}>
                   <Badge category={e.category} />
@@ -98,5 +103,28 @@ export function PatientTable({
         </tbody>
       </table>
     </div>
+  );
+}
+
+function QueueBrief({ encounter }: { encounter: Row<"patient_encounters"> }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <details
+      className="queue-brief"
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary>Medical summary</summary>
+      {open && (
+        <>
+          <p>
+            Registered{" "}
+            {new Date(encounter.arrived_at).toLocaleString("en-IN", {
+              timeZone: "Asia/Kolkata",
+            })}
+          </p>
+          <ClinicalBrief encounterId={encounter.id} />
+        </>
+      )}
+    </details>
   );
 }

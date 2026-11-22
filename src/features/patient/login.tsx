@@ -28,7 +28,11 @@ export function Login({
       if (reset) setMessage(result.message);
       else {
         router.push(
-          result.redirect === "/registration" ? "/registration" : "/dashboard",
+          ["/nurse", "/doctor", "/reception", "/dashboard"].includes(
+            result.redirect,
+          )
+            ? result.redirect
+            : "/dashboard",
         );
         router.refresh();
       }

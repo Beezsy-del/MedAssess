@@ -1,4 +1,6 @@
 "use client";
+import { ResourceRequests } from "./resource-requests";
+import { ClinicalBrief, DepartmentReferrals } from "./clinical-brief";
 import { canRegister } from "@/features/access/policy";
 import Link from "next/link";
 import { useState } from "react";
@@ -106,6 +108,9 @@ export function Encounter({ id }: { id: string }) {
           )}
         </div>
       </div>
+      <ClinicalBrief encounterId={id} />
+      <DepartmentReferrals encounterId={id} />
+      <ResourceRequests encounterId={id} />
       <div className="encounter-status">
         <Badge category={e.category} />
         <Status value={e.status} />

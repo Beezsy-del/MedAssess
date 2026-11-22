@@ -1,5 +1,5 @@
 "use client";
-import { canRegister } from "@/features/access/policy";
+import { canRegister, canVisit } from "@/features/access/policy";
 import Link from "next/link";
 import { CareMap } from "@/components/chrome";
 import { ArrowRight, Plus, Clock3, ShieldCheck, Activity } from "lucide-react";
@@ -152,9 +152,11 @@ export function Overview({
           Synthetic demo only. Clinical use is disabled; the protocol is not
           validated.
         </span>
-        <Link href="/settings/triage-protocol">
-          View protocol <ArrowRight size={14} />
-        </Link>
+        {canVisit(data.membership.role, "/protocols") && (
+          <Link href="/protocols">
+            View protocol <ArrowRight size={14} />
+          </Link>
+        )}
       </div>
       <div className="metrics">
         <Metric

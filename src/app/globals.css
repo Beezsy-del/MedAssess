@@ -3460,3 +3460,91 @@ dd {
   margin: 0.25rem 0;
   overflow-wrap: anywhere;
 }
+
+.administration-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  align-items: start;
+  gap: 1.5rem;
+}
+.administration-layout > section {
+  min-width: 0;
+}
+.resource-sidebar {
+  position: sticky;
+  top: 6rem;
+  max-height: calc(100dvh - 12rem);
+  overflow: auto;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+}
+.resource-sidebar h2 {
+  font-size: 1rem;
+  margin: 1.25rem 0 0.5rem;
+}
+.resource-sidebar dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 0.35rem;
+}
+.resource-sidebar dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.resource-sidebar summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+@media (max-width: 1000px) {
+  .administration-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .resource-sidebar {
+    grid-row: 1;
+    top: 4.5rem;
+    z-index: 5;
+    max-height: 35dvh;
+  }
+}
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+.brief-grid dd {
+  margin: 0.4rem 0;
+}
+.brief-grid dt {
+  font-weight: 600;
+}
+.report-json {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 25rem;
+  overflow: auto;
+  font-size: 0.85rem;
+}
+.patient-priority {
+  border-left-width: 0.4rem;
+}
+.patient-priority.priority-red {
+  border-left-color: #c32d3c;
+}
+.patient-priority.priority-yellow {
+  border-left-color: #b67b00;
+}
+.patient-priority.priority-green {
+  border-left-color: #247b4c;
+}
+.patient-review dl > div {
+  border-bottom: 1px solid var(--border);
+  padding-block: 0.45rem;
+}
+.patient-review dd {
+  margin: 0.3rem 0 0.3rem 1rem;
+  overflow-wrap: anywhere;
+}

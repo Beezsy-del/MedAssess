@@ -89,6 +89,16 @@ export function WorkspaceProvider({
         {
           event: "*",
           schema: "public",
+          table: "hospital_activity",
+          filter: `hospital_id=eq.${data.hospital.id}`,
+        },
+        reload,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
           table: "patient_encounters",
           filter: `hospital_id=eq.${data.hospital.id}`,
         },
@@ -147,13 +157,20 @@ export function WorkspaceProvider({
       .subscribe((status) => {
         if (status === "SUBSCRIBED") reload();
       });
-    const timer = setInterval(reload, 30000);
+    const timer = setInterval(reload, 10000);
+    const visible = () => {
+      if (document.visibilityState === "visible") reload();
+    };
     window.addEventListener("online", reload);
+    window.addEventListener("focus", reload);
+    document.addEventListener("visibilitychange", visible);
     return () => {
       live.dispose();
       void db.removeChannel(channel);
       clearInterval(timer);
       window.removeEventListener("online", reload);
+      window.removeEventListener("focus", reload);
+      document.removeEventListener("visibilitychange", visible);
     };
   }, [data.hospital.id, refresh]);
   const command = async (action: string, payload: CommandData) => {

@@ -197,6 +197,9 @@ begin
  if jsonb_typeof(a->'identity') is distinct from 'object' or jsonb_typeof(a->'history') is distinct from 'object' or jsonb_typeof(a->'answers') is distinct from 'object' or jsonb_typeof(a->'self_reported_vitals') is distinct from 'object' then raise exception 'Invalid report structure';end if;
  if a->>'progression' not in ('unknown','improving','same','worsening') or a->>'allergy_status' not in ('unknown','none_reported','recorded') or a->>'medication_status' not in ('unknown','none_reported','recorded') or a#>>'{history,status}' not in ('unknown','none_reported','recorded') then raise exception 'Invalid report status';end if;
  if jsonb_typeof(a->'symptoms_complete') is distinct from 'boolean' or jsonb_typeof(a->'emergency_help') is distinct from 'boolean' then raise exception 'Explicit coverage required';end if;
+ for k in select jsonb_object_keys(a->'answers') loop
+  if (k like 'chest_%' and not(a->'symptoms'?'chest_discomfort')) or (k like 'fever_%' and not(a->'symptoms'?'fever')) or (k like 'bleeding_%' and not(a->'symptoms'?'bleeding')) or (k like 'breathing_%' and not(a->'symptoms'?'breathing_difficulty')) or (k like 'injury_%' and not(a->'symptoms'?'injury')) then raise exception 'Inactive symptom branch';end if;
+ end loop;
  if a->>'medication_status'='recorded' and jsonb_array_length(a->'medications')=0 or a->>'allergy_status'='recorded' and jsonb_array_length(a->'allergies')=0 then raise exception 'Recorded history needs details';end if;
  for v in select value from jsonb_array_elements(a->'medications') loop if jsonb_typeof(v)<>'object' or length(trim(coalesce(v->>'name','')))=0 then raise exception 'Medication name required';end if;end loop;
  for v in select value from jsonb_array_elements(a->'allergies') loop if jsonb_typeof(v)<>'object' or length(trim(coalesce(v->>'substance','')))=0 then raise exception 'Allergy substance required';end if;end loop;
@@ -261,6 +264,9 @@ begin
   cat:=(assessment->>'category')::public.triage_category;effective:=case when private.urgency_rank(cat)>private.urgency_rank(e.category) then cat else e.category end;
   insert into public.preliminary_assessments(hospital_id,encounter_id,report_id,previous_category,category,protocol_version,reasons,missing,matched_rules) values(e.hospital_id,e.id,report.id,e.preliminary_category,cat,assessment->>'protocol',assessment->'reasons',assessment->'missing',assessment->'matched');
   update public.patient_encounters set latest_patient_report=report.id,preliminary_category=cat,category=effective,emergency=e.emergency or cat='RED',deteriorating=e.deteriorating or a->>'progression'='worsening' or private.urgency_rank(cat)>private.urgency_rank(e.category),symptoms=case when e.latest_patient_report is null and e.symptoms='' then a->>'complaint' else e.symptoms end,version=version+1,updated_at=now() where id=e.id;
+  if cat='RED' then
+   insert into public.resource_requests(hospital_id,encounter_id,token_id,kind,reason) values(e.hospital_id,e.id,t.id,'Stretcher','Emergency patient report: staff must assess appropriate transport and equipment') on conflict(encounter_id,kind) where status in ('REQUESTED','ACKNOWLEDGED') do nothing;
+  end if;
   update public.encounter_access_tokens set submitted_at=coalesce(submitted_at,now()) where id=t.id;
   delete from private.patient_drafts where token_id=t.id;
   if a->>'progression'='worsening' or private.urgency_rank(cat)>private.urgency_rank(e.category) then
@@ -293,14 +299,16 @@ begin
  when p_action in ('assess','note','subpriority','reassessment') then r in ('nurse','triage_nurse','doctor')
  when p_action in ('follow_up','referral') then r='doctor'
  when p_action='referral_status' then r in ('doctor','emergency_coordinator')
- when p_action in ('settings','department','resource','facility','shift','bed_ward','bed_configure') then r in ('hospital_admin','super_admin')
- when p_action in ('bed_plan','bed_assign','bed_release','transition') then r in ('nurse','triage_nurse','doctor','emergency_coordinator')
+ when p_action in ('settings','department','resource','facility','shift') then r in ('hospital_admin','super_admin')
+ when p_action in ('bed_ward','bed_configure') then r in ('hospital_admin','super_admin','resource_manager','emergency_coordinator')
+ when p_action in ('bed_plan','transition') then r in ('nurse','triage_nurse','doctor','emergency_coordinator')
+ when p_action in ('bed_assign','bed_release') then r in ('nurse','triage_nurse','doctor','emergency_coordinator','resource_manager')
  when p_action in ('bed_refresh','bed_status','reserve','release','maintenance','shortage') then r in ('nurse','triage_nurse','doctor','emergency_coordinator','resource_manager','hospital_admin','super_admin')
  when p_action='alert' then r<>'receptionist'
  else false end;
  if not permitted then raise exception 'Role cannot perform action' using errcode='42501';end if;
  eid:=nullif(p_data->>'encounter_id','')::uuid;
- if eid is not null and p_action not in ('intake','token') and not private.clinical_access(p_hospital,eid) then raise exception 'Encounter access denied' using errcode='42501';end if;
+ if eid is not null and p_action not in ('intake','token') and not private.clinical_access(p_hospital,eid) and not (r='resource_manager' and p_action in ('bed_assign','bed_release','shortage')) then raise exception 'Encounter access denied' using errcode='42501';end if;
  result:=private.portal_previous_command(p_hospital,p_action,p_data);
  if p_action in ('register','intake','token') and result->>'token' is not null then
   manual:=encode(extensions.gen_random_bytes(16),'hex');

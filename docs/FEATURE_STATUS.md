@@ -1,5 +1,7 @@
 # Final acceptance matrix
 
+**22 November local upgrade:** See [PORTAL_UPGRADE_VERIFICATION.md](PORTAL_UPGRADE_VERIFICATION.md) for the current patient-portal, role, resource, protocol and referral implementation. Hosted deployment was explicitly deferred by the user; older hosted-status statements below describe the previous release. The new local implementation supersedes older gaps for staff role editing, department RLS, adaptive history/medicines/allergies, internal referrals and scheduled reassessment. It does not establish clinical validation or production readiness.
+
 This is a working, database-backed **core prototype**. The complete master specification is **not fully implemented**. Vercel preview and production deployments exist; see DEPLOYMENT_STATUS.md. All rows below refer to synthetic demonstration workflows, not clinical validation.
 
 | Feature                                                  | Implementation status                 | Test status                                                                               | Database integration status                         | Deployment status     | Remaining limitation                                                                                        |

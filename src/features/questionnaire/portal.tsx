@@ -1,5 +1,13 @@
 "use client";
 import Link from "next/link";
+import {
+  PatientLanguage,
+  translatePatient,
+  usePatientCopy,
+  type PatientLanguageCode,
+} from "./language";
+import { PatientReview } from "./review";
+import { Dictation } from "./voice";
 import { useEffect, useRef, useState } from "react";
 import {
   emptyReport,
@@ -11,6 +19,7 @@ import {
   freeTextQuestions,
   type PatientReport,
 } from "./model";
+import { questionLabels as labels } from "./question-labels";
 import { PublicHeader } from "@/components/chrome";
 type PortalStatus = {
   reference: string;
@@ -35,29 +44,7 @@ const sections = [
   "Additional information",
   "Review & send",
 ];
-const labels: Record<string, string> = {
-  chest_current: "Is the chest discomfort happening now?",
-  chest_breathing: "Are you also having difficulty breathing?",
-  chest_faintness_sweating: "Have you felt faint or unusually sweaty?",
-  chest_spread: "Does the discomfort spread elsewhere?",
-  fever_duration: "How long have you had a fever?",
-  fever_intermittent: "Does the fever come and go?",
-  fever_chills: "Have you had chills?",
-  fever_other: "What other symptoms have you noticed?",
-  bleeding_location: "Where is the bleeding?",
-  bleeding_ongoing: "Is the bleeding continuing now?",
-  bleeding_uncontrolled: "Have you been unable to stop the bleeding?",
-  bleeding_injury: "Did an injury cause the bleeding?",
-  breathing_current: "Are you having difficulty breathing now?",
-  breathing_worsening: "Is the breathing difficulty getting worse?",
-  breathing_speech: "Does breathing difficulty make it hard to speak?",
-  breathing_warning: "Do you need immediate help with your breathing?",
-  injury_cause: "What caused the injury?",
-  injury_time: "When did the injury happen?",
-  injury_location: "Which part of your body was injured?",
-  injury_bleeding: "Is there bleeding?",
-  injury_unconscious: "Did you lose consciousness after the injury?",
-};
+
 const readable = (v: string) => v.replaceAll("_", " ");
 function TextField({
   label,
@@ -70,9 +57,10 @@ function TextField({
   change: (value: string) => void;
   max?: number;
 }) {
+  const t = usePatientCopy();
   return (
     <label className="field">
-      <span>{label}</span>
+      <span>{t(label)}</span>
       <input
         value={value}
         maxLength={max}
@@ -92,13 +80,14 @@ function Choice({
   choices: readonly string[];
   change: (value: string) => void;
 }) {
+  const t = usePatientCopy();
   return (
     <label className="field">
-      <span>{label}</span>
+      <span>{t(label)}</span>
       <select value={value} onChange={(e) => change(e.target.value)}>
         {choices.map((option) => (
           <option key={option} value={option}>
-            {readable(option)}
+            {t(readable(option))}
           </option>
         ))}
       </select>
@@ -123,6 +112,7 @@ async function call(body: unknown) {
 }
 export function AdaptivePortal() {
   const [report, setReport] = useState<PatientReport>(emptyReport);
+  const t = (text: string) => translatePatient(text, report.language);
   const [status, setStatus] = useState<PortalStatus | null>(null);
   const [step, setStep] = useState(0);
   const [pass, setPass] = useState("");
@@ -235,6 +225,19 @@ export function AdaptivePortal() {
       setMessage("Report recorded. A member of staff must review it.");
     });
   }
+  async function answerQuestion(key: string, value: string) {
+    update("answers", { ...report.answers, [key]: value });
+    if (key === "breathing_warning" && value === "yes") {
+      update("emergency_help", true);
+      await operation(async () => {
+        await call({ action: "emergency" });
+        setMessage(
+          "Emergency request recorded; alert nearby staff now. Do not wait for this form.",
+        );
+        setStatus(await call({ action: "status" }));
+      });
+    }
+  }
   const identity = <K extends keyof PatientReport["identity"]>(
     key: K,
     value: PatientReport["identity"][K],
@@ -244,17 +247,32 @@ export function AdaptivePortal() {
     value: PatientReport["history"][K],
   ) => update("history", { ...report.history, [key]: value });
   return (
-    <>
+    <PatientLanguage.Provider value={report.language}>
       <PublicHeader />
-      <main className="public-page questionnaire-page">
+      <main className="public-page questionnaire-page" lang={report.language}>
+        <label className="field">
+          Language / ಭಾಷೆ / भाषा
+          <select
+            aria-label="Language"
+            value={report.language}
+            onChange={(e) =>
+              update("language", e.target.value as PatientLanguageCode)
+            }
+          >
+            <option value="en">English</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="hi">हिन्दी</option>
+          </select>
+        </label>
         <div className="panel panel-copy">
-          <strong>Synthetic demonstration only</strong>
+          <strong>{t("Synthetic demonstration only")}</strong>
           <p>
-            This questionnaire is not a diagnosis. Emergency care must never
-            wait for registration or this form.
+            {t(
+              "This questionnaire is not a diagnosis. Emergency care must never wait for registration or this form.",
+            )}
           </p>
           <Link href="/emergency" className="button emergency-button">
-            Get emergency help directly
+            {t("Get emergency help directly")}
           </Link>
           {status && !status.closed && (
             <button
@@ -272,7 +290,7 @@ export function AdaptivePortal() {
                 })
               }
             >
-              Notify staff: I need immediate help
+              {t("Notify staff: I need immediate help")}
             </button>
           )}
         </div>
@@ -297,7 +315,7 @@ export function AdaptivePortal() {
               );
             }}
           >
-            <h1>Open your patient pass</h1>
+            <h1>{t("Open your patient pass")}</h1>
             <TextField
               label="Private access token"
               value={pass}
@@ -305,41 +323,73 @@ export function AdaptivePortal() {
               max={100}
             />
             <p>
-              Your encounter reference is not an access token. Keep your pass
-              private.
+              {t(
+                "Your encounter reference is not an access token. Keep your pass private.",
+              )}
             </p>
             <button className="button primary" disabled={busy}>
-              Open encounter
+              {t("Open encounter")}
             </button>
           </form>
         ) : (
           <>
-            <section className="panel panel-copy">
+            <section
+              className={`panel panel-copy patient-priority priority-${status.category.toLowerCase()}`}
+            >
+              <h2>
+                {t(
+                  status.category === "RED"
+                    ? "RED — emergency assistance"
+                    : status.category === "YELLOW"
+                      ? "YELLOW — prompt assessment"
+                      : status.category === "GREEN"
+                        ? "GREEN — non-immediate care"
+                        : "Human assessment required",
+                )}
+              </h2>
               <p>
-                {status.reference} · {readable(status.status)}
+                {t(
+                  status.category === "RED"
+                    ? "Alert nearby hospital staff now. Do not wait for this screen to update."
+                    : status.category === "YELLOW"
+                      ? "Prompt clinical assessment is required. Contact the assigned care professional."
+                      : status.category === "GREEN"
+                        ? "Follow the care team's waiting instructions. Tell staff immediately if symptoms worsen. This does not mean your condition is harmless."
+                        : "Human assessment required",
+                )}
+              </p>
+              <p>
+                {status.reference}
+                {t("·")}
+                {readable(status.status)}
               </p>
               <h1>
-                {status.closed
-                  ? "This encounter is closed"
-                  : "Your care team’s updates"}
+                {t(
+                  status.closed
+                    ? "This encounter is closed"
+                    : "Your care team’s updates",
+                )}
               </h1>
               <p>
-                Preliminary priority:{" "}
+                {t("Preliminary priority:")}{" "}
                 {readable(status.preliminary_category ?? "ASSESSMENT_REQUIRED")}
-                . Human review required.
+                {t(". Human review required.")}
               </p>
               <p>
-                Latest clinician decision:{" "}
+                {t("Latest clinician decision:")}{" "}
                 {status.confirmed_category
                   ? readable(status.confirmed_category)
                   : "Not yet recorded"}
-                .
+                {t(".")}
               </p>
               <p>
-                Department: {status.department ?? "Awaiting staff assignment"}
+                {t("Department:")}{" "}
+                {status.department ?? "Awaiting staff assignment"}
               </p>
               {status.closed ? (
-                <p>Ask staff for a new encounter if you need further care.</p>
+                <p>
+                  {t("Ask staff for a new encounter if you need further care.")}
+                </p>
               ) : (
                 !editing && (
                   <button
@@ -353,7 +403,7 @@ export function AdaptivePortal() {
                       })
                     }
                   >
-                    Report a symptom change
+                    {t("Report a symptom change")}
                   </button>
                 )
               )}
@@ -370,23 +420,27 @@ export function AdaptivePortal() {
                   })
                 }
               >
-                Close private session
+                {t("Close private session")}
               </button>
             </section>
             {!status.closed && editing && (
               <section className="panel panel-copy">
                 <p>
-                  Step {step + 1} of {sections.length}
+                  {t("Step")}
+                  {step + 1}
+                  {t("of")}
+                  {sections.length}
                 </p>
                 <progress
                   value={step + 1}
                   max={sections.length}
                   aria-label="Questionnaire progress"
                 />
-                <h2>{sections[step]}</h2>
+                <h2>{t(sections[step])}</h2>
                 <p>
-                  Leave unknown information as unknown. Use synthetic details
-                  only.
+                  {t(
+                    "Leave unknown information as unknown. Use synthetic details only.",
+                  )}
                 </p>
                 <fieldset disabled={busy} className="questionnaire-fields">
                   {step === 0 && (
@@ -398,7 +452,7 @@ export function AdaptivePortal() {
                         max={160}
                       />
                       <label className="field">
-                        <span>Age, if known</span>
+                        <span>{t("Age, if known")}</span>
                         <input
                           type="number"
                           min="0"
@@ -415,7 +469,7 @@ export function AdaptivePortal() {
                         />
                       </label>
                       <label className="field">
-                        <span>Or date of birth</span>
+                        <span>{t("Or date of birth")}</span>
                         <input
                           type="date"
                           max={new Date().toISOString().slice(0, 10)}
@@ -488,6 +542,17 @@ export function AdaptivePortal() {
                         change={(v) => update("complaint", v)}
                         max={3000}
                       />
+                      <Dictation
+                        language={report.language}
+                        onText={(value) =>
+                          update(
+                            "complaint",
+                            `${report.complaint} ${value}`
+                              .trim()
+                              .slice(0, 3000),
+                          )
+                        }
+                      />
                       <div className="questionnaire-options">
                         {symptoms.map((s) => (
                           <label key={s}>
@@ -503,7 +568,7 @@ export function AdaptivePortal() {
                                 )
                               }
                             />{" "}
-                            {readable(s)}
+                            {t(readable(s))}
                           </label>
                         ))}
                       </div>
@@ -515,7 +580,7 @@ export function AdaptivePortal() {
                             update("symptoms_complete", e.target.checked)
                           }
                         />{" "}
-                        I have reviewed the symptom list.
+                        {t("I have reviewed the symptom list.")}
                       </label>
                       <TextField
                         label="When did it start?"
@@ -541,7 +606,7 @@ export function AdaptivePortal() {
                         max={200}
                       />
                       <label className="field">
-                        <span>Pain from 0 to 10, if known</span>
+                        <span>{t("Pain from 0 to 10, if known")}</span>
                         <input
                           type="number"
                           min="0"
@@ -579,8 +644,9 @@ export function AdaptivePortal() {
                     <>
                       {visibleQuestions(report).length === 0 && (
                         <p>
-                          No additional questions for the selected symptoms. You
-                          can add details in the final section.
+                          {t(
+                            "No additional questions for the selected symptoms. You can add details in the final section.",
+                          )}
                         </p>
                       )}
                       {visibleQuestions(report).map((key) =>
@@ -589,9 +655,7 @@ export function AdaptivePortal() {
                             key={key}
                             label={labels[key]}
                             value={report.answers[key] ?? ""}
-                            change={(v) =>
-                              update("answers", { ...report.answers, [key]: v })
-                            }
+                            change={(v) => void answerQuestion(key, v)}
                             max={300}
                           />
                         ) : (
@@ -600,9 +664,7 @@ export function AdaptivePortal() {
                             label={labels[key]}
                             value={report.answers[key] ?? "unknown"}
                             choices={yesNo}
-                            change={(v) =>
-                              update("answers", { ...report.answers, [key]: v })
-                            }
+                            change={(v) => void answerQuestion(key, v)}
                           />
                         ),
                       )}
@@ -642,7 +704,7 @@ export function AdaptivePortal() {
                                     )
                                   }
                                 />{" "}
-                                {readable(c)}
+                                {t(readable(c))}
                               </label>
                             ))}
                           </div>
@@ -705,7 +767,10 @@ export function AdaptivePortal() {
                         <>
                           {report.medications.map((medicine, index) => (
                             <fieldset key={index}>
-                              <legend>Medicine {index + 1}</legend>
+                              <legend>
+                                {t("Medicine")}
+                                {index + 1}
+                              </legend>
                               {(
                                 [
                                   "name",
@@ -716,7 +781,7 @@ export function AdaptivePortal() {
                               ).map((key) => (
                                 <TextField
                                   key={key}
-                                  label={readable(key)}
+                                  label={t(readable(key))}
                                   value={medicine[key]}
                                   max={
                                     key === "name"
@@ -746,7 +811,8 @@ export function AdaptivePortal() {
                                   )
                                 }
                               >
-                                Remove medicine {index + 1}
+                                {t("Remove medicine")}
+                                {index + 1}
                               </button>
                             </fieldset>
                           ))}
@@ -765,7 +831,7 @@ export function AdaptivePortal() {
                               ])
                             }
                           >
-                            Add medicine
+                            {t("Add medicine")}
                           </button>
                         </>
                       )}
@@ -815,7 +881,10 @@ export function AdaptivePortal() {
                         <>
                           {report.allergies.map((allergy, index) => (
                             <fieldset key={index}>
-                              <legend>Allergy {index + 1}</legend>
+                              <legend>
+                                {t("Allergy")}
+                                {index + 1}
+                              </legend>
                               <TextField
                                 label="Substance"
                                 value={allergy.substance}
@@ -853,7 +922,8 @@ export function AdaptivePortal() {
                                   )
                                 }
                               >
-                                Remove allergy {index + 1}
+                                {t("Remove allergy")}
+                                {index + 1}
                               </button>
                             </fieldset>
                           ))}
@@ -867,7 +937,7 @@ export function AdaptivePortal() {
                               ])
                             }
                           >
-                            Add allergy
+                            {t("Add allergy")}
                           </button>
                         </>
                       )}
@@ -903,8 +973,9 @@ export function AdaptivePortal() {
                         max={2000}
                       />
                       <p>
-                        Optional measurements you report yourself. Staff must
-                        verify them.
+                        {t(
+                          "Optional measurements you report yourself. Staff must verify them.",
+                        )}
                       </p>
                       {Object.entries(report.self_reported_vitals).map(
                         ([key, value]) => (
@@ -931,30 +1002,31 @@ export function AdaptivePortal() {
                   )}
                   {step === 7 && (
                     <>
+                      <PatientReview report={report} />
                       <dl>
-                        <dt>Main concern</dt>
+                        <dt>{t("Main concern")}</dt>
                         <dd>{report.complaint || "Unknown"}</dd>
-                        <dt>Symptoms</dt>
+                        <dt>{t("Symptoms")}</dt>
                         <dd>
                           {report.symptoms.map(readable).join(", ") ||
                             "Unknown"}
                         </dd>
-                        <dt>Progression</dt>
+                        <dt>{t("Progression")}</dt>
                         <dd>{report.progression}</dd>
-                        <dt>Medical history</dt>
+                        <dt>{t("Medical history")}</dt>
                         <dd>
                           {readable(report.history.status)}{" "}
                           {report.history.conditions.map(readable).join(", ")}{" "}
                           {report.history.details}
                         </dd>
-                        <dt>Medicines</dt>
+                        <dt>{t("Medicines")}</dt>
                         <dd>
                           {readable(report.medication_status)}{" "}
                           {report.medications
                             .map((m) => `${m.name} ${m.dose} ${m.frequency}`)
                             .join("; ")}
                         </dd>
-                        <dt>Allergies</dt>
+                        <dt>{t("Allergies")}</dt>
                         <dd>
                           {readable(report.allergy_status)}{" "}
                           {report.allergies
@@ -963,9 +1035,9 @@ export function AdaptivePortal() {
                         </dd>
                       </dl>
                       <p>
-                        Use Back to correct any section. Your answers will be
-                        shared with the authorized hospital care team for this
-                        encounter.
+                        {t(
+                          "Use Back to correct any section. Your answers will be shared with the authorized hospital care team for this encounter.",
+                        )}
                       </p>
                       <label>
                         <input
@@ -973,8 +1045,9 @@ export function AdaptivePortal() {
                           checked={report.consent}
                           onChange={(e) => update("consent", e.target.checked)}
                         />{" "}
-                        I reviewed my answers and consent to sharing this report
-                        with the care team.
+                        {t(
+                          "I reviewed my answers and consent to sharing this report with the care team.",
+                        )}
                       </label>
                     </>
                   )}
@@ -986,7 +1059,7 @@ export function AdaptivePortal() {
                       disabled={busy}
                       onClick={() => setStep((s) => s - 1)}
                     >
-                      Back
+                      {t("Back")}
                     </button>
                   )}
                   <button
@@ -994,7 +1067,7 @@ export function AdaptivePortal() {
                     disabled={busy}
                     onClick={() => save(step)}
                   >
-                    Save draft
+                    {t("Save draft")}
                   </button>
                   {step < 7 ? (
                     <button
@@ -1002,7 +1075,7 @@ export function AdaptivePortal() {
                       disabled={busy}
                       onClick={() => save(step + 1)}
                     >
-                      Save & continue
+                      {t("Save & continue")}
                     </button>
                   ) : (
                     <button
@@ -1019,6 +1092,6 @@ export function AdaptivePortal() {
           </>
         )}
       </main>
-    </>
+    </PatientLanguage.Provider>
   );
 }

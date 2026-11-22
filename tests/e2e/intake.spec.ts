@@ -3,7 +3,8 @@ import AxeBuilder from "@axe-core/playwright";
 async function nurse(page: Page) {
   await page.goto("/login");
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
-  await expect(page).toHaveURL(/\/registration$/);
+  await expect(page).toHaveURL(/\/nurse$/);
+  await page.goto("/registration");
   await expect(
     page.getByRole("heading", { name: "Patient registration", exact: true }),
   ).toBeVisible();
@@ -211,10 +212,9 @@ test("duplicate identity is stopped without losing form and roles retain their l
     .getByRole("button", { name: "Administrator", exact: true })
     .click();
   await expect(page).toHaveURL(/\/dashboard$/);
-  await page.goto("/registration");
-  await expect(
-    page.getByRole("heading", { name: "Clinical intake access required" }),
-  ).toBeVisible();
+  const forbidden = await page.goto("/registration");
+  expect(forbidden?.status()).toBe(403);
+  await expect(page.locator("body")).toContainText("Access denied");
   const denied = await page.request.post("/api/command", {
     headers: { origin: new URL(page.url()).origin },
     data: {
@@ -231,12 +231,13 @@ test("duplicate identity is stopped without losing form and roles retain their l
         event.action === "intake.confirmed" && event.actor,
     ),
   ).toBe(true);
+  await page.goto("/dashboard");
   await page
     .getByRole("button", { name: "Log out and clear local drafts" })
     .click();
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible();
 });
 

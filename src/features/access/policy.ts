@@ -135,7 +135,9 @@ export function canCommand(role: string, action: string): boolean {
     return clinicalRoles.includes(role);
   if (["department_referral", "follow_up", "referral"].includes(action))
     return role === "doctor";
-  if (["protocol_save", "protocol_review"].includes(action))
+  if (
+    ["protocol_save", "protocol_review", "department_routing"].includes(action)
+  )
     return role === "doctor";
   if (
     [
@@ -146,17 +148,40 @@ export function canCommand(role: string, action: string): boolean {
       "shift",
       "staff_access",
       "department_access",
+      "resource_edit",
     ].includes(action)
   )
     return administratorRoles.includes(role);
+  if (action === "resource_restore")
+    return [
+      "resource_manager",
+      "emergency_coordinator",
+      ...administratorRoles,
+    ].includes(role);
+  if (action === "resource_request") return clinicalRoles.includes(role);
+  if (action === "resource_request_status")
+    return [
+      ...clinicalRoles,
+      "resource_manager",
+      "emergency_coordinator",
+    ].includes(role);
   if (action === "transition")
     return [...clinicalRoles, "emergency_coordinator"].includes(role);
   if (action === "department_referral_status")
     return [...clinicalRoles, "emergency_coordinator"].includes(role);
   if (["bed_ward", "bed_configure"].includes(action))
-    return administratorRoles.includes(role);
-  if (["bed_plan", "bed_assign", "bed_release"].includes(action))
-    return [...clinicalRoles, "emergency_coordinator"].includes(role);
+    return [
+      ...administratorRoles,
+      "resource_manager",
+      "emergency_coordinator",
+    ].includes(role);
+  if (action === "bed_plan") return clinicalRoles.includes(role);
+  if (["bed_assign", "bed_release"].includes(action))
+    return [
+      ...clinicalRoles,
+      "emergency_coordinator",
+      "resource_manager",
+    ].includes(role);
   if (["bed_refresh", "bed_status"].includes(action))
     return [
       "nurse",
@@ -167,7 +192,19 @@ export function canCommand(role: string, action: string): boolean {
       "hospital_admin",
       "super_admin",
     ].includes(role);
-  if (["reserve", "release", "maintenance", "shortage"].includes(action))
+  if (action === "maintenance")
+    return [
+      ...administratorRoles,
+      "resource_manager",
+      "emergency_coordinator",
+    ].includes(role);
+  if (["reserve", "shortage"].includes(action))
+    return [
+      ...clinicalRoles,
+      "resource_manager",
+      "emergency_coordinator",
+    ].includes(role);
+  if (["release", "resource_clean"].includes(action))
     return [
       ...clinicalRoles,
       "resource_manager",

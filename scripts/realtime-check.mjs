@@ -9,8 +9,8 @@ const db = createClient(
 assert.equal(
   (
     await db.auth.signInWithPassword({
-      email: process.env.DEMO_DOCTOR_EMAIL,
-      password: process.env.DEMO_DOCTOR_PASSWORD,
+      email: process.env.DEMO_NURSE_EMAIL,
+      password: process.env.DEMO_NURSE_PASSWORD,
     })
   ).error,
   null,

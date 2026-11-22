@@ -2,6 +2,9 @@
 // Run with Node's built-in TypeScript stripping (Node 24+). Output contains no data.
 import { z } from "zod";
 import { reportSchema } from "../src/features/questionnaire/model.ts";
+import { protocolSchema } from "../src/features/questionnaire/rules.ts";
+const protocol = process.argv.includes("--protocol");
+const functionName = protocol ? "protocol_shape" : "patient_report_shape";
 const quote = (value) => `'${String(value).replaceAll("'", "''")}'`;
 function expression(schema, value) {
   if (schema.anyOf)
@@ -48,5 +51,5 @@ function expression(schema, value) {
   return `(${checks.join(" and ")})`;
 }
 console.log(
-  `create function private.patient_report_shape(a jsonb) returns boolean language sql immutable set search_path='' as $$\nselect coalesce(${expression(z.toJSONSchema(reportSchema), "a")},false)\n$$;\nrevoke all on function private.patient_report_shape(jsonb) from public,anon,authenticated;`,
+  `create function private.${functionName}(a jsonb) returns boolean language sql immutable set search_path='' as $$\nselect coalesce(${expression(z.toJSONSchema(protocol ? protocolSchema : reportSchema), "a")},false)\n$$;\nrevoke all on function private.${functionName}(jsonb) from public,anon,authenticated;`,
 );

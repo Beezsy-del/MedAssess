@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { protocolSchema } from "@/features/questionnaire/rules";
 import { capabilities, bedKinds } from "@/features/beds/model";
 import { emergencySigns } from "@/features/clinical/engine";
 const uuid = z.uuid();
@@ -99,6 +100,98 @@ const bedOperation = { operation_id: uuid, reason };
 const bedEncounter = { encounter_id: uuid, version: integer(1, 2147483647) };
 const bedResource = { resource_id: uuid, bed_version: integer(1, 2147483647) };
 export const actionSchemas = {
+  resource_restore: z.strictObject({
+    resource_id: uuid,
+    reason,
+    checks_confirmed: z.literal(true),
+  }),
+  opd_route: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    department_id: uuid,
+  }),
+  department_referral: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    department_id: uuid,
+    urgency: z.enum(["GREEN", "YELLOW", "RED", "ASSESSMENT_REQUIRED"]),
+    observations: text(3000),
+  }),
+  department_referral_status: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    id: uuid,
+    referral_version: integer(1, 2147483647),
+    status: z.enum([
+      "ACKNOWLEDGED",
+      "ACCEPTED",
+      "ARRIVED",
+      "COMPLETED",
+      "CANCELLED",
+    ]),
+  }),
+  escalate_doctor: z.strictObject({ ...bedOperation, ...bedEncounter }),
+  vitals: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    pulse: z.number().min(0).max(400).nullable(),
+    spo2: z.number().min(0).max(100).nullable(),
+    respiratory_rate: z.number().min(0).max(150).nullable(),
+    systolic: z.number().min(0).max(350).nullable(),
+    temperature: z.number().min(20).max(50).nullable(),
+  }),
+  department_access: z.strictObject({
+    ...bedOperation,
+    user_id: uuid,
+    department_id: uuid,
+    enabled: z.boolean(),
+  }),
+  staff_access: z.strictObject({
+    ...bedOperation,
+    user_id: uuid,
+    role: z.enum([
+      "doctor",
+      "nurse",
+      "triage_nurse",
+      "receptionist",
+      "resource_manager",
+      "emergency_coordinator",
+      "hospital_admin",
+    ]),
+    active: z.boolean(),
+  }),
+  department_routing: z.strictObject({
+    ...bedOperation,
+    department_id: uuid,
+    categories: z.array(z.enum(["GREEN", "YELLOW"])).max(2),
+    reviewed: z.literal(true),
+  }),
+  protocol_save: z.strictObject({
+    ...bedOperation,
+    configuration: protocolSchema,
+  }),
+  protocol_review: z.strictObject({
+    ...bedOperation,
+    id: uuid,
+    reviewed: z.literal(true),
+  }),
+  resource_edit: z.strictObject({
+    ...bedOperation,
+    resource_id: uuid,
+    name: text(160).min(1),
+    location: text(300),
+  }),
+  resource_request: z.strictObject({
+    ...bedOperation,
+    ...bedEncounter,
+    kind: z.enum(["Stretcher", "Wheelchair", "Equipment"]),
+  }),
+  resource_request_status: z.strictObject({
+    ...bedOperation,
+    id: uuid,
+    status: z.enum(["ACKNOWLEDGED", "FULFILLED", "CANCELLED"]),
+    resource_id: uuid.optional(),
+  }),
   bed_refresh: z.strictObject({}),
   bed_plan: z.strictObject({
     ...bedOperation,
@@ -207,6 +300,10 @@ export const actionSchemas = {
   }),
   reserve: z.strictObject({ ...encounter, resource_id: uuid }),
   release: z.strictObject({ resource_id: uuid }),
+  resource_clean: z.strictObject({
+    resource_id: uuid,
+    checks_confirmed: z.literal(true),
+  }),
   alert: z
     .strictObject({
       id: uuid,

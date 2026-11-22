@@ -34,9 +34,23 @@ export async function POST(request: Request) {
   const data = parsed.data;
   const jar = await cookies();
   if (data.action === "logout") {
-    jar.delete(cookieName);
+    jar.set(cookieName, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/api/patient/session",
+      maxAge: 0,
+    });
     return reply({ ok: true });
   }
+  if (data.action === "open")
+    jar.set(cookieName, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/api/patient/session",
+      maxAge: 0,
+    });
   const token =
     data.action === "open" ? data.token : jar.get(cookieName)?.value;
   if (!patientToken.safeParse(token).success || !token)

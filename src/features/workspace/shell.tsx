@@ -36,6 +36,8 @@ const nav = [
     [
       ["/dashboard", "Overview", LayoutDashboard],
       ["/registration", "Patient registration", ClipboardPlus],
+      ["/nurse", "Nursing queue", HeartPulse],
+      ["/patients", "Patient directory", ClipboardPlus],
       ["/reception", "Reception", ClipboardPlus],
       ["/triage", "Triage & queues", HeartPulse],
       ["/doctor", "Clinical workspace", Stethoscope],
@@ -57,6 +59,8 @@ const nav = [
       ["/analytics", "Analytics", ChartNoAxesCombined],
       ["/audit", "Audit trail", ShieldCheck],
       ["/settings", "Settings", Settings],
+      ["/staff", "Staff access", ShieldCheck],
+      ["/protocols", "Reviewed protocols", ShieldCheck],
     ],
   ],
 ] as const;
