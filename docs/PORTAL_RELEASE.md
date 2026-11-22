@@ -35,3 +35,9 @@ Supabase security advisors report deliberate deny-all RLS on private receipts/dr
 - **Temporary access:** preview automation bypass revoked and its local credential file removed after verification.
 
 The deployed application does not include subsequent documentation-only commits. No database reset, force push, clinical enablement or change of Vercel project was performed.
+
+## Staff provisioning release — 22 November 2026
+
+Production deployment `dpl_83m7MKuByujiKv7ZhdX6TMUnwQDM` is READY and the canonical URL points to it. Deployed application commit: `88bde395a2dfc7cdba0735e9fb68e91405f838d5`. The production and preview `SUPABASE_SECRET_KEY` entries were confirmed as sensitive variables without retrieving their values. No additional database migration was needed for this validation fix.
+
+Formatting, lint, strict TypeScript, 90 unit tests and the production build passed. Post-deployment verification on the canonical live site passed: oversized passwords return explicit validation errors; the administrator form creates an Auth account and hospital membership; the new member persists after reload; new credentials sign in with nurse permissions; administrator routes are denied to that nurse; duplicate creation and doctor provisioning are rejected. The synthetic test membership was disabled afterward, and its existing session lost workspace access. No credentials were printed. The post-release error/fatal runtime-log query returned no groups during the short observed window.
