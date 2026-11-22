@@ -141,15 +141,17 @@ export function AdaptivePortal() {
   }
   useEffect(() => {
     let active = true;
+    const generation = epoch.current;
     const fragment = window.location.hash.slice(1);
     if (fragment)
       window.history.replaceState(null, "", window.location.pathname);
     call(fragment ? { action: "open", token: fragment } : { action: "status" })
       .then((value) => {
-        if (active) restore(value);
+        if (active && generation === epoch.current && !foreground.current)
+          restore(value);
       })
       .catch(() => {
-        if (active)
+        if (active && generation === epoch.current && !foreground.current)
           setMessage(
             "Enter the private token from your patient pass. You can always ask a nurse for assistance.",
           );

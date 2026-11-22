@@ -198,3 +198,55 @@ test("patient reconnect clears stale warning and old status cannot reopen a clos
   ).toBeVisible();
   await expect(page.getByText("Synthetic reconnect")).toHaveCount(0);
 });
+
+test("late initial patient session cannot replace a newly opened encounter", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/patient/session", async (route) => {
+    const { action } = route.request().postDataJSON();
+    if (action === "status") await gate;
+    await route.fulfill({
+      json: {
+        reference:
+          action === "status"
+            ? "Synthetic old encounter"
+            : "Synthetic chosen encounter",
+        status: "WAITING",
+        category: "ASSESSMENT_REQUIRED",
+        closed: false,
+        report_id: null,
+      },
+    });
+  });
+  await page.goto("/patient/start");
+  await page.getByLabel("Private access token").fill("a".repeat(32));
+  await page
+    .getByRole("button", { name: "Open encounter", exact: true })
+    .click();
+  await expect(
+    page.getByText("Synthetic chosen encounter", { exact: false }),
+  ).toBeVisible();
+  const old = page.waitForResponse(
+    (r) =>
+      r.url().endsWith("/api/patient/session") &&
+      r.request().postDataJSON().action === "status",
+  );
+  release();
+  await old;
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  await expect(
+    page.getByText("Synthetic old encounter", { exact: false }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("Synthetic chosen encounter", { exact: false }),
+  ).toBeVisible();
+});
