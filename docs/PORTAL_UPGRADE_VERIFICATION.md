@@ -72,3 +72,9 @@ The local Colima VM is named `medcipher`. Keep it running while viewing the app.
 ## Local completion entry
 
 Final local browser run: **21/21 passed** (1.3 minutes), including escalation without manual reload, patient-session closure returning 401, real staff creation, resource creation, role denials, bed turnover, offline synchronization and failure handling. Formatting, lint, strict TypeScript, 87 unit tests and production build passed. Dependency audit reported zero vulnerabilities. Local schema inspection found zero public tables without RLS, one active workflow cron job, and zero security-definer functions missing a configured search path. The added local SQL runner also passed against the running Supabase stack with all fixture writes rolled back. These results do not change the separate pilot, production or clinical readiness decisions above.
+
+## Clean-start Realtime correction
+
+The first GitHub run for `da4bfdb` passed static/build verification and every database workflow group, but its first Realtime delivery timed out. An isolated fresh local stack reproduced the exact failure; a second subscription on the same warmed stack passed. The installed SDK documents that ordinary `SUBSCRIBED` can precede the actual Postgres subscription. Both the workspace and the regression script now use `postgres_changes_options.wait: true`, so subscription acknowledgement waits for the change stream. The cold-start delivery and disconnect/reconnect checks then passed on the freshly rebuilt local stack. The public table publication and RLS were retained unchanged; no test was disabled or weakened.
+
+During reproduction the main local synthetic stack was accidentally stopped without a backup. Its synthetic fixtures were rebuilt from the committed seed script and verification was repeated; no hosted database or real patient data was involved. The separate temporary reproduction stack was stopped afterward.

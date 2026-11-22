@@ -83,7 +83,9 @@ export function WorkspaceProvider({
     );
     const reload = live.request;
     const channel = db
-      .channel(`hospital-${data.hospital.id}`)
+      .channel(`hospital-${data.hospital.id}`, {
+        config: { postgres_changes_options: { wait: true } },
+      })
       .on(
         "postgres_changes",
         {
