@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { staffPasswordSchema } from "@/features/access/staff-password";
 import { createClient } from "@supabase/supabase-js";
 import { session } from "@/lib/data";
 import { readBoundedJson } from "@/lib/request-json";
@@ -7,7 +8,7 @@ import type { Database } from "@/lib/supabase/database.types";
 const schema = z.strictObject({
   hospital: z.uuid(),
   email: z.email().max(320),
-  password: z.string().min(12).max(128),
+  password: staffPasswordSchema,
   display_name: z.string().trim().min(2).max(160),
   role: z.enum([
     "doctor",
@@ -33,7 +34,11 @@ export async function POST(request: Request) {
   const parsed = schema.safeParse(body);
   if (!parsed.success)
     return reply(
-      { error: "Check the email, name and password (at least 12 characters)." },
+      {
+        error:
+          parsed.error.issues.find((issue) => issue.path[0] === "password")
+            ?.message ?? "Check the email and staff name.",
+      },
       400,
     );
   const s = await session();

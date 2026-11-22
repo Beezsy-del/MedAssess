@@ -74,7 +74,7 @@ export function StaffAccess() {
               type="password"
               required
               minLength={12}
-              maxLength={128}
+              maxLength={72}
               autoComplete="new-password"
             />
           </label>

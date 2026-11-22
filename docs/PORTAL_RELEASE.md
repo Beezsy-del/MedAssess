@@ -13,7 +13,9 @@ The user authorized deployment to the existing site after local and CI acceptanc
 
 ## Remaining configuration and readiness
 
-`SUPABASE_SECRET_KEY` is not configured in Vercel. The new synthetic staff-account provisioning endpoint therefore returns an explicit configuration error; it does not falsely claim account creation. The user was asked to configure that server-only variable for Preview and Production without sharing its value in chat. Existing staff sign-in, membership management and other tested workflows work without it. A new deployment is needed after adding the variable.
+`SUPABASE_SECRET_KEY` is now configured as a sensitive server-only variable for Production and Preview. The subsequent production redeployment `dpl_D8iToa7hX47dkVAA8tQHXTVxYCJn` reached READY. Live administrator-form verification created a synthetic Auth account and hospital membership, confirmed persistence after reload, signed in as the new nurse, verified administrator-route denial and rejected duplicate/non-administrator provisioning. The test membership was then disabled and its existing session lost workspace access. No key or test password was printed.
+
+The live check also exposed a validation mismatch: the form accepted passwords beyond Supabase's limit. Initial staff passwords now enforce 12–72 characters and a 72-byte UTF-8 maximum, with explicit validation errors and three regression tests. This does not change existing-user sign-in or reset credentials.
 
 No medically validated protocol or symptom-condition mapping has been supplied. Unreviewed/missing data remains assessment-required. Qualified clinical and language review remains necessary; clinical operational use stays disabled. This deployment is a synthetic demonstration, not production or clinical certification. The remaining feature and operational limits are described in PORTAL_UPGRADE_VERIFICATION.md.
 
