@@ -72,3 +72,7 @@ Target confirmed: Beezsy-del/MedAssess and medcipher-triage-platform.vercel.app.
 | Deployment                     | Existing production preserved; no remote migration from this branch                                                                                            | Isolated Supabase staging, full preview acceptance, then production promotion                         |
 
 Checkpoint verification: formatting, lint, strict typecheck and 87 unit tests passed. The local database transaction fixture is `tests/sql/patient-portal.sql`; it runs after the draft migration and rolls back all synthetic fixtures. Local PostgreSQL does not test Supabase Auth, PostgREST, Realtime or Vercel. This is not completion of the master specification.
+
+## Current technical-gap release
+
+See [TECHNICAL_GAP_RELEASE.md](TECHNICAL_GAP_RELEASE.md): individual-staff credential changes, patient reconnect/race safety, localized patient workflow messages and verbatim answer review are implemented. Static checks, 94 unit tests and all database workflow suites pass; new browser regressions pass. The report distinguishes historical test evidence, current deployment verification and unfinished technical scope.

@@ -8,12 +8,14 @@ import { PublicHeader, CareMap } from "@/components/chrome";
 export function Login({
   demo = false,
   reset = false,
+  initialMessage = "",
 }: {
   demo?: boolean;
   reset?: boolean;
+  initialMessage?: string;
 }) {
   const router = useRouter();
-  const [message, setMessage] = useState(""),
+  const [message, setMessage] = useState(initialMessage),
     [busy, setBusy] = useState(false);
   async function login(payload: Record<string, unknown>) {
     setBusy(true);

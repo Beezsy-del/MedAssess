@@ -1,9 +1,11 @@
 "use client";
 import { createContext, useContext } from "react";
+import { statusCopy } from "./status-copy";
 export type PatientLanguageCode = "en" | "kn" | "hi";
 export const PatientLanguage = createContext<PatientLanguageCode>("en");
 // Prototype wording: qualified clinical and native-language review is required before use in care.
 export const patientCopy: Record<string, [string, string]> = {
+  ...statusCopy,
   "Preliminary priority:": ["ಪ್ರಾಥಮಿಕ ಆದ್ಯತೆ:", "प्रारंभिक प्राथमिकता:"],
   ". Human review required.": [
     ". ಸಿಬ್ಬಂದಿಯ ಪರಿಶೀಲನೆ ಅಗತ್ಯ.",

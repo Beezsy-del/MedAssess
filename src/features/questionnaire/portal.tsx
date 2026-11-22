@@ -119,6 +119,9 @@ export function AdaptivePortal() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [refreshError, setRefreshError] = useState("");
+  const epoch = useRef(0);
+  const foreground = useRef(false);
   const [editing, setEditing] = useState(true);
   const pending = useRef<{ operation_id: string; fingerprint: string } | null>(
     null,
@@ -159,26 +162,50 @@ export function AdaptivePortal() {
   useEffect(() => {
     if (!hasSession) return;
     let active = true;
-    const timer = setInterval(() => {
-      if (document.visibilityState !== "visible") return;
-      call({ action: "status" })
-        .then((value) => {
-          if (active) setStatus(value);
-        })
-        .catch(() => {
-          if (active)
-            setError(
-              "Updates are unavailable. Your displayed status may be out of date. Contact staff directly.",
-            );
-        });
-    }, 10000);
+    let refreshing = false;
+    const refresh = async () => {
+      if (
+        !active ||
+        refreshing ||
+        foreground.current ||
+        document.visibilityState !== "visible"
+      )
+        return;
+      refreshing = true;
+      const generation = epoch.current;
+      try {
+        const value = await call({ action: "status" });
+        if (active && generation === epoch.current && !foreground.current) {
+          setStatus(value);
+          setRefreshError("");
+        }
+      } catch {
+        if (active && generation === epoch.current && !foreground.current)
+          setRefreshError(
+            "Updates are unavailable. Your displayed status may be out of date. Contact staff directly.",
+          );
+      } finally {
+        refreshing = false;
+      }
+    };
+    const timer = setInterval(() => void refresh(), 10000);
+    window.addEventListener("online", refresh);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
     return () => {
       active = false;
       clearInterval(timer);
+      window.removeEventListener("online", refresh);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
     };
-  }, [hasSession]); // A status refresh must not overwrite unsaved answers.
+  }, [hasSession]); // Refresh status only; never overwrite unsaved answers.
   async function operation(task: () => Promise<void>) {
+    if (foreground.current) return;
+    foreground.current = true;
+    epoch.current++;
     setBusy(true);
+    setRefreshError("");
     setError("");
     setMessage("");
     try {
@@ -188,6 +215,8 @@ export function AdaptivePortal() {
         err instanceof Error ? err.message : "Unable to complete this action.",
       );
     } finally {
+      epoch.current++;
+      foreground.current = false;
       setBusy(false);
     }
   }
@@ -203,7 +232,7 @@ export function AdaptivePortal() {
   async function submit() {
     const issues = submissionIssues(report);
     if (issues.length) {
-      setError(issues.join(" "));
+      setError(issues.map(t).join(" "));
       return;
     }
     await operation(async () => {
@@ -296,10 +325,11 @@ export function AdaptivePortal() {
         </div>
         {error && (
           <p role="alert" className="error-text">
-            {error}
+            {t(error)}
           </p>
         )}
-        {message && <p role="status">{message}</p>}
+        {refreshError && <p role="alert">{t(refreshError)}</p>}
+        {message && <p role="status">{t(message)}</p>}
         {!status ? (
           <form
             className="panel panel-copy"
@@ -361,7 +391,7 @@ export function AdaptivePortal() {
               <p>
                 {status.reference}
                 {t("·")}
-                {readable(status.status)}
+                {t(readable(status.status))}
               </p>
               <h1>
                 {t(
@@ -372,19 +402,23 @@ export function AdaptivePortal() {
               </h1>
               <p>
                 {t("Preliminary priority:")}{" "}
-                {readable(status.preliminary_category ?? "ASSESSMENT_REQUIRED")}
+                {t(
+                  readable(
+                    status.preliminary_category ?? "ASSESSMENT_REQUIRED",
+                  ),
+                )}
                 {t(". Human review required.")}
               </p>
               <p>
                 {t("Latest clinician decision:")}{" "}
                 {status.confirmed_category
-                  ? readable(status.confirmed_category)
-                  : "Not yet recorded"}
+                  ? t(readable(status.confirmed_category))
+                  : t("Not yet recorded")}
                 {t(".")}
               </p>
               <p>
                 {t("Department:")}{" "}
-                {status.department ?? "Awaiting staff assignment"}
+                {status.department ?? t("Awaiting staff assignment")}
               </p>
               {status.closed ? (
                 <p>
@@ -434,7 +468,7 @@ export function AdaptivePortal() {
                 <progress
                   value={step + 1}
                   max={sections.length}
-                  aria-label="Questionnaire progress"
+                  aria-label={t("Questionnaire progress")}
                 />
                 <h2>{t(sections[step])}</h2>
                 <p>

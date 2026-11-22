@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { browserClient } from "@/lib/supabase/browser";
+import { staffPasswordSchema } from "@/features/access/staff-password";
 import { Field } from "@/components/ui";
 export function ProfileSettings() {
   const [message, setMessage] = useState(""),
@@ -14,15 +14,33 @@ export function ProfileSettings() {
       setMessage("Passwords do not match.");
       return;
     }
+    const parsed = staffPasswordSchema.safeParse(password);
+    if (!parsed.success) {
+      setMessage(parsed.error.issues[0].message);
+      return;
+    }
     setBusy(true);
-    const { error } = await browserClient().auth.updateUser({ password });
-    setMessage(
-      error
-        ? "Unable to update password. Request a fresh recovery link."
-        : "Password updated.",
-    );
-    if (!error) form.reset();
-    setBusy(false);
+    setMessage("");
+    try {
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "password", password }),
+      });
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(result.error ?? "Unable to update password.");
+      setMessage("Password updated.");
+      form.reset();
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Connection unavailable. Password update was not confirmed; retry when connected.",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <section className="panel detail-panel spaced">
@@ -39,6 +57,7 @@ export function ProfileSettings() {
             autoComplete="new-password"
             required
             minLength={12}
+            maxLength={72}
           />
         </Field>
         <Field label="Confirm new password">
@@ -48,6 +67,7 @@ export function ProfileSettings() {
             autoComplete="new-password"
             required
             minLength={12}
+            maxLength={72}
           />
         </Field>
         <button disabled={busy} className="button">

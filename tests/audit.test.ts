@@ -7,9 +7,12 @@ import {
 import { rankQueue } from "../src/features/queue/rank";
 const auth = vi.hoisted(() => ({
   signOut: vi.fn(),
+  updateUser: vi.fn(),
+  session: vi.fn(),
   resetPasswordForEmail: vi.fn(),
   signInWithPassword: vi.fn(),
 }));
+vi.mock("@/lib/data", () => ({ session: auth.session }));
 vi.mock("@/lib/supabase/server", () => ({
   serverClient: async () => ({ auth }),
 }));
@@ -89,4 +92,53 @@ it("sorts 10000 synthetic queue entries with deterministic category ordering", (
   expect(sorted[5000].category).toBe("GREEN");
   expect(sorted[7500].category).toBe("ASSESSMENT_REQUIRED");
   expect(performance.now() - start).toBeLessThan(2000);
+});
+
+describe("password update authorization", () => {
+  it("requires an active membership", async () => {
+    auth.session.mockResolvedValue(null);
+    expect(
+      (
+        await POST(
+          req(
+            JSON.stringify({
+              action: "password",
+              password: "Synthetic-password-123",
+            }),
+          ),
+        )
+      ).status,
+    ).toBe(401);
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
+  it("does not claim success when Auth rejects the change", async () => {
+    auth.session.mockResolvedValue({
+      user: { email: "synthetic-independent@example.test" },
+    });
+    auth.updateUser.mockResolvedValue({
+      error: { message: "private provider error" },
+    });
+    const response = await POST(
+      req(
+        JSON.stringify({
+          action: "password",
+          password: "Synthetic-password-123",
+        }),
+      ),
+    );
+    expect(response.status).toBe(400);
+    expect(await response.text()).not.toContain("private provider error");
+  });
+  it("rejects excessive encoded password length before provider access", async () => {
+    expect(
+      (
+        await POST(
+          req(
+            JSON.stringify({ action: "password", password: "界".repeat(25) }),
+          ),
+        )
+      ).status,
+    ).toBe(400);
+    expect(auth.updateUser).not.toHaveBeenCalled();
+  });
 });

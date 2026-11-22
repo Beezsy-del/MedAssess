@@ -981,7 +981,7 @@ export function Settings({ section }: { section: string }) {
           )}
         </section>
       </div>
-      {!data.hospital.is_demo && <ProfileSettings />}
+      <ProfileSettings />
       {modal && (
         <Modal
           title="Update hospital configuration"

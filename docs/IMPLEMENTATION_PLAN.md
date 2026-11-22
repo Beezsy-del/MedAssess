@@ -60,3 +60,7 @@ Baseline and target confirmation: PORTAL_UPGRADE_BASELINE.md. Feature branch: fe
 ### Repeated final master prompt reconciliation
 
 Compared the newly attached prompt to the prior attachment: identical content. Rechecked current production READY/HTTP 200, deployed-commit CI success, all 16 hosted migrations, RLS on all 40 public tables and active reassessment cron. Corrected stale hosted-deferral and now-implemented workflow statements. See MASTER_PROMPT_RECONCILIATION.md for the consolidated release and outstanding external/clinical requirements. No application or schema change was needed for the repeated specification.
+
+### Technical gap fixes and regression release
+
+Implemented authenticated individual-staff password recovery/update, provider/error validation, stale patient-status race protection, reconnect recovery, localized patient status/validation messages and verbatim free-text review. Added credential-change and delayed-response browser regressions plus password authorization and review-value unit checks. All database workflow suites and load/Realtime checks passed; browser coverage is recorded in TECHNICAL_GAP_RELEASE.md. No schema change is required for these fixes. Broader remaining technical work is explicitly distinguished from external configuration and clinical review.

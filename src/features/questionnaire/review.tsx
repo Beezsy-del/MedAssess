@@ -1,4 +1,5 @@
 "use client";
+import { reviewValue } from "./review-value";
 import type { PatientReport } from "./model";
 import { activeReport } from "./model";
 import { questionLabels } from "./question-labels";
@@ -38,14 +39,7 @@ export function PatientReview({ report }: { report: PatientReport }) {
       ) : (
         t("Unknown")
       );
-    if (value === null || value === "") return t("Unknown");
-    return t(
-      typeof value === "boolean"
-        ? value
-          ? "yes"
-          : "no"
-        : String(value).replaceAll("_", " "),
-    );
+    return reviewValue(value, path, t);
   }
   return (
     <details open className="patient-review">

@@ -2,8 +2,14 @@ import { serverClient } from "@/lib/supabase/server";
 import { readBoundedJson } from "@/lib/request-json";
 import { staffLanding } from "@/lib/landing-server";
 import { z } from "zod";
+import { staffPasswordSchema } from "@/features/access/staff-password";
+import { session } from "@/lib/data";
 const schema = z.discriminatedUnion("action", [
   z.strictObject({ action: z.literal("logout") }),
+  z.strictObject({
+    action: z.literal("password"),
+    password: staffPasswordSchema,
+  }),
   z.strictObject({
     action: z.literal("demo"),
     role: z.enum(["doctor", "nurse", "admin"]),
@@ -36,6 +42,37 @@ export async function POST(request: Request) {
   const input = parsed.data;
   try {
     const db = await serverClient();
+    if (input.action === "password") {
+      const current = await session();
+      if (!current)
+        return Response.json(
+          { error: "Sign in with an active staff account first." },
+          { status: 401 },
+        );
+      const shared = ["DOCTOR", "NURSE", "ADMIN"].some(
+        (role) =>
+          process.env[`DEMO_${role}_EMAIL`]?.toLowerCase() ===
+          current.user.email?.toLowerCase(),
+      );
+      if (shared)
+        return Response.json(
+          {
+            error:
+              "Shared demonstration account passwords cannot be changed here.",
+          },
+          { status: 403 },
+        );
+      const { error } = await db.auth.updateUser({ password: input.password });
+      if (error)
+        return Response.json(
+          {
+            error:
+              "Unable to update password. Request a fresh recovery link or sign in again.",
+          },
+          { status: 400 },
+        );
+      return Response.json({ ok: true });
+    }
     if (input.action === "logout") {
       const { error } = await db.auth.signOut({ scope: "local" });
       if (error)
