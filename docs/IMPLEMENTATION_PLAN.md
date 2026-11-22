@@ -56,3 +56,7 @@ Baseline and target confirmation: PORTAL_UPGRADE_BASELINE.md. Feature branch: fe
 22 November — hosted deployment explicitly authorized. Applied the two tested portal/workflow migrations to existing MedAssess, preserved existing records, and verified 40/40 public tables with RLS plus successful scheduled execution. Preview acceptance and 33 hosted core assertions passed. Production release evidence and outstanding server-only staff-provisioning configuration are tracked in PORTAL_RELEASE.md.
 
 22 November — verified the newly configured server-only Supabase secret and successful production redeployment. Live staff account creation, persistence, new-account login, role restrictions, duplicate rejection and deactivation passed. Fixed the initial-password provider-length mismatch and added boundary/UTF-8 regression tests.
+
+### Repeated final master prompt reconciliation
+
+Compared the newly attached prompt to the prior attachment: identical content. Rechecked current production READY/HTTP 200, deployed-commit CI success, all 16 hosted migrations, RLS on all 40 public tables and active reassessment cron. Corrected stale hosted-deferral and now-implemented workflow statements. See MASTER_PROMPT_RECONCILIATION.md for the consolidated release and outstanding external/clinical requirements. No application or schema change was needed for the repeated specification.

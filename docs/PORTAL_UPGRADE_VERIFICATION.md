@@ -2,17 +2,17 @@
 
 **Hosted release update:** Deployment was subsequently authorized. See [PORTAL_RELEASE.md](PORTAL_RELEASE.md) for migration, deployment and live verification evidence; earlier deferral statements below are historical.
 
-Target: [Beezsy-del/MedAssess](https://github.com/Beezsy-del/MedAssess), branch `feat/patient-portal-role-workflows`. Product remains MedCipher. The user explicitly chose **continue locally; defer hosted deployment**. This report covers the latest patient-portal/role-workflow specification. Historical master-specification gaps remain recorded separately; this is not a blanket production-readiness certificate.
+Target: [Beezsy-del/MedAssess](https://github.com/Beezsy-del/MedAssess), branch `feat/patient-portal-role-workflows`. Product remains MedCipher. The initial local-only instruction was superseded by explicit deployment authorization; the upgrade is now hosted. This report covers the latest patient-portal/role-workflow specification. Historical master-specification gaps remain recorded separately; this is not a blanket production-readiness certificate.
 
 ## Environment and migration status
 
 The local application uses a real isolated Supabase stack (PostgreSQL, Auth, PostgREST and Realtime), not mocked successful API calls. Two synthetic hospital tenants and separate nurse, doctor, receptionist, administrator, resource and emergency accounts are seeded through `scripts/prepare-local.mjs`. Local-only scripts reject non-loopback database URLs. Credentials are stored in ignored, owner-readable files and are never committed.
 
-All 16 migrations were applied locally. The two new portal/workflow migrations also replay against the existing 14-migration baseline in a transaction that executes the SQL assertions and rolls back. No hosted database migration or Vercel deployment was performed for this upgrade. The existing production URL is https://medcipher-triage-platform.vercel.app/ and does **not** contain this branch's changes. There is no new hosted preview URL.
+All 16 migrations were applied locally. The two new portal/workflow migrations also replay against the existing 14-migration baseline in a transaction that executes the SQL assertions and rolls back. Both new migrations have now been applied to the existing hosted project. Production is https://medcipher-triage-platform.vercel.app/. The tested preview and exact deployment evidence are recorded in PORTAL_RELEASE.md.
 
 ## Feature-by-feature evidence
 
-Every row below is implemented locally; hosted status for every row is **deferred by the user**.
+The implementations below are deployed. Tests explicitly described as local remain local evidence; hosted acceptance coverage is separately recorded in PORTAL_RELEASE.md. Deployment does not turn untested device behavior or unreviewed clinical rules into verified capabilities.
 
 | Feature / expected behavior                         | Actual implementation and evidence                                                                                                                                                                                                | Security / remaining dependencies / medical review                                                                                                                                                                                                                      |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -55,11 +55,11 @@ Results obtained locally:
 
 ## Separate readiness assessments
 
-**A. Hackathon demonstration:** local synthetic demonstration workflows implemented and tested; use only synthetic data and disclose the unvalidated protocol. Hosted demonstration of this upgrade is deferred.
+**A. Hackathon demonstration:** local synthetic demonstration workflows implemented and tested; use only synthetic data and disclose the unvalidated protocol. Hosted synthetic demonstration is deployed and acceptance-tested.
 
 **B. Supervised pilot:** not ready. Requires qualified clinical protocol/mapping review, native-language review, operational emergency procedures, privacy approval, deployment isolation and representative supervised acceptance.
 
-**C. Production technical:** not ready. Requires hosted staging/production verification, realistic load and failover/restore tests, security review, monitoring and delivery-provider configuration, scalable bounded-history retrieval and production identity lifecycle controls.
+**C. Production technical:** not ready. Hosted acceptance has passed; still requires isolated staging, realistic load and failover/restore tests, security review, monitoring and delivery-provider configuration, scalable bounded-history retrieval and production identity lifecycle controls.
 
 **D. Clinical and regulatory:** not ready and not validated. No medical efficacy, diagnostic accuracy, regulatory clearance or permission to process real patient data is claimed. Clinical use remains disabled.
 
