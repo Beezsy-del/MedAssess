@@ -45,3 +45,7 @@ Formatting, lint, strict TypeScript, 90 unit tests and the production build pass
 ## Subsequent technical-gap release
 
 The current production source is `733a0fb2c38d470224388a949da8c7b8f3c31287`, deployment `dpl_78iEQbudkBW51NsfVtepXqYvGSoa` (READY). See [TECHNICAL_GAP_RELEASE.md](TECHNICAL_GAP_RELEASE.md) for preview/production acceptance, exact-source CI (94 unit and 24 browser tests), staff credential changes, remaining technical work and external review requirements. Earlier deployment IDs in this document are historical.
+
+## Fourth login portal release
+
+Current production source: `6c16cdc19aac68319bc7ec58869429afb4568009`; READY deployment `dpl_C1hnLrhsyrSWmbWTRzQdpfLnhJgt`. `/login` has four portal options and `/patient-portal` opens the integrated QR/token questionnaire. See [FOUR_PORTAL_RELEASE.md](FOUR_PORTAL_RELEASE.md) for the final URLs, 94-unit/26-browser CI result, hosted acceptance and limitations. Earlier deployment IDs above are historical.

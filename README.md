@@ -68,3 +68,5 @@ Supabase project: **MedAssess**, reference `kkfqxlwwcwhnmhmsqitx`, Mumbai (`ap-s
 GitHub repository: [MedAssess](https://github.com/Beezsy-del/MedAssess). Product brand: MedCipher.
 
 Latest verified release: [technical-gap fixes and acceptance evidence](docs/TECHNICAL_GAP_RELEASE.md). The report separates implemented prototype workflows, unfinished technical scope, external provider configuration and required clinical review.
+
+Patient entry is available as the fourth option on `/login`, or directly at `/patient-portal`. Existing QR links remain compatible; newly generated passes use the new route. See [four-portal release verification](docs/FOUR_PORTAL_RELEASE.md).
