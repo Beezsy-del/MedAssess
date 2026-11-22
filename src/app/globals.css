@@ -3613,3 +3613,197 @@ dd {
     grid-template-columns: 1fr;
   }
 }
+
+/* Isolated presentation workspace uses the existing MedCipher colour tokens. */
+.patient-access-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 28px 0;
+}
+.patient-access-options section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+}
+.patient-access-options .button {
+  margin-top: auto;
+  min-height: 44px;
+}
+.demo-banner {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 12px 20px;
+  background: var(--hero);
+  color: var(--hero-ink);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.demo-workspace {
+  max-width: 1240px;
+  margin: 30px auto 70px;
+  padding: 0 24px;
+}
+.demo-workspace > .panel {
+  margin: 22px 0;
+}
+.demo-workspace h3 {
+  margin: 16px 0 8px;
+}
+.demo-workspace p {
+  line-height: 1.7;
+}
+.demo-controls h2 {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+.demo-controls .button-row {
+  align-items: end;
+  gap: 10px;
+}
+.demo-controls .button {
+  font-size: 12px;
+  min-height: 44px;
+}
+.demo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0;
+}
+.demo-tabs .button {
+  min-height: 44px;
+}
+.demo-tabs [aria-current="page"] {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--brand-light);
+}
+.demo-feedback {
+  padding: 12px 16px;
+  background: var(--subtle);
+  border-left: 3px solid var(--brand);
+}
+.demo-emergency {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.demo-emergency p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.demo-profile {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+.demo-scenarios {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.demo-scenario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.demo-scenario:hover {
+  border-color: var(--brand);
+}
+.demo-scenario span {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.demo-scenario span:last-child {
+  color: var(--brand);
+  font-weight: 650;
+  margin-top: auto;
+}
+.demo-questionnaire progress {
+  width: 100%;
+  height: 10px;
+  margin: 16px 0 24px;
+  accent-color: var(--brand);
+}
+.demo-checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.demo-checks label,
+.demo-consent {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+}
+.demo-questionnaire input[type="checkbox"],
+.demo-consent input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.demo-questionnaire .patient-review {
+  max-height: 480px;
+  overflow: auto;
+  margin-bottom: 20px;
+}
+.demo-timeline {
+  border-left: 2px solid var(--border);
+  padding-left: 24px;
+  margin: 20px 0;
+  list-style: none;
+}
+.demo-timeline li {
+  padding: 0 0 24px;
+}
+.demo-timeline time {
+  color: var(--muted);
+  font-size: 12px;
+}
+.demo-notification {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+.demo-workspace textarea {
+  min-height: 100px;
+}
+.demo-workspace fieldset:disabled {
+  opacity: 0.6;
+}
+@media (max-width: 760px) {
+  .patient-access-options,
+  .demo-profile,
+  .demo-scenarios {
+    grid-template-columns: 1fr;
+  }
+  .demo-workspace {
+    padding: 0 16px;
+  }
+  .demo-emergency {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .demo-checks {
+    grid-template-columns: 1fr;
+  }
+  .demo-controls .button-row > * {
+    flex: 1 1 160px;
+  }
+}

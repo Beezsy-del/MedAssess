@@ -80,3 +80,7 @@ See [TECHNICAL_GAP_RELEASE.md](TECHNICAL_GAP_RELEASE.md): individual-staff crede
 ## Fourth login portal
 
 The login now includes Administrator, Doctor, Triage Nurse and Patient Portal options. `/patient-portal` reuses existing secure questionnaire, assessments, staff notifications and database workflows. New QR passes target that route. See FOUR_PORTAL_RELEASE.md for test/deployment evidence and device/clinical-review limitations.
+
+## Isolated patient demonstration
+
+`/patient-portal/demo` provides a token-free, interactive fictional patient journey. Presentation scenarios select simulated outcomes; they are not clinical rules. All demo state stays in memory, and no real patient APIs or alerts are used. The separate Real Patient Access option retains existing capability validation. See PATIENT_DEMO_MODE.md.

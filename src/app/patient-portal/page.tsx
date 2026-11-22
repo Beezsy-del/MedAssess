@@ -1,5 +1,5 @@
-import { AdaptivePortal } from "@/features/questionnaire/portal";
+import { PatientEntry } from "@/features/patient-demo/entry";
 export const metadata = { title: "Patient Portal | MedCipher" };
 export default function PatientPortalPage() {
-  return <AdaptivePortal />;
+  return <PatientEntry />;
 }

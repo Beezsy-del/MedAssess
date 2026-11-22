@@ -36,6 +36,9 @@ test("patient manual access, adaptive report, saved progress, staff brief and dy
     .getByRole("link", { name: "Enter Patient Portal", exact: true })
     .click();
   await expect(patient).toHaveURL(/\/patient-portal$/);
+  await patient
+    .getByRole("link", { name: "Real Patient Access", exact: true })
+    .click();
   await patient.getByLabel("Private access token").fill(created.manual_token);
   await patient
     .getByRole("button", { name: "Open encounter", exact: true })

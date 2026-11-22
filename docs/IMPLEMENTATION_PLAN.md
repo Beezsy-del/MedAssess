@@ -68,3 +68,7 @@ Implemented authenticated individual-staff password recovery/update, provider/er
 ### Fourth portal on the existing login
 
 Added the fourth Patient Portal option alongside the three existing staff portals, preserving staff authentication. The public `/patient-portal` route reuses the integrated adaptive intake; new QR links use it and old routes remain supported. Added multilingual QR/token/assisted-care instructions and regression tests for four-option navigation, mobile accessibility, QR/manual encounter equivalence and guessed-token rejection. See FOUR_PORTAL_RELEASE.md for acceptance mapping and deployment evidence. No schema modification required.
+
+### Patient Portal Demo Mode
+
+Added two entry choices inside the existing Patient Portal. The token-free demo uses only an in-memory browser store and five explicit presentation scripts. Implemented questionnaire/review, scenario results, symptom updates, timeline, simulated alerts and nurse/doctor actions, QR illustration and reset controls. Real access and issued QR routes remain protected. See PATIENT_DEMO_MODE.md for scope, isolation and test/release evidence. No database migration or new external service is needed.

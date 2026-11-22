@@ -36,6 +36,12 @@ test("login exposes four portals with accessible mobile patient entry", async ({
   await choices.getByRole("link", { name: "Enter Patient Portal" }).click();
   await expect(page).toHaveURL(/\/patient-portal$/);
   await expect(
+    page.getByRole("link", { name: "Explore Demo Mode", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Real Patient Access", exact: true })
+    .click();
+  await expect(
     page.getByRole("heading", { name: "Scan your QR code" }),
   ).toBeVisible();
   await expect(page.getByLabel("Private access token")).toBeVisible();
@@ -85,7 +91,9 @@ test("new patient route opens QR fragment for the correct encounter and rejects 
   try {
     const patient = await context.newPage();
     await patient.goto("/patient-portal");
-    await expect(patient.getByLabel("Private access token")).toBeVisible();
+    await expect(
+      patient.getByRole("link", { name: "Real Patient Access", exact: true }),
+    ).toBeVisible();
     await patient.goto(`/patient-portal#${created.token}`);
     await expect(
       patient.getByRole("heading", { name: "About you", exact: true }),

@@ -54,3 +54,5 @@ Historical bed-release failures were followed by the portal release's successful
 The patient-portal migrations and staff lifecycles are now deployed. The earlier in-progress portal checkpoint is superseded by PORTAL_UPGRADE_VERIFICATION.md. Hosted Supabase branching remains unavailable on the connected plan; no paid-plan change was made.
 
 Fourth portal: phone-camera QR instructions and opening generated QR URLs are covered; physical camera scanning across Android/iPhone models still requires device acceptance. The new entry point does not establish clinical protocol or translation validation. See FOUR_PORTAL_RELEASE.md.
+
+Patient Demo Mode is a browser-only presentation: refreshing clears it, and its simulated staff view does not connect to live queues. Scenario-selected categories are not medical assessments. Demo wording is English. No additional provider configuration is required for this isolated demonstration. See PATIENT_DEMO_MODE.md.

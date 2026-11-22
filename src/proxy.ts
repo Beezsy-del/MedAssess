@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    request.nextUrl.pathname === "/patient-portal" ||
+    /^\/patient-portal(?:\/|$)/.test(request.nextUrl.pathname) ||
     /^\/patient(?:\/|$)/.test(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/api/patient/") ||
     request.nextUrl.pathname === "/emergency"
