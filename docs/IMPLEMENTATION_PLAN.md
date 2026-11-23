@@ -76,3 +76,5 @@ Added two entry choices inside the existing Patient Portal. The token-free demo 
 ## MediRoute rebrand
 
 Renamed the product to MediRoute across visible UI, page metadata, manifest, offline fallback, CSV export, demo QR label, package metadata, CI name and documentation. Existing service identifiers, URLs, session cookies and device storage keys are retained for compatibility.
+
+MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
