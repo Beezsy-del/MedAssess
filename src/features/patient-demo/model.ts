@@ -1,4 +1,4 @@
-export const demoQrValue = "MEDCIPHER-DEMO-NOT-VALID-FOR-PATIENT-ACCESS";
+export const demoQrValue = "MEDIROUTE-DEMO-NOT-VALID-FOR-PATIENT-ACCESS";
 import { emptyReport, type PatientReport } from "../questionnaire/model";
 export type DemoCategory = "GREEN" | "YELLOW" | "RED";
 export const scenarios = [

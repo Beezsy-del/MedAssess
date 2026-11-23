@@ -1,4 +1,4 @@
-name: Verify MedCipher
+name: Verify MediRoute
 on:
   push:
     branches: [main, feat/patient-portal-role-workflows]

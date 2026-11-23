@@ -2,7 +2,7 @@
 
 ## Baseline and scope
 
-The latest attachment is byte-for-byte identical to the previously implemented patient-portal master prompt. No new application requirements were introduced. The user's earlier explicit project clarification remains authoritative: use Beezsy-del/MedAssess and the existing MedCipher Vercel project, not the MedVita hostname printed in the template. Preserve records and existing functionality.
+The latest attachment is byte-for-byte identical to the previously implemented patient-portal master prompt. No new application requirements were introduced. The user's earlier explicit project clarification remains authoritative: use Beezsy-del/MedAssess and the existing MediRoute Vercel project, not the MediRoute hostname printed in the template. Preserve records and existing functionality.
 
 The existing Next.js App Router / strict TypeScript / React / Supabase application, API and feature inventory, 16 migration files, permission documentation and acceptance reports were inspected. No new schema migration or duplicate deployment is necessary for this unchanged prompt. This follow-up corrects contradictory historical deployment/feature-status statements; it does not claim a fresh execution of every browser test.
 

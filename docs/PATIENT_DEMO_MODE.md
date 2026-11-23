@@ -4,7 +4,7 @@
 
 Open `/login` → Patient Portal → **Explore Demo Mode**. The exact demo route is `/patient-portal/demo`. No account, token, QR scan or login is needed. The other option, **Real Patient Access**, opens the existing secure portal at `/patient/start`. Existing issued QR links still open their protected encounter.
 
-The demo uses an in-memory browser store. It makes no patient API or Supabase calls, writes no database records, and sends no SMS, email, push or hospital alerts. Refreshing the page starts a fresh demo. Reset Demo clears the scenario, answers, classifications, notes, timeline and simulated notifications. The demo QR contains only `MEDCIPHER-DEMO-NOT-VALID-FOR-PATIENT-ACCESS`; the real token validator rejects it.
+The demo uses an in-memory browser store. It makes no patient API or Supabase calls, writes no database records, and sends no SMS, email, push or hospital alerts. Refreshing the page starts a fresh demo. Reset Demo clears the scenario, answers, classifications, notes, timeline and simulated notifications. The demo QR contains only `MEDIROUTE-DEMO-NOT-VALID-FOR-PATIENT-ACCESS`; the real token validator rejects it.
 
 The public demo route does not run staff authentication. This exemption does not change real patient credential checks or staff route/API/database permissions. No migration, demo database tenant, service key or special production environment variable is needed for the presentation.
 

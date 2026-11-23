@@ -56,3 +56,7 @@ The patient-portal migrations and staff lifecycles are now deployed. The earlier
 Fourth portal: phone-camera QR instructions and opening generated QR URLs are covered; physical camera scanning across Android/iPhone models still requires device acceptance. The new entry point does not establish clinical protocol or translation validation. See FOUR_PORTAL_RELEASE.md.
 
 Patient Demo Mode is a browser-only presentation: refreshing clears it, and its simulated staff view does not connect to live queues. Scenario-selected categories are not medical assessments. Demo wording is English. No additional provider configuration is required for this isolated demonstration. See PATIENT_DEMO_MODE.md.
+
+## MediRoute rebrand
+
+Rebranding preserves existing deployment hostnames, repository/workspace names, historical migration/job identifiers, auth identities, cookie names and offline storage keys. These are compatibility identifiers, not visible product branding. No clinical behavior or approval status changed.

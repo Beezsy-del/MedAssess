@@ -32,7 +32,7 @@ export default function Emergency() {
         </Link>
       </main>
       <footer className="public-footer">
-        MedCipher · Synthetic demonstration only
+        MediRoute · Synthetic demonstration only
       </footer>
     </>
   );

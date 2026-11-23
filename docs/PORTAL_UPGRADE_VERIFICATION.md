@@ -2,7 +2,7 @@
 
 **Hosted release update:** Deployment was subsequently authorized. See [PORTAL_RELEASE.md](PORTAL_RELEASE.md) for migration, deployment and live verification evidence; earlier deferral statements below are historical.
 
-Target: [Beezsy-del/MedAssess](https://github.com/Beezsy-del/MedAssess), branch `feat/patient-portal-role-workflows`. Product remains MedCipher. The initial local-only instruction was superseded by explicit deployment authorization; the upgrade is now hosted. This report covers the latest patient-portal/role-workflow specification. Historical master-specification gaps remain recorded separately; this is not a blanket production-readiness certificate.
+Target: [Beezsy-del/MedAssess](https://github.com/Beezsy-del/MedAssess), branch `feat/patient-portal-role-workflows`. Product remains MediRoute. The initial local-only instruction was superseded by explicit deployment authorization; the upgrade is now hosted. This report covers the latest patient-portal/role-workflow specification. Historical master-specification gaps remain recorded separately; this is not a blanket production-readiness certificate.
 
 ## Environment and migration status
 

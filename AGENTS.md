@@ -1,6 +1,6 @@
-# MedCipher project instructions
+# MediRoute project instructions
 
-Read docs/PRODUCT_REQUIREMENTS.md for the original milestone requirements. Product brand is MedCipher; workspace and existing Supabase project are named MedAssess.
+Read docs/PRODUCT_REQUIREMENTS.md for the original milestone requirements. Product brand is MediRoute; workspace and existing Supabase project are named MedAssess.
 
 - Build integrated Next.js App Router / strict TypeScript / Supabase workflows. Keep features, domain rules, persistence, and UI separate.
 - This is a synthetic hackathon prototype, never a validated clinical system. Clinical operational use must remain disabled without reviewed protocols.

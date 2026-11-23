@@ -40,7 +40,7 @@ export function SmartFlow() {
     <>
       <div className="page-heading">
         <div>
-          <p className="page-context">MedCipher SmartFlow</p>
+          <p className="page-context">MediRoute SmartFlow</p>
           <h1>Patient flow</h1>
           <p>Track each encounter from registration to disposition.</p>
         </div>
@@ -701,7 +701,7 @@ export function Analytics() {
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = "medcipher-synthetic-aggregate-report.csv";
+    a.download = "mediroute-synthetic-aggregate-report.csv";
     a.click();
     URL.revokeObjectURL(url);
   }

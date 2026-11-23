@@ -3614,7 +3614,7 @@ dd {
   }
 }
 
-/* Isolated presentation workspace uses the existing MedCipher colour tokens. */
+/* Isolated presentation workspace uses the existing MediRoute colour tokens. */
 .patient-access-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

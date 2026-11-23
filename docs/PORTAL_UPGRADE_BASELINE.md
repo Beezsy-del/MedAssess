@@ -1,6 +1,6 @@
 # Patient portal and role-workflow baseline
 
-Baseline: `b051ada`, existing repository https://github.com/Beezsy-del/MedAssess; branch `feat/patient-portal-role-workflows`. User confirmed that the MedVita hostname in the supplied prompt means this existing MedCipher application: https://medcipher-triage-platform.vercel.app. No replacement project will be created.
+Baseline: `b051ada`, existing repository https://github.com/Beezsy-del/MedAssess; branch `feat/patient-portal-role-workflows`. User confirmed that the MediRoute hostname in the supplied prompt means this existing MediRoute application: https://medcipher-triage-platform.vercel.app. No replacement project will be created.
 
 Stack: Next.js 16.4.6 App Router, React 19.3.0, strict TypeScript, Supabase Auth/PostgreSQL/Realtime, Zod, Vitest and Playwright. Existing Vercel project `prj_b5W03SkZFPbvjjRhs5JVbupkQalN`, bloodflow team, Node 24. The deployment uses source uploads; no linked Git repository is returned by project metadata. Existing remote and history are preserved.
 

@@ -27,7 +27,7 @@ No database migration is needed. Hosted inspection confirmed 16 applied migratio
 - QR acceptance opens the generated URL. Physical camera scanning on actual Android/iPhone hardware is not certified; the instructions use the phone's camera and do not claim a built-in scanner.
 - GREEN/YELLOW/RED automation is verified using explicitly synthetic reviewed fixtures. Real clinician-approved protocols and native-language/clinical translation review remain required. Missing or unreviewed information remains assessment-required, never assumed GREEN.
 - Patient status is limited to permitted encounter fields. No clinical notes or staff communications are exposed. Broad system limitations in TECHNICAL_GAP_RELEASE.md remain unchanged.
-- The deployed target remains the user-confirmed MedCipher project, not the MedVita hostname in the template.
+- The deployed target remains the user-confirmed MediRoute project, not the MediRoute hostname in the template.
 
 Final test, GitHub, preview and production evidence is appended after verification.
 

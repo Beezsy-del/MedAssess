@@ -392,7 +392,7 @@ Source: PRODUCT_REQUIREMENTS.md. Clinical operation remains disabled.
 
 - [ ] Modern hospital management software. (source line 607)
 - [ ] Clean professional dashboard. (source line 608)
-- [ ] Burgundy and subtle gold brand accents inspired by the MedCipher event identity. (source line 609)
+- [ ] Burgundy and subtle gold brand accents inspired by the MediRoute event identity. (source line 609)
 - [ ] Neutral background surfaces. (source line 610)
 - [ ] Clear typography. (source line 611)
 - [ ] Proper spacing. (source line 612)
@@ -635,7 +635,7 @@ Source: PRODUCT_REQUIREMENTS.md. Clinical operation remains disabled.
 
 ### 3. Patient registration flow
 
-- [ ] MedCipher identity. (source line 1037)
+- [ ] MediRoute identity. (source line 1037)
 - [ ] Language selection. (source line 1038)
 - [ ] Encounter verification. (source line 1039)
 - [ ] Patient details. (source line 1040)
@@ -683,7 +683,7 @@ Source: PRODUCT_REQUIREMENTS.md. Clinical operation remains disabled.
 
 ### 7. QR printing
 
-- [ ] MedCipher branding. (source line 1111)
+- [ ] MediRoute branding. (source line 1111)
 - [ ] Encounter reference. (source line 1112)
 - [ ] QR code. (source line 1113)
 - [ ] Simple scan instructions. (source line 1114)

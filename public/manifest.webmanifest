@@ -1,6 +1,6 @@
 {
-  "name": "MedCipher Hospital Workspace",
-  "short_name": "MedCipher",
+  "name": "MediRoute Hospital Workspace",
+  "short_name": "MediRoute",
   "description": "Clinical workflow demonstration",
   "start_url": "/",
   "scope": "/",

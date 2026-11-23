@@ -41,7 +41,7 @@ export function PatientEntry() {
             <Play aria-hidden="true" />
             <h2>Explore Demo Mode</h2>
             <p>
-              Experience the complete MedVita patient journey without login or
+              Experience the complete MediRoute patient journey without login or
               access token.
             </p>
             <p>

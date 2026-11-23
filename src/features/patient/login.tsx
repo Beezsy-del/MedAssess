@@ -56,7 +56,7 @@ export function Login({
       <main className="login-layout">
         <section className="login-story">
           <div className="login-intro">
-            <p className="hero-kicker">MedCipher hospital workspace</p>
+            <p className="hero-kicker">MediRoute hospital workspace</p>
             <h1>
               Triage and patient flow,
               <br />
@@ -211,7 +211,7 @@ export function Login({
         </section>
       </main>
       <footer className="public-footer">
-        MedCipher · Synthetic hospital workflow demonstration
+        MediRoute · Synthetic hospital workflow demonstration
       </footer>
     </>
   );

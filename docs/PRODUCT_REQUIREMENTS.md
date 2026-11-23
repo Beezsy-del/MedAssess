@@ -1,8 +1,8 @@
-# MEDASSESS
+# MEDIROUTE
 
 — MASTER CODEX DEVELOPMENT PROMPTS
 
-**Project:** MedAssess — Intelligent Clinical Triage & Hospital Flow Management System
+**Project:** MediRoute — Intelligent Clinical Triage & Hospital Flow Management System
 
 **Instruction to the developer:** Execute these prompts sequentially in one Codex project workspace. Each prompt is a development milestone, not a request to merely describe or propose code. Build the feature, integrate it, test it, document it, and verify it before finishing the milestone.
 
@@ -23,7 +23,7 @@ You are acting as a complete senior software engineering team consisting of:
 - QA and automation engineer.
 - DevOps and deployment engineer.
 
-Your task is to build a complete, professional, working web application called **MedCipher**.
+Your task is to build a complete, professional, working web application called **MediRoute**.
 
 Do not create a static landing page, a collection of disconnected UI screens, or a frontend-only mockup.
 
@@ -31,7 +31,7 @@ You must develop an integrated, functional full-stack healthcare workflow manage
 
 ## A. Product vision
 
-MedCipher is an intelligent patient triage, emergency coordination and hospital patient-flow management platform designed for:
+MediRoute is an intelligent patient triage, emergency coordination and hospital patient-flow management platform designed for:
 
 1. Government hospitals.
 2. Rural primary healthcare centres.
@@ -478,7 +478,7 @@ Do not create one oversized component containing all business logic.
 
 ## D. Critical clinical safety requirements
 
-MedCipher is a hackathon clinical workflow prototype.
+MediRoute is a hackathon clinical workflow prototype.
 
 It must not claim to be a validated diagnostic system or an autonomous replacement for trained triage staff.
 
@@ -559,7 +559,7 @@ Do not stop at a planning document. The goal is a functioning integrated applica
 
 # PROMPT 1 — PROJECT INITIALISATION, ARCHITECTURE AND PROFESSIONAL UI
 
-I am now authorising you to begin the actual MedCipher project implementation.
+I am now authorising you to begin the actual MediRoute project implementation.
 
 Use the complete requirements in the permanent project instructions.
 
@@ -600,13 +600,13 @@ Verify the current stable installation commands using official documentation.
 
 Create a premium, professional healthcare-management interface.
 
-Use MedCipher as the brand identity.
+Use MediRoute as the brand identity.
 
 Design direction:
 
 - Modern hospital management software.
 - Clean professional dashboard.
-- Burgundy and subtle gold brand accents inspired by the MedCipher event identity.
+- Burgundy and subtle gold brand accents inspired by the MediRoute event identity.
 - Neutral background surfaces.
 - Clear typography.
 - Proper spacing.
@@ -744,7 +744,7 @@ Complete the project foundation and run the relevant checks.
 
 # PROMPT 2 — SUPABASE DATABASE, AUTHENTICATION AND SECURITY
 
-Now implement the complete Supabase backend for MedCipher.
+Now implement the complete Supabase backend for MediRoute.
 
 Do not create frontend-only mock data.
 
@@ -1034,7 +1034,7 @@ When a patient scans the QR code, open a professional mobile page.
 
 Show:
 
-1. MedCipher identity.
+1. MediRoute identity.
 2. Language selection.
 3. Encounter verification.
 4. Patient details.
@@ -1108,7 +1108,7 @@ Do not expose internal clinical notes, staff-only comments, other patients' info
 
 Create a printable patient QR slip with:
 
-- MedCipher branding.
+- MediRoute branding.
 - Encounter reference.
 - QR code.
 - Simple scan instructions.
@@ -1139,7 +1139,7 @@ All information must be saved through authenticated or securely token-validated 
 
 # PROMPT 4 — CLINICAL TRIAGE ENGINE, EMERGENCY OVERRIDE AND SCORING
 
-Implement the main MedCipher clinical decision-support engine.
+Implement the main MediRoute clinical decision-support engine.
 
 This is the most important engineering module.
 
@@ -1545,7 +1545,7 @@ Test:
 
 Now implement the entire hospital operations module.
 
-Call this module **MedCipher SmartFlow**.
+Call this module **MediRoute SmartFlow**.
 
 ### 1. Patient journey engine
 
@@ -1785,7 +1785,7 @@ Test:
 
 Now transform the website into an installable, rural-friendly Progressive Web Application.
 
-This feature is a major differentiator for MedCipher.
+This feature is a major differentiator for MediRoute.
 
 ### 1. PWA
 
@@ -2299,7 +2299,7 @@ Do not claim clinical validation.
 
 # PROMPT 10 — GITHUB REPOSITORY, SUPABASE REMOTE DATABASE AND VERCEL DEPLOYMENT
 
-Now prepare MedCipher for real hosted deployment.
+Now prepare MediRoute for real hosted deployment.
 
 This stage requires actual authenticated infrastructure operations, not just deployment configuration files.
 
@@ -2667,7 +2667,7 @@ Produce a final table with these columns:
 
 Use only verified results.
 
-The final MedCipher application must be a complete integrated working prototype, not a presentation mockup.
+The final MediRoute application must be a complete integrated working prototype, not a presentation mockup.
 
 Do not stop just because a preview deployment succeeds. Verify the features in the deployed application.
 

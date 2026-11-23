@@ -13,7 +13,7 @@ export function Brand({ href = "/" }: { href?: string }) {
       <span className="brand-symbol">
         <Activity size={24} />
       </span>
-      <span>MedCipher</span>
+      <span>MediRoute</span>
     </Link>
   );
 }

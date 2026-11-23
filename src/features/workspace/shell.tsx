@@ -236,7 +236,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <footer className="workspace-footer">
           <span>
             <Activity size={14} />
-            MedCipher
+            MediRoute
           </span>
           <span>Synthetic data only. Unvalidated clinical protocol.</span>
           <span>Hospital workspace</span>

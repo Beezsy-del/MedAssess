@@ -28,7 +28,7 @@ const hospital = randomUUID(),
 await insert("hospitals", [
   {
     id: hospital,
-    name: "Synthetic MedCipher local hospital",
+    name: "Synthetic MediRoute local hospital",
     location: "Local test environment",
     is_demo: true,
   },

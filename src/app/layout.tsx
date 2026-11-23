@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { PWA } from "@/components/pwa";
 export const metadata: Metadata = {
-  title: "MedCipher — Hospital workspace",
+  title: "MediRoute — Hospital workspace",
   description:
     "Clinical triage and hospital flow coordination. Synthetic demonstration prototype.",
   manifest: "/manifest.webmanifest",

@@ -19,7 +19,7 @@
 - [x] Production deployment reached READY; see TEST_RESULTS.md for hosted verification.
 - [ ] Complete master feature acceptance: remaining requirements are inventoried in MASTER_AUDIT.md and MASTER_REQUIREMENTS_CHECKLIST.md.
 
-Product brand: MedCipher. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
+Product brand: MediRoute. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
 
 Core milestone checks passed as described in TEST_RESULTS.md. The supplied master acceptance milestone is not complete; external access and feature-development gaps are explicitly distinguished.
 
@@ -49,7 +49,7 @@ Baseline and target confirmation: PORTAL_UPGRADE_BASELINE.md. Feature branch: fe
 7. Cover synthetic acceptance A–J, tenant/role/token abuse, migration compatibility, load/reconnection, accessibility and regression.
 8. Push logical commits; verify isolated preview; promote only after required checks pass; publish exact results and remaining external clinical review needs.
 
-21 November — portal foundation checkpoint (not release acceptance): user confirmed MedAssess and the existing MedCipher deployment. Added role checks before page data loading and API commands, filtered navigation and doctor registration/pass controls, request-scoped session reuse, an eight-step English patient form, scoped HttpOnly session endpoint, strict report validation, and draft/report/rule models. Draft migration replay plus synthetic transaction tests passed in isolated local PostgreSQL 17. Existing production has not been migrated or replaced. Supabase hosted branch creation failed because the project plan does not support branching; an isolated hosted environment is still required. Staff review/referral/admin integration, translations, scheduler, full A–J acceptance and hosted verification remain unchecked.
+21 November — portal foundation checkpoint (not release acceptance): user confirmed MedAssess and the existing MediRoute deployment. Added role checks before page data loading and API commands, filtered navigation and doctor registration/pass controls, request-scoped session reuse, an eight-step English patient form, scoped HttpOnly session endpoint, strict report validation, and draft/report/rule models. Draft migration replay plus synthetic transaction tests passed in isolated local PostgreSQL 17. Existing production has not been migrated or replaced. Supabase hosted branch creation failed because the project plan does not support branching; an isolated hosted environment is still required. Staff review/referral/admin integration, translations, scheduler, full A–J acceptance and hosted verification remain unchecked.
 
 22 November — user chose local execution and deferred hosted deployment. Implemented the adaptive patient portal, prototype EN/KN/HI copy and optional dictation, nurse briefs/OPD, doctor internal referrals, operational admin directory/sticky resources, staff provisioning/access, reviewed configuration, scheduled monitoring, and scoped snapshots. Real local Supabase Auth/PostgREST/Realtime is running with two synthetic tenants. SQL replay, 87 unit tests, 33 core, 16 intake, 20 bed and 19 portal integration groups passed. Added isolated local CI. Hosted preview/production work is explicitly deferred, not represented as completed. Current verification and remaining dependencies: PORTAL_UPGRADE_VERIFICATION.md.
 
@@ -72,3 +72,7 @@ Added the fourth Patient Portal option alongside the three existing staff portal
 ### Patient Portal Demo Mode
 
 Added two entry choices inside the existing Patient Portal. The token-free demo uses only an in-memory browser store and five explicit presentation scripts. Implemented questionnaire/review, scenario results, symptom updates, timeline, simulated alerts and nurse/doctor actions, QR illustration and reset controls. Real access and issued QR routes remain protected. See PATIENT_DEMO_MODE.md for scope, isolation and test/release evidence. No database migration or new external service is needed.
+
+## MediRoute rebrand
+
+Renamed the product to MediRoute across visible UI, page metadata, manifest, offline fallback, CSV export, demo QR label, package metadata, CI name and documentation. Existing service identifiers, URLs, session cookies and device storage keys are retained for compatibility.

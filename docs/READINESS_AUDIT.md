@@ -1,4 +1,4 @@
-# MedCipher independent readiness audit
+# MediRoute independent readiness audit
 
 Audit date: 20 November 2026. Scope: source, original PRODUCT_REQUIREMENTS.md and master inventory, hosted Supabase, GitHub/CI and Vercel. This is an engineering assessment, not an independent third-party certification or medical validation. Tests use synthetic records exclusively. **Full master acceptance is not achieved.**
 
