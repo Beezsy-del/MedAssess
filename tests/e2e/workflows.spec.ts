@@ -505,3 +505,44 @@ test("workspace themes persist and navigation supports keyboard dismissal", asyn
     .click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
+
+test("patient intake portal on login leads to interactive intake simulation and dashboard supports quick-peek drawer", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await expect(
+    page.getByRole("heading", { name: "Patient Intake Portal" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Enter patient intake" }).click();
+  await expect(page).toHaveURL(/\/patient-portal$/);
+  await page.getByRole("link", { name: "Launch intake simulator" }).click();
+  await expect(page).toHaveURL(/\/patient-portal\/demo$/);
+
+  await page.getByRole("button", { name: "Continue to symptoms" }).click();
+  await page
+    .getByRole("button", { name: "Continue to medical history" })
+    .click();
+  await page.getByRole("button", { name: "Send to care team" }).click();
+  await expect(page.getByText(/Simulated intake priority/i)).toBeVisible();
+  await page.getByRole("button", { name: "Report worsening symptoms" }).click();
+  await expect(
+    page.getByText(/Patient reported worsening symptoms/i),
+  ).toBeVisible();
+
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hospital overview" }),
+  ).toBeVisible();
+  const peekButtons = page.getByRole("button", { name: /^Quick peek / });
+  if ((await peekButtons.count()) > 0) {
+    await peekButtons.first().click();
+    await expect(
+      page.getByRole("region", { name: /Clinical quick brief for/i }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("region", { name: /Clinical quick brief for/i }),
+    ).toHaveCount(0);
+  }
+});

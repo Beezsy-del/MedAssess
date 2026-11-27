@@ -2,18 +2,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Activity,
-  LayoutDashboard,
-  ClipboardPlus,
-  Stethoscope,
-  HeartPulse,
-  Workflow,
-  BedDouble,
-  Building2,
-  ArrowRightLeft,
-  ChartNoAxesCombined,
+  LayoutGrid,
   Settings,
-  ShieldCheck,
   Bell,
   Search,
   Menu,
@@ -21,8 +11,7 @@ import {
   RefreshCw,
   WifiOff,
   ChevronDown,
-  Grid2X2,
-  UserPlus,
+  ShieldCheck,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -31,33 +20,48 @@ import { clearOutbox } from "@/features/offline/outbox";
 import { Modal } from "@/components/ui";
 import { Brand } from "@/components/chrome";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  AcuityShieldIcon,
+  AnalyticsTrendIcon,
+  AuditSealIcon,
+  BedBayIcon,
+  DepartmentUnitIcon,
+  EmergencyBeaconIcon,
+  FlowJunctionIcon,
+  MedCipherLogo,
+  OverviewPulseIcon,
+  PatientIntakeIcon,
+  ReceptionDeskIcon,
+  ReferralTransferIcon,
+  StethoscopeCrossIcon,
+} from "@/components/icons";
 
 const nav = [
   [
     "Workspace",
     [
-      ["/dashboard", "Overview", LayoutDashboard],
-      ["/registration", "Patient registration", ClipboardPlus],
-      ["/reception", "Reception", UserPlus],
-      ["/triage", "Triage & queues", HeartPulse],
-      ["/doctor", "Clinical workspace", Stethoscope],
-      ["/emergency-center", "Emergency centre", Activity],
+      ["/dashboard", "Overview", OverviewPulseIcon],
+      ["/registration", "Patient registration", PatientIntakeIcon],
+      ["/reception", "Reception", ReceptionDeskIcon],
+      ["/triage", "Triage & queues", AcuityShieldIcon],
+      ["/doctor", "Clinical workspace", StethoscopeCrossIcon],
+      ["/emergency-center", "Emergency centre", EmergencyBeaconIcon],
     ],
   ],
   [
     "Hospital operations",
     [
-      ["/smartflow", "SmartFlow", Workflow],
-      ["/resources", "Beds & resources", BedDouble],
-      ["/departments", "Departments", Building2],
-      ["/referrals", "Referrals", ArrowRightLeft],
+      ["/smartflow", "SmartFlow", FlowJunctionIcon],
+      ["/resources", "Beds & resources", BedBayIcon],
+      ["/departments", "Departments", DepartmentUnitIcon],
+      ["/referrals", "Referrals", ReferralTransferIcon],
     ],
   ],
   [
     "Management",
     [
-      ["/analytics", "Analytics", ChartNoAxesCombined],
-      ["/audit", "Audit trail", ShieldCheck],
+      ["/analytics", "Analytics", AnalyticsTrendIcon],
+      ["/audit", "Audit trail", AuditSealIcon],
       ["/settings", "Settings", Settings],
     ],
   ],
@@ -180,7 +184,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             aria-haspopup="dialog"
             onClick={() => setOpen(true)}
           >
-            <Grid2X2 size={16} />
+            <LayoutGrid size={15} />
             <span>Workspace</span>
             <ChevronDown size={14} />
           </button>
@@ -252,7 +256,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               href="/dashboard"
               aria-current={path === "/dashboard" ? "page" : undefined}
             >
-              <LayoutDashboard size={18} />
+              <OverviewPulseIcon size={18} />
               <span>Overview</span>
             </Link>
             <Link
@@ -263,7 +267,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   : undefined
               }
             >
-              <ClipboardPlus size={18} />
+              <PatientIntakeIcon size={18} />
               <span>{isNurse ? "Register" : "Reception"}</span>
             </Link>
             {!isNurse && (
@@ -272,7 +276,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 className="rail-desktop-only"
                 aria-current={path === "/registration" ? "page" : undefined}
               >
-                <UserPlus size={18} />
+                <ReceptionDeskIcon size={18} />
                 <span>Nursing intake</span>
               </Link>
             )}
@@ -283,14 +287,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 path === "/triage" || path === "/queues" ? "page" : undefined
               }
             >
-              <HeartPulse size={18} />
+              <AcuityShieldIcon size={18} />
               <span>Triage queue</span>
             </Link>
             <Link
               href="/doctor"
               aria-current={path === "/doctor" ? "page" : undefined}
             >
-              <Stethoscope size={18} />
+              <StethoscopeCrossIcon size={18} />
               <span>Clinical</span>
             </Link>
             <Link
@@ -302,7 +306,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   : undefined
               }
             >
-              <Activity size={18} />
+              <EmergencyBeaconIcon size={18} />
               <span>Alerts</span>
               {unread > 0 && <span className="rail-badge">{unread}</span>}
             </Link>
@@ -315,7 +319,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="rail-desktop-only"
               aria-current={path === "/smartflow" ? "page" : undefined}
             >
-              <Workflow size={18} />
+              <FlowJunctionIcon size={18} />
               <span>Flow board</span>
             </Link>
             <Link
@@ -326,7 +330,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   : undefined
               }
             >
-              <BedDouble size={18} />
+              <BedBayIcon size={18} />
               <span>Resources</span>
             </Link>
             <Link
@@ -334,7 +338,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="rail-desktop-only"
               aria-current={path === "/departments" ? "page" : undefined}
             >
-              <Building2 size={18} />
+              <DepartmentUnitIcon size={18} />
               <span>Departments</span>
             </Link>
             <Link
@@ -342,7 +346,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="rail-desktop-only"
               aria-current={path === "/referrals" ? "page" : undefined}
             >
-              <ArrowRightLeft size={18} />
+              <ReferralTransferIcon size={18} />
               <span>Referrals</span>
             </Link>
           </div>
@@ -354,7 +358,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="rail-desktop-only"
               aria-current={path === "/analytics" ? "page" : undefined}
             >
-              <ChartNoAxesCombined size={18} />
+              <AnalyticsTrendIcon size={18} />
               <span>Analytics</span>
             </Link>
             <Link
@@ -362,7 +366,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="rail-desktop-only"
               aria-current={path === "/audit" ? "page" : undefined}
             >
-              <ShieldCheck size={18} />
+              <AuditSealIcon size={18} />
               <span>Audit trail</span>
             </Link>
             <Link
@@ -408,7 +412,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           )}
           <main id="main">
             <div className="hospital-context">
-              <Building2 size={15} />
+              <DepartmentUnitIcon size={15} />
               <span>{data.hospital.name}</span>
               {data.hospitals.length > 1 && (
                 <select
@@ -442,7 +446,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </main>
           <footer className="workspace-footer">
             <span>
-              <Activity size={14} />
+              <MedCipherLogo size={15} />
               MedCipher
             </span>
             <span>Synthetic data only. Unvalidated clinical protocol.</span>
@@ -454,7 +458,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {open && (
         <Modal title="Workspace navigation" onClose={() => setOpen(false)}>
           <div className="navigation-hospital">
-            <Building2 size={22} />
+            <DepartmentUnitIcon size={22} />
             <div>
               {data.hospitals.length > 1 ? (
                 <select

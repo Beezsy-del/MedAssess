@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { PublicHeader } from "@/components/chrome";
-import { Activity, AlertTriangle, ArrowRight } from "lucide-react";
+import { EmergencyBeaconIcon, PatientPortalIcon } from "@/components/icons";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function Emergency() {
   return (
     <>
       <PublicHeader />
       <main className="public-page">
-        <Activity size={34} aria-hidden="true" />
+        <div className="gateway-icon-wrap" aria-hidden="true">
+          <EmergencyBeaconIcon size={28} />
+        </div>
         <h1>Get help from hospital staff now.</h1>
         <p>
           If someone is unresponsive, struggling to breathe, bleeding heavily,
@@ -32,8 +35,12 @@ export default function Emergency() {
           or ask someone nearby to help.
         </p>
         <div className="button-row">
+          <Link className="button" href="/patient-portal">
+            <PatientPortalIcon size={16} />
+            Patient intake portal
+          </Link>
           <Link className="button" href="/patient/start">
-            Patient registration information
+            QR registration info
           </Link>
           <Link className="button primary" href="/login">
             Staff sign in <ArrowRight size={16} />

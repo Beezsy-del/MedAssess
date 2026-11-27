@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { PublicHeader } from "@/components/chrome";
-import { QrCode, Smartphone, ShieldAlert } from "lucide-react";
+import { PatientPortalIcon } from "@/components/icons";
+import { QrCode, Smartphone, ShieldAlert, ArrowRight } from "lucide-react";
 
 export default function Start() {
   return (
     <>
       <PublicHeader />
       <main className="public-page">
-        <h1>Welcome to MedCipher</h1>
+        <div className="gateway-icon-wrap" aria-hidden="true">
+          <PatientPortalIcon size={26} />
+        </div>
+        <h1>Hospital Encounter Pass</h1>
         <p>
-          Visit reception to receive a secure encounter pass. Scan the QR code
-          on your pass to share your symptoms with your care team.
+          Visit reception to receive a private QR encounter pass. Scan the QR
+          code on your printed pass to share symptoms directly with your care
+          team.
         </p>
         <div className="detail-grid spaced">
           <div className="form-note">
@@ -24,8 +29,8 @@ export default function Start() {
             >
               <QrCode size={17} aria-hidden="true" /> Using your QR pass
             </strong>
-            Enter the private link from your printed pass in your browser. Do
-            not share it with others.
+            Enter or scan the private link from your printed pass in your
+            browser. Do not share it with others.
           </div>
           <div className="form-note">
             <strong
@@ -44,6 +49,9 @@ export default function Start() {
           </div>
         </div>
         <div className="button-row">
+          <Link className="button primary" href="/patient-portal">
+            Open patient portal &amp; demo <ArrowRight size={15} />
+          </Link>
           <Link className="button emergency-button" href="/emergency">
             <ShieldAlert size={16} aria-hidden="true" />
             Need help immediately?

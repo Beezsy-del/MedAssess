@@ -1,20 +1,24 @@
 import Link from "next/link";
-import {
-  Activity,
-  ShieldCheck,
-  ClipboardPlus,
-  Stethoscope,
-  Workflow,
-} from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import {
+  MedCipherLogo,
+  PatientIntakeIcon,
+  StethoscopeCrossIcon,
+  FlowJunctionIcon,
+  VitalsMonitorIcon,
+} from "./icons";
 
 export function Brand({ href = "/" }: { href?: string }) {
   return (
     <Link className="brand" href={href}>
       <span className="brand-symbol" aria-hidden="true">
-        <Activity size={20} strokeWidth={2.25} />
+        <MedCipherLogo size={24} />
       </span>
-      <span>MedCipher</span>
+      <span className="brand-wordmark">
+        <strong>MedCipher</strong>
+        <small>Triage &amp; Flow</small>
+      </span>
     </Link>
   );
 }
@@ -23,9 +27,14 @@ export function PublicHeader() {
   return (
     <header className="public-topbar">
       <Brand />
+      <nav className="public-nav" aria-label="Public access">
+        <Link href="/login">Staff sign in</Link>
+        <Link href="/patient-portal">Patient intake</Link>
+        <Link href="/patient/start">QR pass</Link>
+      </nav>
       <div className="topbar-actions">
         <span className="environment-label">
-          <ShieldCheck size={14} /> Synthetic demo
+          <ShieldCheck size={14} aria-hidden="true" /> Synthetic demo
         </span>
         <ThemeToggle />
         <Link className="public-help" href="/emergency">
@@ -52,40 +61,42 @@ export function CareMap({
       }
     >
       <div className="map-caption">
-        <span>{counts ? "Encounter stages" : "Care coordination"}</span>
-        <span>{counts ? "Hospital snapshot" : "Workflow overview"}</span>
+        <span>{counts ? "Encounter stages" : "Care pipeline"}</span>
+        <span>{counts ? "Hospital snapshot" : "Door-to-disposition"}</span>
       </div>
       <div className="map-nodes">
         <div className="map-node">
           <span className="map-icon" aria-hidden="true">
-            <ClipboardPlus size={20} />
+            <PatientIntakeIcon size={20} />
           </span>
-          <strong>{counts ? counts.pending : "Register"}</strong>
-          <small>{counts ? "Awaiting triage" : "Create the encounter"}</small>
+          <strong>{counts ? counts.pending : "01 · Intake"}</strong>
+          <small>
+            {counts ? "Awaiting triage" : "QR pass or desk check-in"}
+          </small>
         </div>
         <span className="map-connector" aria-hidden="true" />
         <div className="map-node center">
           <span className="map-icon" aria-hidden="true">
-            <Stethoscope size={22} />
+            <StethoscopeCrossIcon size={22} />
           </span>
-          <strong>{counts ? counts.assessment : "Assess"}</strong>
-          <small>{counts ? "In assessment" : "Review clinical urgency"}</small>
+          <strong>{counts ? counts.assessment : "02 · Triage"}</strong>
+          <small>{counts ? "In assessment" : "Acuity & vitals review"}</small>
         </div>
         <span className="map-connector" aria-hidden="true" />
         <div className="map-node">
           <span className="map-icon" aria-hidden="true">
-            <Workflow size={20} />
+            <FlowJunctionIcon size={20} />
           </span>
-          <strong>{counts ? counts.treatment : "Coordinate"}</strong>
-          <small>{counts ? "In treatment" : "Document the next step"}</small>
+          <strong>{counts ? counts.treatment : "03 · Flow"}</strong>
+          <small>{counts ? "In treatment" : "Bed bay & handover"}</small>
         </div>
       </div>
       <div className="map-foot">
-        <Activity size={14} aria-hidden="true" />
+        <VitalsMonitorIcon size={15} />
         <span>
           {counts
             ? "Counts reflect recorded status, not clinical recommendations."
-            : "Human decisions. Documented handovers."}
+            : "Clinician-verified triage · Auditable handovers"}
         </span>
       </div>
     </div>
