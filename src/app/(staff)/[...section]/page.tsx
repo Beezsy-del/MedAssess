@@ -76,10 +76,9 @@ export default async function StaffPage({
       content = (
         <>
           <BedManagement />
-          <details className="panel panel-copy spaced">
-            <summary>Stretchers, wheelchairs & other equipment</summary>
+          <section className="panel detail-panel spaced">
             <Resources />
-          </details>
+          </section>
         </>
       );
       break;

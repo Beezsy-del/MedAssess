@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Field } from "@/components/ui";
 import { PublicHeader, CareMap } from "@/components/chrome";
+
 export function Login({
   demo = false,
   reset = false,
@@ -14,9 +15,14 @@ export function Login({
 }) {
   const router = useRouter();
   const [message, setMessage] = useState(""),
-    [busy, setBusy] = useState(false);
+    [isError, setIsError] = useState(false),
+    [busy, setBusy] = useState(false),
+    [showPassword, setShowPassword] = useState(false);
+
   async function login(payload: Record<string, unknown>) {
     setBusy(true);
+    setMessage("");
+    setIsError(false);
     try {
       const r = await fetch("/api/auth", {
         method: "POST",
@@ -25,19 +31,22 @@ export function Login({
       });
       const result = await r.json();
       if (!r.ok) throw new Error(result.error);
-      if (reset) setMessage(result.message);
-      else {
+      if (reset) {
+        setMessage(result.message);
+      } else {
         router.push(
           result.redirect === "/registration" ? "/registration" : "/dashboard",
         );
         router.refresh();
       }
     } catch (e) {
+      setIsError(true);
       setMessage(e instanceof Error ? e.message : "Unable to sign in");
     } finally {
       setBusy(false);
     }
   }
+
   return (
     <>
       <PublicHeader />
@@ -56,15 +65,14 @@ export function Login({
             </p>
             <CareMap />
             <div className="login-safety">
-              <ShieldCheck size={17} />
+              <ShieldCheck size={17} aria-hidden="true" />
               <span>
-                Synthetic demonstration only.
-                <br />
-                Clinical operations are disabled.
+                Synthetic demonstration only. Clinical operations are disabled.
               </span>
             </div>
           </div>
         </section>
+
         <section className="login-form">
           <div>
             <h2>{reset ? "Reset your password" : "Staff sign in"}</h2>
@@ -88,21 +96,34 @@ export function Login({
                   name="email"
                   type="email"
                   autoComplete="email"
+                  placeholder="clinician@hospital.example"
                   required
                 />
               </Field>
               {!reset && (
                 <Field label="Password">
-                  <input
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    minLength={8}
-                  />
+                  <div className="password-wrap">
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      required
+                      minLength={8}
+                    />
+                    <button
+                      type="button"
+                      className="icon-button"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </Field>
               )}
-              <button className="button primary" disabled={busy}>
+              <button type="submit" className="button primary" disabled={busy}>
                 {busy
                   ? "Please wait…"
                   : reset
@@ -112,7 +133,12 @@ export function Login({
               </button>
             </form>
             {message && (
-              <p className="form-note" role="status">
+              <p
+                className={
+                  isError ? "error-text spaced" : "success-text spaced"
+                }
+                role={isError ? "alert" : "status"}
+              >
                 {message}
               </p>
             )}
@@ -125,7 +151,7 @@ export function Login({
             {demo && !reset && (
               <div className="demo-login">
                 <div>
-                  <ShieldCheck size={18} />
+                  <ShieldCheck size={17} aria-hidden="true" />
                   <strong>Try a staff role</strong>
                 </div>
                 <p>
@@ -135,6 +161,7 @@ export function Login({
                 <div className="button-row">
                   {["doctor", "nurse", "admin"].map((role) => (
                     <button
+                      type="button"
                       className="button"
                       key={role}
                       disabled={busy}
@@ -150,9 +177,11 @@ export function Login({
                 </div>
               </div>
             )}
-            <p className="muted">
+            <p className="muted spaced">
               Need emergency assistance?{" "}
-              <Link href="/emergency">Contact nearby staff now.</Link>
+              <Link href="/emergency" className="back-link">
+                Contact nearby staff now
+              </Link>
             </p>
           </div>
         </section>

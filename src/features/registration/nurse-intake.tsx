@@ -321,7 +321,7 @@ export function NurseIntake() {
     .filter((e) => {
       const p = data.patients.find((p) => p.id === e.patient_id);
       if (
-        !`${p?.name} ${e.reference} ${e.patient_id}`
+        !`${p?.name ?? ""} ${e.reference} ${e.patient_id}`
           .toLowerCase()
           .includes(boardQuery.toLowerCase())
       )

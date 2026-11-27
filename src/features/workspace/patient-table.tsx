@@ -5,19 +5,29 @@ import { Badge, Empty, Status, minutes } from "@/components/ui";
 import { useWorkspace } from "./context";
 import { rankQueue, queueExplanation } from "@/features/queue/rank";
 import type { Row } from "@/lib/data";
+
 export function PatientTable({
   encounters,
   preserveOrder = false,
+  onReset,
 }: {
   encounters: Row<"patient_encounters">[];
   preserveOrder?: boolean;
+  onReset?: () => void;
 }) {
   const { data } = useWorkspace();
   if (!encounters.length)
     return (
       <Empty
         title="The queue is clear"
-        description="Register a patient or change the filters to see encounters."
+        description="Register a patient or adjust the active filters to view encounters."
+        action={
+          onReset ? (
+            <button type="button" className="button small" onClick={onReset}>
+              Reset filters
+            </button>
+          ) : undefined
+        }
       />
     );
   return (
@@ -53,7 +63,8 @@ export function PatientTable({
                     <span>
                       <strong>{p?.name ?? "Patient"}</strong>
                       <small>
-                        {e.reference} <span>·</span>{" "}
+                        <span className="mono">{e.reference}</span>{" "}
+                        <span>·</span>{" "}
                         {p?.age == null ? "Age unknown" : `${p?.age} yrs`}
                       </small>
                     </span>
@@ -71,7 +82,7 @@ export function PatientTable({
                 </td>
                 <td>
                   <span className="wait-time">
-                    <Clock3 size={13} />
+                    <Clock3 size={14} aria-hidden="true" />
                     {minutes(e.arrived_at, data.loadedAt)} min
                   </span>
                   {overdue && (

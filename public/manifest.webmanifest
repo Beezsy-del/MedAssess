@@ -1,12 +1,12 @@
 {
   "name": "MedCipher Hospital Workspace",
   "short_name": "MedCipher",
-  "description": "Clinical workflow demonstration",
+  "description": "Clinical triage and hospital flow coordination prototype",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f7fb",
-  "theme_color": "#920942",
+  "background_color": "#F5F6F8",
+  "theme_color": "#651D38",
   "icons": [
     {
       "src": "/icon.svg",

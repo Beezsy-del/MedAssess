@@ -2,6 +2,7 @@
 import type { Category } from "@/features/clinical/engine";
 import { X, Inbox } from "lucide-react";
 import { useEffect, useRef } from "react";
+
 export function Badge({ category }: { category: Category }) {
   return (
     <span className={`badge ${category.toLowerCase()}`}>
@@ -16,26 +17,50 @@ export function Badge({ category }: { category: Category }) {
     </span>
   );
 }
+
 export function Status({ value }: { value: string }) {
   return (
     <span className="status">{value.toLowerCase().replaceAll("_", " ")}</span>
   );
 }
+
 export function Empty({
   title = "Nothing here yet",
   description = "New records will appear here as your team works.",
+  action,
 }: {
   title?: string;
   description?: string;
+  action?: React.ReactNode;
 }) {
   return (
     <div className="empty">
-      <Inbox size={28} />
+      <Inbox size={28} aria-hidden="true" />
       <h3>{title}</h3>
       <p>{description}</p>
+      {action}
     </div>
   );
 }
+
+export function Skeleton({
+  height = 16,
+  width = "100%",
+  className = "",
+}: {
+  height?: number | string;
+  width?: number | string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`skeleton ${className}`.trim()}
+      style={{ height, width }}
+      aria-hidden="true"
+    />
+  );
+}
+
 export function Metric({
   label,
   value,
@@ -53,6 +78,7 @@ export function Metric({
     </div>
   );
 }
+
 export function SectionTitle({
   title,
   children,
@@ -67,6 +93,7 @@ export function SectionTitle({
     </div>
   );
 }
+
 export function Modal({
   title,
   onClose,
@@ -92,6 +119,7 @@ export function Modal({
       <div className="modal-head">
         <h2>{title}</h2>
         <button
+          type="button"
           className="icon-button"
           onClick={onClose}
           aria-label="Close dialog"
@@ -103,6 +131,7 @@ export function Modal({
     </dialog>
   );
 }
+
 export function Field({
   label,
   children,
@@ -117,6 +146,7 @@ export function Field({
     </label>
   );
 }
+
 export function time(value: string) {
   return new Intl.DateTimeFormat("en-IN", {
     timeZone: "Asia/Kolkata",
@@ -126,6 +156,9 @@ export function time(value: string) {
     minute: "2-digit",
   }).format(new Date(value));
 }
+
 export function minutes(value: string, now: string) {
   return Math.max(0, Math.floor((Date.parse(now) - Date.parse(value)) / 60000));
 }
+
+export { toIstLocalInput, normalizeIstIso } from "@/lib/date-ist";

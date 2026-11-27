@@ -7,16 +7,18 @@ import {
   Workflow,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+
 export function Brand({ href = "/" }: { href?: string }) {
   return (
     <Link className="brand" href={href}>
-      <span className="brand-symbol">
-        <Activity size={24} />
+      <span className="brand-symbol" aria-hidden="true">
+        <Activity size={20} strokeWidth={2.25} />
       </span>
       <span>MedCipher</span>
     </Link>
   );
 }
+
 export function PublicHeader() {
   return (
     <header className="public-topbar">
@@ -33,6 +35,7 @@ export function PublicHeader() {
     </header>
   );
 }
+
 export function CareMap({
   counts,
 }: {
@@ -41,6 +44,7 @@ export function CareMap({
   return (
     <div
       className="care-map"
+      role="region"
       aria-label={
         counts
           ? "Current encounter stages"
@@ -53,31 +57,31 @@ export function CareMap({
       </div>
       <div className="map-nodes">
         <div className="map-node">
-          <span className="map-icon">
-            <ClipboardPlus size={23} />
+          <span className="map-icon" aria-hidden="true">
+            <ClipboardPlus size={20} />
           </span>
           <strong>{counts ? counts.pending : "Register"}</strong>
           <small>{counts ? "Awaiting triage" : "Create the encounter"}</small>
         </div>
         <span className="map-connector" aria-hidden="true" />
         <div className="map-node center">
-          <span className="map-icon">
-            <Stethoscope size={25} />
+          <span className="map-icon" aria-hidden="true">
+            <Stethoscope size={22} />
           </span>
           <strong>{counts ? counts.assessment : "Assess"}</strong>
           <small>{counts ? "In assessment" : "Review clinical urgency"}</small>
         </div>
         <span className="map-connector" aria-hidden="true" />
         <div className="map-node">
-          <span className="map-icon">
-            <Workflow size={23} />
+          <span className="map-icon" aria-hidden="true">
+            <Workflow size={20} />
           </span>
           <strong>{counts ? counts.treatment : "Coordinate"}</strong>
           <small>{counts ? "In treatment" : "Document the next step"}</small>
         </div>
       </div>
       <div className="map-foot">
-        <Activity size={14} />
+        <Activity size={14} aria-hidden="true" />
         <span>
           {counts
             ? "Counts reflect recorded status, not clinical recommendations."

@@ -18,10 +18,13 @@ import {
   Empty,
   Metric,
   time,
+  toIstLocalInput,
+  normalizeIstIso,
 } from "@/components/ui";
 import { terminalStatuses } from "@/features/flow/machine";
 import { ProfileSettings } from "@/features/workspace/profile";
 import { forecast } from "@/features/analytics/forecast";
+
 export function SmartFlow() {
   const { data } = useWorkspace();
   const [department, setDepartment] = useState("");
@@ -35,6 +38,7 @@ export function SmartFlow() {
       ["ADMITTED", "REFERRED", "TRANSFERRED", "DISCHARGED", "CANCELLED"],
     ],
   ] as const;
+
   return (
     <>
       <div className="page-heading">
@@ -77,12 +81,15 @@ export function SmartFlow() {
                 >
                   <Badge category={e.category} />
                   <h3>
-                    {data.patients.find((p) => p.id === e.patient_id)?.name}
+                    {data.patients.find((p) => p.id === e.patient_id)?.name ??
+                      "Patient"}
                   </h3>
-                  <small>{e.reference}</small>
+                  <small className="mono">{e.reference}</small>
                   <p>{e.symptoms || "Awaiting intake"}</p>
-                  <Status value={e.status} />
-                  <small>Updated {time(e.updated_at)}</small>
+                  <div className="flow-card-meta">
+                    <Status value={e.status} />
+                    <small>Updated {time(e.updated_at)}</small>
+                  </div>
                 </Link>
               ))}
               {!encounters.length && (
@@ -95,6 +102,7 @@ export function SmartFlow() {
     </>
   );
 }
+
 export function Resources() {
   const { data: snapshot, command, busy } = useWorkspace();
   const data = {
@@ -105,8 +113,10 @@ export function Resources() {
     [error, setError] = useState(""),
     [kind, setKind] = useState(""),
     [maintenance, setMaintenance] = useState("");
+
   async function reserve(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
     try {
       await command("reserve", {
         resource_id: resource,
@@ -117,12 +127,17 @@ export function Resources() {
       setError(e instanceof Error ? e.message : "Reservation failed");
     }
   }
+
+  const displayedResources = data.resources.filter(
+    (r) => !kind || r.kind === kind,
+  );
+
   return (
     <>
       <div className="page-heading">
         <div>
           <p className="page-context">Hospital operations</p>
-          <h2>Other hospital resources</h2>
+          <h2>Stretchers, wheelchairs & other equipment</h2>
           <p>
             Reserve safely. Release after handover. Confirm cleaning before
             reuse.
@@ -165,10 +180,9 @@ export function Resources() {
           detail="Unavailable until released"
         />
       </div>
-      <div className="resource-grid">
-        {data.resources
-          .filter((r) => !kind || r.kind === kind)
-          .map((r) => {
+      {displayedResources.length ? (
+        <div className="resource-grid">
+          {displayedResources.map((r) => {
             const reservation = data.reservations.find(
               (x) => x.resource_id === r.id,
             );
@@ -178,15 +192,15 @@ export function Resources() {
             return (
               <section className="resource-card" key={r.id}>
                 <div className="resource-icon">
-                  <BedDouble size={24} />
+                  <BedDouble size={22} />
                   <Status value={r.status} />
                 </div>
-                <h2>{r.name}</h2>
+                <h3>{r.name}</h3>
                 <p>
                   {r.location} · {r.kind}
                 </p>
                 {encounter && (
-                  <Link href={`/encounters/${encounter.id}`}>
+                  <Link href={`/encounters/${encounter.id}`} className="mono">
                     {encounter.reference}
                   </Link>
                 )}
@@ -198,6 +212,7 @@ export function Resources() {
                 ].includes(data.membership.role) &&
                   r.status !== "MAINTENANCE" && (
                     <button
+                      type="button"
                       disabled={busy}
                       className={`button full ${r.status === "AVAILABLE" ? "primary" : ""}`}
                       onClick={() =>
@@ -223,7 +238,8 @@ export function Resources() {
                 ].includes(data.membership.role) &&
                   ["AVAILABLE", "CLEANING"].includes(r.status) && (
                     <button
-                      className="button full spaced"
+                      type="button"
+                      className="button full"
                       disabled={busy}
                       onClick={() => {
                         setMaintenance(r.id);
@@ -236,18 +252,31 @@ export function Resources() {
               </section>
             );
           })}
-      </div>
+        </div>
+      ) : (
+        <Empty
+          title="No equipment matches this filter"
+          description="Select another resource category or add equipment in Settings."
+        />
+      )}
       <p className="form-note spaced">
         If the appropriate resource is unavailable, contact the emergency
         coordinator and review referral options. Resource shortages never reduce
         clinical priority.
       </p>
       {maintenance && (
-        <Modal title="Resource maintenance" onClose={() => setMaintenance("")}>
+        <Modal
+          title="Resource maintenance"
+          onClose={() => {
+            setMaintenance("");
+            setError("");
+          }}
+        >
           <form
             className="stack-form"
             onSubmit={async (event) => {
               event.preventDefault();
+              setError("");
               const reason = new FormData(event.currentTarget).get("reason");
               try {
                 await command("maintenance", {
@@ -263,15 +292,25 @@ export function Resources() {
             <Field label="Maintenance reason">
               <textarea name="reason" minLength={5} maxLength={3000} required />
             </Field>
-            {error && <p role="alert">{error}</p>}
-            <button className="button primary" disabled={busy}>
-              Confirm maintenance
+            {error && (
+              <p className="error-text" role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="button primary" disabled={busy}>
+              {busy ? "Saving…" : "Confirm maintenance"}
             </button>
           </form>
         </Modal>
       )}
       {resource && (
-        <Modal title="Reserve resource" onClose={() => setResource("")}>
+        <Modal
+          title="Reserve resource"
+          onClose={() => {
+            setResource("");
+            setError("");
+          }}
+        >
           <form className="stack-form" onSubmit={reserve}>
             <Field label="Patient encounter">
               <select name="encounter_id" required>
@@ -290,8 +329,8 @@ export function Resources() {
                 {error}
               </p>
             )}
-            <button className="button primary" disabled={busy}>
-              Confirm reservation
+            <button type="submit" className="button primary" disabled={busy}>
+              {busy ? "Saving…" : "Confirm reservation"}
             </button>
           </form>
         </Modal>
@@ -299,17 +338,21 @@ export function Resources() {
     </>
   );
 }
+
 export function Alerts() {
   const { data, command, busy } = useWorkspace();
   const [selected, setSelected] = useState(""),
     [status, setStatus] = useState(""),
     [error, setError] = useState("");
   const [all, setAll] = useState(false);
+
   const alerts = data.notifications.filter(
     (n) => all || !["RESOLVED", "CANCELLED"].includes(n.status),
   );
+
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
     try {
       await command("alert", {
         id: selected,
@@ -321,6 +364,7 @@ export function Alerts() {
       setError(e instanceof Error ? e.message : "Alert update failed");
     }
   }
+
   return (
     <>
       <div className="page-heading">
@@ -363,7 +407,7 @@ export function Alerts() {
               <h2>{n.title}</h2>
               <Link href={`/encounters/${n.encounter_id}`}>
                 {data.patients.find((p) => p.id === e?.patient_id)?.name} ·{" "}
-                {e?.reference}
+                <span className="mono">{e?.reference}</span>
               </Link>
               <p>
                 Recipients:{" "}
@@ -380,6 +424,7 @@ export function Alerts() {
               <div className="button-row spaced">
                 {(n.status === "CREATED" || n.status === "ESCALATED") && (
                   <button
+                    type="button"
                     className="button primary"
                     disabled={busy}
                     onClick={() =>
@@ -394,7 +439,9 @@ export function Alerts() {
                 )}
                 {n.status === "ACKNOWLEDGED" && (
                   <button
+                    type="button"
                     className="button primary"
+                    disabled={busy}
                     onClick={() =>
                       void command("alert", {
                         id: n.id,
@@ -407,8 +454,11 @@ export function Alerts() {
                 )}
                 {n.status === "IN_PROGRESS" && (
                   <button
+                    type="button"
                     className="button"
+                    disabled={busy}
                     onClick={() => {
+                      setError("");
                       setSelected(n.id);
                       setStatus("RESOLVED");
                     }}
@@ -420,7 +470,9 @@ export function Alerts() {
                   n.status,
                 ) && (
                   <button
+                    type="button"
                     className="button"
+                    disabled={busy}
                     onClick={() =>
                       void command("alert", {
                         id: n.id,
@@ -444,19 +496,32 @@ export function Alerts() {
         )}
       </div>
       {selected && (
-        <Modal title="Resolve alert" onClose={() => setSelected("")}>
+        <Modal
+          title="Resolve alert"
+          onClose={() => {
+            setSelected("");
+            setError("");
+          }}
+        >
           <form className="stack-form" onSubmit={save}>
             <Field label="Response and resolution notes">
               <textarea name="reason" required minLength={5} />
             </Field>
-            {error && <p role="alert">{error}</p>}
-            <button className="button primary">Save resolution</button>
+            {error && (
+              <p className="error-text" role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="button primary" disabled={busy}>
+              {busy ? "Saving…" : "Save resolution"}
+            </button>
           </form>
         </Modal>
       )}
     </>
   );
 }
+
 export function Departments() {
   const { data } = useWorkspace();
   return (
@@ -482,7 +547,13 @@ export function Departments() {
           );
           return (
             <section className="resource-card" key={d.id}>
-              <Users size={25} />
+              <div className="resource-icon">
+                <Users size={22} />
+                <span className="count-label">
+                  {Math.round((active.length / Math.max(1, d.capacity)) * 100)}%
+                  load
+                </span>
+              </div>
               <h2>{d.name}</h2>
               <p>{d.location}</p>
               <strong className="big-count">
@@ -518,8 +589,9 @@ export function Departments() {
     </>
   );
 }
+
 export function Referrals() {
-  const { data, command } = useWorkspace();
+  const { data, command, busy } = useWorkspace();
   const [selected, setSelected] = useState(""),
     [error, setError] = useState("");
   const next: Record<string, string> = {
@@ -531,6 +603,7 @@ export function Referrals() {
   };
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
     const ref = data.referrals.find((r) => r.id === selected)!;
     try {
       await command("referral_status", {
@@ -562,23 +635,25 @@ export function Referrals() {
           {data.referrals.map((r) => (
             <article className="history-item" key={r.id}>
               <Status value={r.status} />
-              <h3>
+              <h3 style={{ marginTop: 10 }}>
                 {data.facilities.find((f) => f.id === r.facility_id)?.name}
               </h3>
               <p>{r.reason}</p>
               <p>{r.summary}</p>
               <small>{r.transport}</small>
-              <p>
+              <p className="muted">
                 {r.acknowledgement ??
                   "Receiving facility has not yet acknowledged."}
               </p>
-              <div className="button-row">
+              <div className="button-row spaced">
                 <Link className="button" href={`/encounters/${r.encounter_id}`}>
                   View encounter
                 </Link>
                 {next[r.status] && (
                   <button
+                    type="button"
                     className="button primary"
+                    disabled={busy}
                     onClick={() => {
                       setSelected(r.id);
                       setError("");
@@ -610,19 +685,32 @@ export function Referrals() {
         </section>
       </div>
       {selected && (
-        <Modal title="Record referral progress" onClose={() => setSelected("")}>
+        <Modal
+          title="Record referral progress"
+          onClose={() => {
+            setSelected("");
+            setError("");
+          }}
+        >
           <form className="stack-form" onSubmit={save}>
             <Field label="Contact, acceptance or handover evidence">
               <textarea name="reason" minLength={5} required />
             </Field>
-            {error && <p role="alert">{error}</p>}
-            <button className="button primary">Save referral event</button>
+            {error && (
+              <p className="error-text" role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="button primary" disabled={busy}>
+              {busy ? "Saving…" : "Save referral event"}
+            </button>
           </form>
         </Modal>
       )}
     </>
   );
 }
+
 export function Analytics() {
   const { data } = useWorkspace();
   const [days, setDays] = useState(7);
@@ -643,6 +731,7 @@ export function Analytics() {
   );
   const count = (status: string) =>
     records.filter((e) => e.status === status).length;
+
   function csv() {
     const rows = [
       ["Metric", "Count"],
@@ -660,6 +749,7 @@ export function Analytics() {
     a.click();
     URL.revokeObjectURL(url);
   }
+
   return (
     <>
       <div className="page-heading">
@@ -680,11 +770,15 @@ export function Analytics() {
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
           </select>
-          <button className="button" onClick={csv}>
+          <button type="button" className="button" onClick={csv}>
             <Download size={16} />
             Export aggregate CSV
           </button>
-          <button className="button" onClick={() => window.print()}>
+          <button
+            type="button"
+            className="button"
+            onClick={() => window.print()}
+          >
             Print report
           </button>
         </div>
@@ -730,7 +824,32 @@ export function Analytics() {
               </div>
             );
           })}
-          <p className="muted">
+          <hr />
+          <h2>Triage category mix</h2>
+          {(
+            [
+              ["RED", "Red · Critical"],
+              ["YELLOW", "Yellow · Urgent"],
+              ["GREEN", "Green · Non-immediate"],
+              ["ASSESSMENT_REQUIRED", "Assessment required"],
+            ] as const
+          ).map(([cat, label]) => {
+            const n = records.filter((e) => e.category === cat).length;
+            return (
+              <div className="chart-row" key={cat}>
+                <span>{label}</span>
+                <div>
+                  <i
+                    style={{
+                      width: `${records.length ? (n / records.length) * 100 : 0}%`,
+                    }}
+                  />
+                </div>
+                <strong>{n}</strong>
+              </div>
+            );
+          })}
+          <p className="muted spaced">
             Counts are derived from the current reporting window, up to 500
             recent encounters.
           </p>
@@ -759,6 +878,17 @@ export function Analytics() {
     </>
   );
 }
+
+function formatAuditDetails(details: unknown): [string, string][] {
+  if (!details || typeof details !== "object" || Array.isArray(details)) {
+    return details == null ? [] : [["value", String(details)]];
+  }
+  return Object.entries(details).map(([k, v]) => [
+    k.replaceAll("_", " "),
+    typeof v === "object" && v !== null ? JSON.stringify(v) : String(v),
+  ]);
+}
+
 export function Audit() {
   const { data } = useWorkspace();
   return (
@@ -783,18 +913,52 @@ export function Audit() {
               </tr>
             </thead>
             <tbody>
-              {data.audit.map((a) => (
-                <tr key={a.id}>
-                  <td>{time(a.created_at)}</td>
-                  <td>
-                    {data.staff.find((s) => s.user_id === a.actor)
-                      ?.display_name ?? "Patient / system"}
-                  </td>
-                  <td>{a.action}</td>
-                  <td>{a.entity_id?.slice(0, 8) ?? "—"}</td>
-                  <td>{JSON.stringify(a.details)}</td>
-                </tr>
-              ))}
+              {data.audit.map((a) => {
+                const enc = a.entity_id
+                  ? data.encounters.find((e) => e.id === a.entity_id)
+                  : undefined;
+                const pairs = formatAuditDetails(a.details);
+                return (
+                  <tr key={a.id}>
+                    <td>{time(a.created_at)}</td>
+                    <td>
+                      {data.staff.find((s) => s.user_id === a.actor)
+                        ?.display_name ?? "Patient / system"}
+                    </td>
+                    <td>
+                      <Status value={a.action.replaceAll(".", "_")} />
+                    </td>
+                    <td>
+                      {enc ? (
+                        <Link
+                          href={`/encounters/${enc.id}`}
+                          className="mono"
+                          style={{ color: "var(--brand)", fontWeight: 600 }}
+                        >
+                          {enc.reference}
+                        </Link>
+                      ) : (
+                        <span className="mono">
+                          {a.entity_id?.slice(0, 8) ?? "—"}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      {pairs.length ? (
+                        <div className="audit-details">
+                          {pairs.map(([k, v]) => (
+                            <span className="audit-pill" key={k}>
+                              <span>{k}:</span> {v}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -808,8 +972,9 @@ export function Audit() {
     </>
   );
 }
+
 export function Settings({ section }: { section: string }) {
-  const { data, command } = useWorkspace();
+  const { data, command, busy } = useWorkspace();
   const [modal, setModal] = useState(""),
     [error, setError] = useState("");
   const admin = ["hospital_admin", "super_admin"].includes(
@@ -817,11 +982,16 @@ export function Settings({ section }: { section: string }) {
   );
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
+    const payload = Object.fromEntries(new FormData(event.currentTarget));
+    if (modal === "shift") {
+      if (typeof payload.starts_at === "string")
+        payload.starts_at = normalizeIstIso(payload.starts_at);
+      if (typeof payload.ends_at === "string")
+        payload.ends_at = normalizeIstIso(payload.ends_at);
+    }
     try {
-      await command(
-        modal,
-        Object.fromEntries(new FormData(event.currentTarget)),
-      );
+      await command(modal, payload);
       setModal("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Update failed");
@@ -850,15 +1020,21 @@ export function Settings({ section }: { section: string }) {
           <Status value={data.membership.role} />
           <hr />
           <h3>Operational configuration</h3>
-          <p>
-            Reassessment warning: {data.settings.reassessment_minutes} minutes
+          <dl>
+            <div>
+              <dt>Reassessment warning</dt>
+              <dd>{data.settings.reassessment_minutes} minutes</dd>
+            </div>
+            <div>
+              <dt>Alert acknowledgement warning</dt>
+              <dd>{data.settings.alert_minutes} minutes</dd>
+            </div>
+          </dl>
+          <p className="muted">
+            Demonstration intervals are not clinical recommendations.
           </p>
-          <p>
-            Alert acknowledgement warning: {data.settings.alert_minutes} minutes
-          </p>
-          <p>Demonstration intervals are not clinical recommendations.</p>
           {admin && (
-            <div className="button-row">
+            <div className="button-row spaced">
               {[
                 ["settings", "Edit intervals"],
                 ["department", "Add department"],
@@ -867,6 +1043,7 @@ export function Settings({ section }: { section: string }) {
                 ["shift", "Schedule shift"],
               ].map(([key, label]) => (
                 <button
+                  type="button"
                   className="button"
                   key={key}
                   onClick={() => {
@@ -891,7 +1068,7 @@ export function Settings({ section }: { section: string }) {
               <small>{p.reference}</small>
             </div>
           ))}
-          <p className="form-note">
+          <p className="form-note spaced">
             Clinical operational use is disabled at the database level. No
             administrator can activate this demonstration protocol. A reviewed
             protocol and a separate safety acceptance process are required.
@@ -910,13 +1087,19 @@ export function Settings({ section }: { section: string }) {
           ))}
           <h3 className="spaced">Duty shifts</h3>
           {data.shifts.map((s) => (
-            <p key={s.id}>
-              {data.staff.find((m) => m.user_id === s.user_id)?.display_name}
-              <br />
-              <small>
-                {time(s.starts_at)} — {time(s.ends_at)}
-              </small>
-            </p>
+            <div className="list-row" key={s.id}>
+              <span>
+                <strong>
+                  {
+                    data.staff.find((m) => m.user_id === s.user_id)
+                      ?.display_name
+                  }
+                </strong>
+                <small>
+                  {time(s.starts_at)} — {time(s.ends_at)}
+                </small>
+              </span>
+            </div>
           ))}
           {!data.shifts.length && (
             <p className="muted">
@@ -924,12 +1107,12 @@ export function Settings({ section }: { section: string }) {
               availability.
             </p>
           )}
-          <p className="form-note">
+          <p className="form-note spaced">
             Account invitations and privileged role changes require secure
             administrator provisioning; self-assigned staff roles are
             prohibited.
           </p>
-          <Link href="/reception" className="back-link">
+          <Link href="/reception" className="back-link spaced">
             Manage device drafts <ArrowRight size={15} />
           </Link>
         </section>
@@ -938,7 +1121,10 @@ export function Settings({ section }: { section: string }) {
       {modal && (
         <Modal
           title="Update hospital configuration"
-          onClose={() => setModal("")}
+          onClose={() => {
+            setModal("");
+            setError("");
+          }}
         >
           <form className="stack-form" onSubmit={save}>
             {modal === "settings" ? (
@@ -975,17 +1161,21 @@ export function Settings({ section }: { section: string }) {
                     ))}
                   </select>
                 </Field>
-                <Field label="Starts (include timezone, e.g. +05:30)">
+                <Field label="Starts (IST)">
                   <input
+                    type="datetime-local"
                     name="starts_at"
-                    placeholder="2026-11-20T09:00:00+05:30"
+                    defaultValue={toIstLocalInput(new Date(data.loadedAt))}
                     required
                   />
                 </Field>
-                <Field label="Ends (include timezone)">
+                <Field label="Ends (IST)">
                   <input
+                    type="datetime-local"
                     name="ends_at"
-                    placeholder="2026-11-20T17:00:00+05:30"
+                    defaultValue={toIstLocalInput(
+                      new Date(Date.parse(data.loadedAt) + 8 * 3600000),
+                    )}
                     required
                   />
                 </Field>
@@ -1033,8 +1223,14 @@ export function Settings({ section }: { section: string }) {
                 )}
               </>
             )}
-            {error && <p role="alert">{error}</p>}
-            <button className="button primary">Save configuration</button>
+            {error && (
+              <p className="error-text" role="alert">
+                {error}
+              </p>
+            )}
+            <button type="submit" className="button primary" disabled={busy}>
+              {busy ? "Saving…" : "Save configuration"}
+            </button>
           </form>
         </Modal>
       )}

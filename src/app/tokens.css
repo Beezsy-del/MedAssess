@@ -1,0 +1,205 @@
+/* Centralized MedCipher design tokens: Deep Burgundy, Wine, Plum, Muted Rose & Warm Gold.
+ * Clinical urgency colors (RED / YELLOW / GREEN / BLUE) remain strictly isolated from brand gradients. */
+
+:root {
+  color-scheme: light;
+
+  /* Core brand palette */
+  --brand-burgundy: #651d38;
+  --brand-wine: #763451;
+  --brand-plum: #51304c;
+  --brand-plum-mid: #713b63;
+  --brand-rose: #96708a;
+  --brand-lilac: #8b6b91;
+  --brand-gold: #a38143;
+  --brand-gold-soft: #f7f1e4;
+
+  /* Semantic brand aliases */
+  --brand: #651d38;
+  --brand-dark: #4b1329;
+  --brand-light: #f6eaef;
+  --primary-fill: #651d38;
+  --primary-hover: #53152d;
+  --on-primary: #ffffff;
+
+  /* Coordinated gradient identity */
+  --gradient-brand: linear-gradient(
+    135deg,
+    #651d38 0%,
+    #713b63 55%,
+    #8b6b91 100%
+  );
+  --gradient-brand-hover: linear-gradient(
+    135deg,
+    #53152d 0%,
+    #613154 55%,
+    #77597d 100%
+  );
+  --gradient-hero:
+    radial-gradient(
+      ellipse at 94% 6%,
+      rgba(163, 129, 67, 0.22) 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 12% 100%,
+      rgba(139, 107, 145, 0.22) 0%,
+      transparent 52%
+    ),
+    linear-gradient(135deg, #2b1220 0%, #4d1c36 52%, #51304c 100%);
+  --gradient-surface-subtle: linear-gradient(
+    135deg,
+    rgba(101, 29, 56, 0.08),
+    rgba(163, 129, 67, 0.07)
+  );
+  --gradient-accent-bar: linear-gradient(90deg, #651d38 0%, #a38143 100%);
+
+  /* Neutral surface & text tokens */
+  --ink: #252634;
+  --muted: #565b6c;
+  --subtle: #eef0f4;
+  --hover: #e5e8ef;
+  --border: #d5d9e2;
+  --border-soft: #e6e9f0;
+  --canvas: #f5f6f8;
+  --white: #ffffff;
+  --rail-bg: #fafbfd;
+
+  /* Hero / dark accent panel text */
+  --hero: #2b1220;
+  --hero-ink: #faf7fa;
+  --hero-muted: #dfd5df;
+  --hero-line: rgba(255, 255, 255, 0.16);
+
+  /* Clinical urgency & status semantics (isolated from brand gradients) */
+  --blue: #144a75;
+  --blue-bg: #edf5fc;
+  --gold: #826227;
+  --red: #a81c34;
+  --red-bg: #fdf0f2;
+  --red-border: #eabcc5;
+  --yellow: #7a5206;
+  --yellow-bg: #fef7e0;
+  --yellow-border: #ebd79a;
+  --green: #0b6b4d;
+  --green-bg: #eaf8f2;
+  --green-border: #b7e2d1;
+
+  /* Typography scale */
+  --font-ui:
+    var(--font-sans, "Plus Jakarta Sans"), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-record:
+    var(--font-mono, "JetBrains Mono"), ui-monospace, SFMono-Regular, Consolas,
+    monospace;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+
+  /* Spacing & dimensions */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --topbar-h: 64px;
+  --rail-w: 244px;
+  --max-content-w: 1380px;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 11px;
+  --radius: 14px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* Elevation & shadows */
+  --shadow-sm: 0 1px 2px rgb(37 38 52 / 4%);
+  --shadow: 0 4px 16px rgb(37 38 52 / 5%), 0 1px 3px rgb(37 38 52 / 4%);
+  --shadow-raised: 0 16px 40px rgb(37 38 52 / 14%);
+  --shadow-brand: 0 4px 14px rgb(101 29 56 / 22%);
+
+  /* Motion & focus */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --duration-fast: 130ms;
+  --duration-base: 190ms;
+  --focus-ring: #651d38;
+  --focus-offset: 2px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --brand: #e798b4;
+  --brand-dark: #f2b7cc;
+  --brand-light: #381e2f;
+  --primary-fill: #8f2d52;
+  --primary-hover: #7a2445;
+  --on-primary: #ffffff;
+
+  --gradient-brand: linear-gradient(
+    135deg,
+    #7f2446 0%,
+    #713b63 55%,
+    #8b6b91 100%
+  );
+  --gradient-brand-hover: linear-gradient(
+    135deg,
+    #942c53 0%,
+    #824673 55%,
+    #9c7ca2 100%
+  );
+  --gradient-hero:
+    radial-gradient(
+      ellipse at 94% 6%,
+      rgba(163, 129, 67, 0.2) 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 12% 100%,
+      rgba(150, 112, 138, 0.16) 0%,
+      transparent 52%
+    ),
+    linear-gradient(135deg, #1b0f1b 0%, #37172b 52%, #3a233b 100%);
+  --gradient-surface-subtle: linear-gradient(
+    135deg,
+    rgba(231, 152, 180, 0.11),
+    rgba(223, 186, 116, 0.08)
+  );
+  --gradient-accent-bar: linear-gradient(90deg, #e798b4 0%, #dfba74 100%);
+
+  --ink: #eef1f7;
+  --muted: #b0bccf;
+  --subtle: #18253a;
+  --hover: #1f304a;
+  --border: #2c3e58;
+  --border-soft: #223249;
+  --canvas: #0b1220;
+  /* Preserved #111d30 surface tone for visual parity with existing dark-mode checks */
+  --white: #111d30;
+  --rail-bg: #0e1829;
+
+  --blue: #8ecafa;
+  --blue-bg: #172b42;
+  --gold: #dfba74;
+  --red: #ff94a6;
+  --red-bg: #3b1e2a;
+  --red-border: #6e3346;
+  --yellow: #f2ce74;
+  --yellow-bg: #342b18;
+  --yellow-border: #645125;
+  --green: #7ce0b6;
+  --green-bg: #14362b;
+  --green-border: #27634f;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 20%);
+  --shadow: 0 6px 20px rgb(0 0 0 / 22%);
+  --shadow-raised: 0 18px 44px rgb(0 0 0 / 42%);
+  --shadow-brand: 0 4px 16px rgb(0 0 0 / 35%);
+  --focus-ring: #dfba74;
+}

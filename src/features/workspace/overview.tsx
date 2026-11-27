@@ -7,6 +7,7 @@ import { useWorkspace } from "./context";
 import { PatientTable } from "./patient-table";
 import { Metric, SectionTitle, Empty } from "@/components/ui";
 import { terminalStatuses } from "@/features/flow/machine";
+
 export function Overview({
   queue = false,
   title = "Hospital overview",
@@ -21,6 +22,7 @@ export function Overview({
     [search, setSearch] = useState(initialQuery),
     [department, setDepartment] = useState(""),
     [assignment, setAssignment] = useState("");
+
   const active = data.encounters.filter(
     (e) => !terminalStatuses.includes(e.status),
   );
@@ -46,10 +48,20 @@ export function Overview({
           ? e.assigned_to === data.userId
           : e.assigned_to === null)) &&
       (!search ||
-        `${data.patients.find((p) => p.id === e.patient_id)?.name} ${e.reference} ${e.symptoms}`
+        `${data.patients.find((p) => p.id === e.patient_id)?.name ?? ""} ${e.reference} ${e.symptoms}`
           .toLowerCase()
           .includes(search.toLowerCase())),
   );
+
+  const hasFilters =
+    filter !== "All patients" || !!search || !!department || !!assignment;
+  function clearFilters() {
+    setFilter("All patients");
+    setSearch("");
+    setDepartment("");
+    setAssignment("");
+  }
+
   const date = new Intl.DateTimeFormat("en-IN", {
     timeZone: "Asia/Kolkata",
     weekday: "long",
@@ -57,6 +69,7 @@ export function Overview({
     month: "long",
     year: "numeric",
   }).format(new Date(data.loadedAt));
+
   return (
     <>
       <div className="page-heading">
@@ -77,27 +90,24 @@ export function Overview({
           <Plus size={17} /> Register patient
         </Link>
       </div>
+
       {!queue && (
         <section className="coordination-hero">
           <div className="hero-copy">
             <p className="hero-kicker">Hospital coordination</p>
-            <h2>
-              Assess urgency.
-              <br />
-              Coordinate the next step.
-            </h2>
+            <h2>Assess urgency. Coordinate the next step.</h2>
             <p>
               Review active encounters, reassessment tasks and available
               resources across your hospital.
             </p>
             <div className="button-row">
               <Link href="/triage" className="button hero-primary">
-                <Activity size={17} />
+                <Activity size={16} />
                 Open triage queue
               </Link>
               <Link href="/smartflow" className="button hero-secondary">
                 View patient flow
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </Link>
             </div>
           </div>
@@ -114,35 +124,33 @@ export function Overview({
             />
             <div className="hero-workspaces">
               <Link href="/reception">
-                <span>01</span>
                 <div>
                   <strong>Patient registration</strong>
-                  <small>Encounters and secure intake passes</small>
+                  <small>Encounters and passes</small>
                 </div>
-                <ArrowRight size={15} />
+                <ArrowRight size={14} />
               </Link>
               <Link href="/doctor">
-                <span>02</span>
                 <div>
                   <strong>Clinical workspace</strong>
-                  <small>Assessments, care notes and decisions</small>
+                  <small>Assessments and notes</small>
                 </div>
-                <ArrowRight size={15} />
+                <ArrowRight size={14} />
               </Link>
               <Link href="/resources">
-                <span>03</span>
                 <div>
                   <strong>Resource coordination</strong>
-                  <small>Beds, availability and handovers</small>
+                  <small>Beds and equipment</small>
                 </div>
-                <ArrowRight size={15} />
+                <ArrowRight size={14} />
               </Link>
             </div>
           </div>
         </section>
       )}
+
       <div className="demo-notice">
-        <ShieldCheck size={17} />
+        <ShieldCheck size={17} aria-hidden="true" />
         <span>
           Synthetic demo only. Clinical use is disabled; the protocol is not
           validated.
@@ -151,6 +159,7 @@ export function Overview({
           View protocol <ArrowRight size={14} />
         </Link>
       </div>
+
       <div className="metrics">
         <Metric
           label="Active encounters"
@@ -183,6 +192,7 @@ export function Overview({
           detail={`${data.resources.filter((r) => r.kind.includes("bed")).length} beds in registered inventory`}
         />
       </div>
+
       <div className={`overview-grid ${queue ? "full-width" : ""}`}>
         <section className="panel queue-panel">
           <SectionTitle title="Patient queue">
@@ -200,8 +210,10 @@ export function Overview({
               "Reassessment due",
             ].map((x) => (
               <button
+                type="button"
                 key={x}
                 className={filter === x ? "selected" : ""}
+                aria-pressed={filter === x}
                 onClick={() => setFilter(x)}
               >
                 {x === "RED"
@@ -212,6 +224,9 @@ export function Overview({
                       ? "Non-immediate"
                       : x}
                 {x === "Awaiting triage" && <span>{pending.length}</span>}
+                {x === "Reassessment due" && overdue.length > 0 && (
+                  <span>{overdue.length}</span>
+                )}
               </button>
             ))}
           </div>
@@ -243,8 +258,20 @@ export function Overview({
               <option value="mine">Assigned to me</option>
               <option value="unassigned">Unassigned</option>
             </select>
+            {hasFilters && (
+              <button
+                type="button"
+                className="button small"
+                onClick={clearFilters}
+              >
+                Clear filters
+              </button>
+            )}
           </div>
-          <PatientTable encounters={displayed} />
+          <PatientTable
+            encounters={displayed}
+            onReset={hasFilters ? clearFilters : undefined}
+          />
           <div className="panel-foot">
             <span>
               {displayed.length} encounters · Clinical urgency always comes
@@ -255,6 +282,7 @@ export function Overview({
             </Link>
           </div>
         </section>
+
         {!queue && (
           <aside className="right-rail">
             <section className="attention-panel">
@@ -313,6 +341,7 @@ export function Overview({
                 Open coordination centre <ArrowRight size={15} />
               </Link>
             </section>
+
             <section className="panel capacity-panel">
               <SectionTitle title="Department capacity" />
               {data.departments.map((d) => {
@@ -344,6 +373,7 @@ export function Overview({
           </aside>
         )}
       </div>
+
       <section className="flow-summary">
         <div>
           <h2>Patient flow</h2>
