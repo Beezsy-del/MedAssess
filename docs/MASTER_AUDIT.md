@@ -1,8 +1,8 @@
-# Master prompt audit — 20 November 2026
+# Product requirements audit — 20 November 2026
 
 ## Acceptance decision
 
-**Not fully accepted.** The application is a working synthetic prototype, but the original master prompt has not been fully executed. Deployment and passing tests do not waive missing requirements. Every source requirement is retained in MASTER_REQUIREMENTS_CHECKLIST.md; verified implemented subsets and evidence appear in FEATURE_STATUS.md and TEST_RESULTS.md.
+**Not fully accepted.** The application is a working synthetic prototype, but the original product specification has not been fully executed. Deployment and passing tests do not waive missing requirements. Every source requirement is retained in MASTER_REQUIREMENTS_CHECKLIST.md; verified implemented subsets and evidence appear in FEATURE_STATUS.md and TEST_RESULTS.md.
 
 ## Database reconciliation
 

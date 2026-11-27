@@ -7,3 +7,9 @@ supabase/migrations
 .env*
 playwright-report
 test-results
+
+# Local media builds, downloaded skills and tool caches
+/artifacts/
+/.serena/
+/skills/
+/skills med.zip

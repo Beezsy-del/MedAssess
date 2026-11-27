@@ -1,33 +1,12 @@
-# MEDIROUTE
-
-— MASTER CODEX DEVELOPMENT PROMPTS
+# MediRoute product requirements
 
 **Project:** MediRoute — Intelligent Clinical Triage & Hospital Flow Management System
 
-**Instruction to the developer:** Execute these prompts sequentially in one Codex project workspace. Each prompt is a development milestone, not a request to merely describe or propose code. Build the feature, integrate it, test it, document it, and verify it before finishing the milestone.
-
 ---
 
-# PROMPT 0 — THE SUPER MASTER PROMPT
+# Milestone 0 — Product scope and safety requirements
 
-## Project identity, complete requirements and permanent development instructions
-
-You are acting as a complete senior software engineering team consisting of:
-
-- Senior full-stack architect.
-- Senior Next.js and TypeScript developer.
-- Supabase database architect.
-- UI/UX designer.
-- Healthcare workflow systems engineer.
-- Application security engineer.
-- QA and automation engineer.
-- DevOps and deployment engineer.
-
-Your task is to build a complete, professional, working web application called **MediRoute**.
-
-Do not create a static landing page, a collection of disconnected UI screens, or a frontend-only mockup.
-
-You must develop an integrated, functional full-stack healthcare workflow management platform.
+## Project identity and requirements
 
 ## A. Product vision
 
@@ -551,15 +530,9 @@ The final product must contain:
 16. A Vercel preview deployment.
 17. A tested production deployment once configuration and approval are complete.
 
-First inspect the repository and create the permanent project instructions and implementation plan. Then proceed with the implementation milestones.
-
-Do not stop at a planning document. The goal is a functioning integrated application.
-
 ---
 
-# PROMPT 1 — PROJECT INITIALISATION, ARCHITECTURE AND PROFESSIONAL UI
-
-I am now authorising you to begin the actual MediRoute project implementation.
+# Milestone 1 — PROJECT INITIALISATION, ARCHITECTURE AND PROFESSIONAL UI
 
 Use the complete requirements in the permanent project instructions.
 
@@ -742,7 +715,7 @@ Complete the project foundation and run the relevant checks.
 
 ---
 
-# PROMPT 2 — SUPABASE DATABASE, AUTHENTICATION AND SECURITY
+# Milestone 2 — SUPABASE DATABASE, AUTHENTICATION AND SECURITY
 
 Now implement the complete Supabase backend for MediRoute.
 
@@ -979,7 +952,7 @@ Only report Supabase as configured after verifying that the connected project an
 
 ---
 
-# PROMPT 3 — PATIENT PORTAL, QR GENERATION AND REGISTRATION
+# Milestone 3 — PATIENT PORTAL, QR GENERATION AND REGISTRATION
 
 Now develop the complete patient-facing and reception-facing registration system.
 
@@ -1137,7 +1110,7 @@ All information must be saved through authenticated or securely token-validated 
 
 ---
 
-# PROMPT 4 — CLINICAL TRIAGE ENGINE, EMERGENCY OVERRIDE AND SCORING
+# Milestone 4 — CLINICAL TRIAGE ENGINE, EMERGENCY OVERRIDE AND SCORING
 
 Implement the main MediRoute clinical decision-support engine.
 
@@ -1339,7 +1312,7 @@ Implement:
 
 ---
 
-# PROMPT 5 — DYNAMIC QUEUES, STAFF DASHBOARDS AND EMERGENCY NOTIFICATIONS
+# Milestone 5 — DYNAMIC QUEUES, STAFF DASHBOARDS AND EMERGENCY NOTIFICATIONS
 
 Implement real-time communication and staff coordination.
 
@@ -1541,7 +1514,7 @@ Test:
 
 ---
 
-# PROMPT 6 — SMARTFLOW, RESOURCE ALLOCATION, REFERRAL AND PATIENT OUTFLOW
+# Milestone 6 — SMARTFLOW, RESOURCE ALLOCATION, REFERRAL AND PATIENT OUTFLOW
 
 Now implement the entire hospital operations module.
 
@@ -1781,7 +1754,7 @@ Test:
 
 ---
 
-# PROMPT 7 — OFFLINE-FIRST PWA, RURAL MODE AND MULTILINGUAL ACCESSIBILITY
+# Milestone 7 — OFFLINE-FIRST PWA, RURAL MODE AND MULTILINGUAL ACCESSIBILITY
 
 Now transform the website into an installable, rural-friendly Progressive Web Application.
 
@@ -1932,7 +1905,7 @@ Document exactly what works offline, what requires internet and what requires an
 
 ---
 
-# PROMPT 8 — ADMIN DASHBOARD, HOSPITAL SETTINGS, ANALYTICS AND FORECASTING
+# Milestone 8 — ADMIN DASHBOARD, HOSPITAL SETTINGS, ANALYTICS AND FORECASTING
 
 Build the complete hospital administrator interface.
 
@@ -2086,7 +2059,7 @@ Test:
 
 ---
 
-# PROMPT 9 — COMPLETE INTEGRATION, QA, SECURITY AND DEMONSTRATION
+# Milestone 9 — COMPLETE INTEGRATION, QA, SECURITY AND DEMONSTRATION
 
 Now perform a full end-to-end review of the application.
 
@@ -2297,7 +2270,7 @@ Do not claim clinical validation.
 
 ---
 
-# PROMPT 10 — GITHUB REPOSITORY, SUPABASE REMOTE DATABASE AND VERCEL DEPLOYMENT
+# Milestone 10 — GITHUB REPOSITORY, SUPABASE REMOTE DATABASE AND VERCEL DEPLOYMENT
 
 Now prepare MediRoute for real hosted deployment.
 
@@ -2489,11 +2462,7 @@ If credentials or account permissions are unavailable, complete the code and con
 
 ---
 
-# PROMPT 11 — FINAL MASTER ACCEPTANCE TEST AND PROJECT COMPLETION
-
-You are now responsible for conducting a final project-wide acceptance audit.
-
-Do not merely summarise the project.
+# Milestone 11 — FINAL MASTER ACCEPTANCE TEST AND PROJECT COMPLETION
 
 Inspect the actual repository, database migrations, tests, CI workflow and deployed application.
 
@@ -2669,6 +2638,6 @@ Use only verified results.
 
 The final MediRoute application must be a complete integrated working prototype, not a presentation mockup.
 
-Do not stop just because a preview deployment succeeds. Verify the features in the deployed application.
+Verify features in the deployed application as well as the preview deployment.
 
 Finish by providing the actual repository URL, preview URL, production URL if deployed, and a concise explanation of any remaining external setup requirements.
