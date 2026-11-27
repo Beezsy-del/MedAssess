@@ -425,7 +425,7 @@ export function PatientDemoPortal() {
             </div>
 
             {step === 1 && (
-              <div className="intake-step-body">
+              <div className="intake-step-body" key="step-1">
                 <div className="step-title-row">
                   <PatientIntakeIcon size={22} />
                   <div>
@@ -492,7 +492,7 @@ export function PatientDemoPortal() {
             )}
 
             {step === 2 && (
-              <div className="intake-step-body">
+              <div className="intake-step-body" key="step-2">
                 <div className="step-title-row">
                   <VitalsMonitorIcon size={22} />
                   <div>
@@ -606,7 +606,7 @@ export function PatientDemoPortal() {
             )}
 
             {step === 3 && (
-              <div className="intake-step-body">
+              <div className="intake-step-body" key="step-3">
                 <div className="step-title-row">
                   <StethoscopeCrossIcon size={22} />
                   <div>
@@ -670,7 +670,7 @@ export function PatientDemoPortal() {
             )}
 
             {step === 4 && submittedCategory && (
-              <div className="intake-step-body">
+              <div className="intake-step-body" key="step-4">
                 <div
                   className="result-callout"
                   data-cat={submittedCategory.toLowerCase()}

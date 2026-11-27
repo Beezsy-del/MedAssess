@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Clock3, Eye, X } from "lucide-react";
 import { Badge, Empty, Status, minutes, time } from "@/components/ui";
 import {
@@ -35,11 +35,21 @@ export function PatientTable({
 }) {
   const { data } = useWorkspace();
   const [inspectId, setInspectId] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+
+  function closeDrawer() {
+    setInspectId(null);
+    requestAnimationFrame(() => {
+      if (triggerRef.current?.isConnected) triggerRef.current.focus();
+    });
+  }
 
   useEffect(() => {
     if (!inspectId) return;
+    closeRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setInspectId(null);
+      if (event.key === "Escape") closeDrawer();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -258,10 +268,13 @@ export function PatientTable({
                         type="button"
                         className="icon-button peek-btn"
                         aria-label={`Quick peek ${p?.name ?? e.reference}`}
+                        aria-expanded={inspectId === e.id}
+                        aria-pressed={inspectId === e.id}
                         title="Quick clinical brief"
-                        onClick={() =>
-                          setInspectId((curr) => (curr === e.id ? null : e.id))
-                        }
+                        onClick={(event) => {
+                          triggerRef.current = event.currentTarget;
+                          setInspectId((curr) => (curr === e.id ? null : e.id));
+                        }}
                       >
                         <Eye size={16} />
                       </button>
@@ -283,145 +296,155 @@ export function PatientTable({
       </div>
 
       {inspectedEncounter && (
-        <aside
-          className="quick-peek-drawer"
-          role="region"
-          aria-label={`Clinical quick brief for ${inspectedPatient?.name ?? inspectedEncounter.reference}`}
-        >
-          <div className="drawer-header">
-            <div>
-              <span className="mono drawer-ref">
-                {inspectedEncounter.reference}
-              </span>
-              <h3>{inspectedPatient?.name ?? "Patient"}</h3>
-              <p className="muted">
-                {inspectedPatient?.age == null
-                  ? "Age unknown"
-                  : `${inspectedPatient.age} yrs`}{" "}
-                ·{" "}
-                {data.departments.find(
-                  (d) => d.id === inspectedEncounter.department_id,
-                )?.name ?? "Awaiting unit"}
-              </p>
-            </div>
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setInspectId(null)}
-              aria-label="Close clinical quick brief"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <div className="drawer-badges">
-            <Badge category={inspectedEncounter.category} />
-            <Status value={inspectedEncounter.status} />
-          </div>
-
-          <div className="drawer-section">
-            <h4>Presenting symptoms &amp; triage explanation</h4>
-            <p className="drawer-complaint">
-              {inspectedEncounter.symptoms || "No symptoms documented yet."}
-            </p>
-            <small className="muted">
-              {queueExplanation(inspectedEncounter)}
-            </small>
-          </div>
-
-          <div className="drawer-section">
-            <h4>Latest vitals ({inspectedVitals.length} recorded)</h4>
-            {inspectedVitals[0] ? (
-              <div className="drawer-vitals-grid">
-                <div>
-                  <span>Pulse</span>
-                  <strong>{inspectedVitals[0].pulse ?? "—"}</strong>
-                </div>
-                <div>
-                  <span>SpO₂</span>
-                  <strong>
-                    {inspectedVitals[0].spo2 != null
-                      ? `${inspectedVitals[0].spo2}%`
-                      : "—"}
-                  </strong>
-                </div>
-                <div>
-                  <span>Systolic BP</span>
-                  <strong>{inspectedVitals[0].systolic ?? "—"}</strong>
-                </div>
-                <div>
-                  <span>Resp / Temp</span>
-                  <strong>
-                    {inspectedVitals[0].respiratory_rate ?? "—"} /{" "}
-                    {inspectedVitals[0].temperature ?? "—"}°
-                  </strong>
-                </div>
-              </div>
-            ) : (
-              <p className="muted">
-                No vitals recorded yet for this encounter.
-              </p>
-            )}
-          </div>
-
-          <div className="drawer-section">
-            <h4>Assignment &amp; bed allocation</h4>
-            <dl className="drawer-kv">
+        <>
+          <div
+            className="drawer-backdrop"
+            aria-hidden="true"
+            onClick={closeDrawer}
+          />
+          <aside
+            className="quick-peek-drawer"
+            role="region"
+            aria-label={`Clinical quick brief for ${inspectedPatient?.name ?? inspectedEncounter.reference}`}
+          >
+            <div className="drawer-header">
               <div>
-                <dt>Clinician</dt>
-                <dd>{inspectedStaff?.display_name ?? "Unassigned"}</dd>
+                <span className="mono drawer-ref">
+                  {inspectedEncounter.reference}
+                </span>
+                <h3>{inspectedPatient?.name ?? "Patient"}</h3>
+                <p className="muted">
+                  {inspectedPatient?.age == null
+                    ? "Age unknown"
+                    : `${inspectedPatient.age} yrs`}{" "}
+                  ·{" "}
+                  {data.departments.find(
+                    (d) => d.id === inspectedEncounter.department_id,
+                  )?.name ?? "Awaiting unit"}
+                </p>
               </div>
-              <div>
-                <dt>Bed bay</dt>
-                <dd>
-                  {inspectedBed
-                    ? `${inspectedBed.name} (${inspectedBed.location || "Unit"})`
-                    : "None reserved"}
-                </dd>
-              </div>
-              <div>
-                <dt>Arrived</dt>
-                <dd>
-                  {time(inspectedEncounter.arrived_at)} (
-                  {minutes(inspectedEncounter.arrived_at, data.loadedAt)} min
-                  ago)
-                </dd>
-              </div>
-            </dl>
-          </div>
-
-          {inspectedAssessments[0] && (
-            <div className="drawer-section">
-              <h4>Latest assessment</h4>
-              <p className="drawer-note-text">
-                {inspectedAssessments[0].reason}
-              </p>
+              <button
+                ref={closeRef}
+                type="button"
+                className="icon-button"
+                onClick={closeDrawer}
+                aria-label="Close clinical quick brief"
+              >
+                <X size={18} />
+              </button>
             </div>
-          )}
 
-          {inspectedNotes[0] && (
-            <div className="drawer-section">
-              <h4>Latest clinical note</h4>
-              <p className="drawer-note-text">{inspectedNotes[0].note}</p>
+            <div className="drawer-body" tabIndex={0}>
+              <div className="drawer-badges">
+                <Badge category={inspectedEncounter.category} />
+                <Status value={inspectedEncounter.status} />
+              </div>
+
+              <div className="drawer-section">
+                <h4>Presenting symptoms &amp; triage explanation</h4>
+                <p className="drawer-complaint">
+                  {inspectedEncounter.symptoms || "No symptoms documented yet."}
+                </p>
+                <small className="muted">
+                  {queueExplanation(inspectedEncounter)}
+                </small>
+              </div>
+
+              <div className="drawer-section">
+                <h4>Latest vitals ({inspectedVitals.length} recorded)</h4>
+                {inspectedVitals[0] ? (
+                  <div className="drawer-vitals-grid">
+                    <div>
+                      <span>Pulse</span>
+                      <strong>{inspectedVitals[0].pulse ?? "—"}</strong>
+                    </div>
+                    <div>
+                      <span>SpO₂</span>
+                      <strong>
+                        {inspectedVitals[0].spo2 != null
+                          ? `${inspectedVitals[0].spo2}%`
+                          : "—"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Systolic BP</span>
+                      <strong>{inspectedVitals[0].systolic ?? "—"}</strong>
+                    </div>
+                    <div>
+                      <span>Resp / Temp</span>
+                      <strong>
+                        {inspectedVitals[0].respiratory_rate ?? "—"} /{" "}
+                        {inspectedVitals[0].temperature ?? "—"}°
+                      </strong>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="muted">
+                    No vitals recorded yet for this encounter.
+                  </p>
+                )}
+              </div>
+
+              <div className="drawer-section">
+                <h4>Assignment &amp; bed allocation</h4>
+                <dl className="drawer-kv">
+                  <div>
+                    <dt>Clinician</dt>
+                    <dd>{inspectedStaff?.display_name ?? "Unassigned"}</dd>
+                  </div>
+                  <div>
+                    <dt>Bed bay</dt>
+                    <dd>
+                      {inspectedBed
+                        ? `${inspectedBed.name} (${inspectedBed.location || "Unit"})`
+                        : "None reserved"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Arrived</dt>
+                    <dd>
+                      {time(inspectedEncounter.arrived_at)} (
+                      {minutes(inspectedEncounter.arrived_at, data.loadedAt)}{" "}
+                      min ago)
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              {inspectedAssessments[0] && (
+                <div className="drawer-section">
+                  <h4>Latest assessment</h4>
+                  <p className="drawer-note-text">
+                    {inspectedAssessments[0].reason}
+                  </p>
+                </div>
+              )}
+
+              {inspectedNotes[0] && (
+                <div className="drawer-section">
+                  <h4>Latest clinical note</h4>
+                  <p className="drawer-note-text">{inspectedNotes[0].note}</p>
+                </div>
+              )}
             </div>
-          )}
 
-          <div className="drawer-actions">
-            <Link
-              href={`/encounters/${inspectedEncounter.id}`}
-              className="button primary full"
-            >
-              Open full encounter chart
-              <ArrowUpRight size={15} />
-            </Link>
-            <Link
-              href={`/beds?encounter=${inspectedEncounter.id}`}
-              className="button full"
-            >
-              Manage bed allocation
-            </Link>
-          </div>
-        </aside>
+            <div className="drawer-actions">
+              <Link
+                href={`/encounters/${inspectedEncounter.id}`}
+                className="button primary full"
+              >
+                Open full encounter chart
+                <ArrowUpRight size={15} />
+              </Link>
+              <Link
+                href={`/beds?encounter=${inspectedEncounter.id}`}
+                className="button full"
+              >
+                Manage bed allocation
+              </Link>
+            </div>
+          </aside>
+        </>
       )}
     </>
   );
