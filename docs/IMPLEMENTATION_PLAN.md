@@ -12,7 +12,7 @@
 - [x] Unit, hosted integration, RLS and primary browser scenario verification.
 - [x] Membership-checked hospital preference, fail-closed explicit selection, full-document workspace switch, assigned/unassigned queue filters, and bounded command request bodies.
 - [x] Strict command validation; persisted reassessment/shortage/follow-up workflows; resource and disposition histories; six remote migrations.
-- [ ] Expanded features from master prompts: detailed gaps are tracked in FEATURE_STATUS.md.
+- [ ] Expanded product requirements: detailed gaps are tracked in FEATURE_STATUS.md.
 - [ ] Full translations, reviewed protocols, provider notification channels, advanced offline and operational analytics.
 - [x] GitHub MedAssess repository published and verify CI passed.
 - [x] Vercel preview built and six hosted browser scenarios passed.
@@ -57,9 +57,9 @@ Baseline and target confirmation: PORTAL_UPGRADE_BASELINE.md. Feature branch: fe
 
 22 November — verified the newly configured server-only Supabase secret and successful production redeployment. Live staff account creation, persistence, new-account login, role restrictions, duplicate rejection and deactivation passed. Fixed the initial-password provider-length mismatch and added boundary/UTF-8 regression tests.
 
-### Repeated final master prompt reconciliation
+### Requirements reconciliation
 
-Compared the newly attached prompt to the prior attachment: identical content. Rechecked current production READY/HTTP 200, deployed-commit CI success, all 16 hosted migrations, RLS on all 40 public tables and active reassessment cron. Corrected stale hosted-deferral and now-implemented workflow statements. See MASTER_PROMPT_RECONCILIATION.md for the consolidated release and outstanding external/clinical requirements. No application or schema change was needed for the repeated specification.
+Reviewed the unchanged patient-portal specification. Rechecked current production READY/HTTP 200, deployed-commit CI success, all 16 hosted migrations, RLS on all 40 public tables and active reassessment cron. Corrected stale hosted-deferral and now-implemented workflow statements. See REQUIREMENTS_RECONCILIATION.md for the consolidated release and outstanding external/clinical requirements. No application or schema change was needed for the repeated specification.
 
 ### Technical gap fixes and regression release
 
@@ -82,3 +82,7 @@ MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to
 ## 27 November 2026 interface integration
 
 See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.
+
+### Repository hygiene — 27 November 2026
+
+Removed copied AI persona and execution framing from the requirements while preserving feature requirements and acceptance evidence. Updated acceptance-ledger source references and renamed the reconciliation report. Local media builds, downloaded skills and tool caches are excluded from version control; application behavior is unchanged.

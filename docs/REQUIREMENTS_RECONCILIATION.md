@@ -1,10 +1,10 @@
-# Final master prompt reconciliation — 22 November 2026
+# Requirements reconciliation — 22 November 2026
 
 ## Baseline and scope
 
-The latest attachment is byte-for-byte identical to the previously implemented patient-portal master prompt. No new application requirements were introduced. The user's earlier explicit project clarification remains authoritative: use Beezsy-del/MedAssess and the existing MediRoute Vercel project, not the MediRoute hostname printed in the template. Preserve records and existing functionality.
+This review covers the patient-portal requirements for the existing Beezsy-del/MedAssess repository and MediRoute Vercel project. It preserves existing records and functionality. The specification introduced no additional requirements beyond the prior portal upgrade.
 
-The existing Next.js App Router / strict TypeScript / React / Supabase application, API and feature inventory, 16 migration files, permission documentation and acceptance reports were inspected. No new schema migration or duplicate deployment is necessary for this unchanged prompt. This follow-up corrects contradictory historical deployment/feature-status statements; it does not claim a fresh execution of every browser test.
+The existing Next.js App Router / strict TypeScript / React / Supabase application, API and feature inventory, 16 migration files, permission documentation and acceptance reports were inspected. No new schema migration or duplicate deployment is necessary for this unchanged specification. This follow-up corrects contradictory historical deployment/feature-status statements; it does not claim a fresh execution of every browser test.
 
 ## Verified release
 
@@ -23,7 +23,7 @@ The existing Next.js App Router / strict TypeScript / React / Supabase applicati
 
 ## Requirement coverage
 
-| Prompt sections                              | Implementation and evidence                                                                                                                                                                       | Remaining limits                                                                                                                                |
+| Requirement sections                         | Implementation and evidence                                                                                                                                                                       | Remaining limits                                                                                                                                |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1: existing application inspection           | Existing baseline, route/API/feature inventory and release documents; repository history preserved                                                                                                | This repeat review does not replace independent security audit                                                                                  |
 | 2–3: patient access and questionnaire        | Encounter-scoped QR/manual capabilities; adaptive questionnaire, structured history, medications, allergies, save/review, three patient languages, optional speech adapter                        | Physical phone scanning and microphone behavior depend on device; language/clinical review outstanding; some errors/status text English         |

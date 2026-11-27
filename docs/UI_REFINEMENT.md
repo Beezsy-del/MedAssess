@@ -1,8 +1,6 @@
 # UI refinement — 20 November 2026
 
-Source directory requested: https://agenticskills.io/skills.
-
-Applied skills: the installed frontend-design skill and [Emil Design Engineering](https://agenticskills.io/skills/emil-design-eng). Emil was installed from emilkowalski/skills, skills/emil-design-eng, using the Codex skill-installer. Taste Skill was also installed from the linked source, but the current upstream 2.5.1 package describes marketing-page layouts and differs from the directory's older app-screen description. Its marketing/export/animation workflow was not applied to the clinical workspace. Both downloaded skills are available for future turns. No downloaded skill scripts were executed against the application.
+Design guidance: [Emil Design Engineering](https://agenticskills.io/skills/emil-design-eng). The clinical workspace uses restrained motion, clear hierarchy and readable controls. The review evidence below records the implemented changes.
 
 The design is a hospital workbench: patient and encounter information has priority, with clinical colors reserved for urgency and the existing burgundy retained for primary actions. No generated imagery, invented metrics, motion library or new runtime dependency was added.
 
