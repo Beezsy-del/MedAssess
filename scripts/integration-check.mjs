@@ -22,7 +22,11 @@ const { data: memberships, error: membershipError } = await doctor
   .select("*");
 assert.equal(membershipError, null);
 const hospital = memberships[0].hospital_id;
-async function command(action, data, client = doctor) {
+async function command(
+  action,
+  data,
+  client = ["register", "token", "intake"].includes(action) ? nurse : doctor,
+) {
   return client.rpc("staff_command", {
     p_hospital: hospital,
     p_action: action,

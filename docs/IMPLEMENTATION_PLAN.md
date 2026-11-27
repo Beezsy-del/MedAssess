@@ -19,7 +19,7 @@
 - [x] Production deployment reached READY; see TEST_RESULTS.md for hosted verification.
 - [ ] Complete master feature acceptance: remaining requirements are inventoried in MASTER_AUDIT.md and MASTER_REQUIREMENTS_CHECKLIST.md.
 
-Product brand: MedCipher. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
+Product brand: MediRoute. Existing backend target: MedAssess, kkfqxlwwcwhnmhmsqitx, ap-south-1. No operational clinical enablement, database reset or destructive migration was performed.
 
 Core milestone checks passed as described in TEST_RESULTS.md. The supplied master acceptance milestone is not complete; external access and feature-development gaps are explicitly distinguished.
 
@@ -35,3 +35,50 @@ Core milestone checks passed as described in TEST_RESULTS.md. The supplied maste
 - [x] Implement nurse-first registration with patient lookup, direct initial assessment, explicit priority confirmation, transactional persistence and device draft recovery. See NURSE_INTAKE.md for integration and verification evidence.
 
 21 November 2026 — Visual bed management: extend existing resources/reservations with physical wards, bed capabilities and clinician-reviewed placement; replace the generic bed reservation path; integrate automatic intake handoff, realtime map, holds/reassignment/turnover and attributable history. Database assertions and role/tenant fixture passed; four new preview scenarios passed and the matching frontend is deployed. Full browser acceptance encountered provider authentication timeouts; CI results are recorded separately. See BED_MANAGEMENT.md.
+
+## Patient portal and role-workflow upgrade — active
+
+Baseline and target confirmation: PORTAL_UPGRADE_BASELINE.md. Feature branch: feat/patient-portal-role-workflows.
+
+1. Preserve production; establish isolated database testing before changing existing permissions.
+2. Implement shared role/route/action policy and database-backed operational privacy views.
+3. Add versioned adaptive questionnaire, saved progress, symptom updates and limited patient status cards.
+4. Add reviewed configuration, attributable preliminary assessments/escalations and scheduled reassessment tasks; retain unknown findings and clinical-use lock.
+5. Add nurse briefs/quick actions/OPD routes and doctor department referrals with transactional lifecycle records.
+6. Reorganize admin directory/resources with sticky summaries and safe staff/department management.
+7. Cover synthetic acceptance A–J, tenant/role/token abuse, migration compatibility, load/reconnection, accessibility and regression.
+8. Push logical commits; verify isolated preview; promote only after required checks pass; publish exact results and remaining external clinical review needs.
+
+21 November — portal foundation checkpoint (not release acceptance): user confirmed MedAssess and the existing MediRoute deployment. Added role checks before page data loading and API commands, filtered navigation and doctor registration/pass controls, request-scoped session reuse, an eight-step English patient form, scoped HttpOnly session endpoint, strict report validation, and draft/report/rule models. Draft migration replay plus synthetic transaction tests passed in isolated local PostgreSQL 17. Existing production has not been migrated or replaced. Supabase hosted branch creation failed because the project plan does not support branching; an isolated hosted environment is still required. Staff review/referral/admin integration, translations, scheduler, full A–J acceptance and hosted verification remain unchecked.
+
+22 November — user chose local execution and deferred hosted deployment. Implemented the adaptive patient portal, prototype EN/KN/HI copy and optional dictation, nurse briefs/OPD, doctor internal referrals, operational admin directory/sticky resources, staff provisioning/access, reviewed configuration, scheduled monitoring, and scoped snapshots. Real local Supabase Auth/PostgREST/Realtime is running with two synthetic tenants. SQL replay, 87 unit tests, 33 core, 16 intake, 20 bed and 19 portal integration groups passed. Added isolated local CI. Hosted preview/production work is explicitly deferred, not represented as completed. Current verification and remaining dependencies: PORTAL_UPGRADE_VERIFICATION.md.
+
+22 November — hosted deployment explicitly authorized. Applied the two tested portal/workflow migrations to existing MedAssess, preserved existing records, and verified 40/40 public tables with RLS plus successful scheduled execution. Preview acceptance and 33 hosted core assertions passed. Production release evidence and outstanding server-only staff-provisioning configuration are tracked in PORTAL_RELEASE.md.
+
+22 November — verified the newly configured server-only Supabase secret and successful production redeployment. Live staff account creation, persistence, new-account login, role restrictions, duplicate rejection and deactivation passed. Fixed the initial-password provider-length mismatch and added boundary/UTF-8 regression tests.
+
+### Repeated final master prompt reconciliation
+
+Compared the newly attached prompt to the prior attachment: identical content. Rechecked current production READY/HTTP 200, deployed-commit CI success, all 16 hosted migrations, RLS on all 40 public tables and active reassessment cron. Corrected stale hosted-deferral and now-implemented workflow statements. See MASTER_PROMPT_RECONCILIATION.md for the consolidated release and outstanding external/clinical requirements. No application or schema change was needed for the repeated specification.
+
+### Technical gap fixes and regression release
+
+Implemented authenticated individual-staff password recovery/update, provider/error validation, stale patient-status race protection, reconnect recovery, localized patient status/validation messages and verbatim free-text review. Added credential-change and delayed-response browser regressions plus password authorization and review-value unit checks. All database workflow suites and load/Realtime checks passed; browser coverage is recorded in TECHNICAL_GAP_RELEASE.md. No schema change is required for these fixes. Broader remaining technical work is explicitly distinguished from external configuration and clinical review.
+
+### Fourth portal on the existing login
+
+Added the fourth Patient Portal option alongside the three existing staff portals, preserving staff authentication. The public `/patient-portal` route reuses the integrated adaptive intake; new QR links use it and old routes remain supported. Added multilingual QR/token/assisted-care instructions and regression tests for four-option navigation, mobile accessibility, QR/manual encounter equivalence and guessed-token rejection. See FOUR_PORTAL_RELEASE.md for acceptance mapping and deployment evidence. No schema modification required.
+
+### Patient Portal Demo Mode
+
+Added two entry choices inside the existing Patient Portal. The token-free demo uses only an in-memory browser store and five explicit presentation scripts. Implemented questionnaire/review, scenario results, symptom updates, timeline, simulated alerts and nurse/doctor actions, QR illustration and reset controls. Real access and issued QR routes remain protected. See PATIENT_DEMO_MODE.md for scope, isolation and test/release evidence. No database migration or new external service is needed.
+
+## MediRoute rebrand
+
+Renamed the product to MediRoute across visible UI, page metadata, manifest, offline fallback, CSV export, demo QR label, package metadata, CI name and documentation. Existing service identifiers, URLs, session cookies and device storage keys are retained for compatibility.
+
+MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
+
+## 27 November 2026 interface integration
+
+See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.

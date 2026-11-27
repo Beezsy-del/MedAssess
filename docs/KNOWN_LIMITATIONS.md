@@ -1,5 +1,11 @@
 # Known limitations and remaining work
 
+**Staff provisioning update:** The server-only Supabase secret is configured and live synthetic staff creation/login/access controls have been verified. Initial passwords enforce the provider length limit. Email invitations remain a separate, unimplemented delivery workflow.
+
+**Hosted release update:** Deployment was subsequently authorized. See [PORTAL_RELEASE.md](PORTAL_RELEASE.md) for migration, deployment and live verification evidence; earlier deferral statements below are historical.
+
+**22 November local upgrade:** See [PORTAL_UPGRADE_VERIFICATION.md](PORTAL_UPGRADE_VERIFICATION.md) for the current patient-portal, role, resource, protocol and referral implementation. The upgrade is deployed; PORTAL_RELEASE.md identifies current hosted evidence. The new local implementation supersedes older gaps for staff role editing, department RLS, adaptive history/medicines/allergies, internal referrals and scheduled reassessment. It does not establish clinical validation or production readiness.
+
 ## Release blockers
 
 1. The full master feature specification is not complete. Consult FEATURE_STATUS.md rather than assuming every described module is ready.
@@ -10,12 +16,12 @@
 ## Important implementation gaps
 
 - Supabase leaked-password protection is disabled and needs account-side configuration.
-- Staff invitations, account activation, role-edit workflow, and complete password-recovery verification.
-- Full clinician-reviewed configurable rule/scoring engine and protocol approval lifecycle.
+- Email invitations, production account activation policy, and complete password-recovery verification. Synthetic account creation and protected role editing are implemented and tested.
+- Medically validated rules, scoring configuration and independent protocol approval. Versioned rule configuration and review controls exist, but do not establish clinical validity.
 - Complete staff-interface translation, clinical language review, structured symptom catalog and normalized medical history.
-- Push/SMS delivery providers, specialization policies, background escalation worker, and real external referral/ambulance integration.
+- Push/SMS delivery providers, specialization policies and real external referral/ambulance integration. Scheduled in-app reassessment/escalation is installed and active.
 - Full offline refresh capture, automatic retention expiry, service-worker background sync and hospital LAN gateway.
-- Fine-grained department/assigned-patient read restrictions, distributed IP abuse prevention and independent security assessment.
+- Distributed IP abuse prevention and independent security assessment. Department membership restrictions are implemented and covered by role/tenant tests.
 - Full requested normalized schema, prescription/protected-document workflows, routing recommendations and detailed staff availability.
 - Forecasts beyond hourly arrival means; patient-flow durations; complete report filtering and PDF output beyond browser print.
 - Server cursor pagination; active encounters are paged up to an explicit 10,000 demo ceiling; closed encounters are capped at 500 and history queries remain bounded. This is not verified at large-hospital scale.
@@ -28,7 +34,7 @@
 - Platform access logs may contain route URLs unless provider-side redaction is configured. Local Next request logging is disabled to avoid raw token paths. Production log redaction must be verified before deployment.
 - Shared synthetic demo accounts are intentionally available through explicit demo-mode sign-in buttons. Never enable them for a real hospital.
 - The compact clinical input model intentionally has no unreviewed physiological cutoffs. Missing information requires human assessment; no autonomous diagnosis or GREEN classification exists.
-- Automatic in-app escalation currently runs during authenticated snapshot refresh. It is not an independently scheduled emergency paging service.
+- The active database scheduler generates in-app reassessment/escalation tasks independently of dashboard reads. It is not an external emergency paging service.
 - Test records remain auditable. The provided reset archives active `Synthetic …` cases, rather than destructively resetting remote data.
 
 Audit update: see [READINESS_AUDIT.md](READINESS_AUDIT.md) for the current feature-by-feature evidence and four separate readiness decisions. AES-GCM device draft encryption, concurrent retry locking and active-queue pagination are now implemented. Encryption does not protect against same-origin script compromise; retention expiry remains missing.
@@ -43,4 +49,20 @@ Bed placement matches explicit reviewed requirements against recorded synthetic 
 
 Bed-release verification observed intermittent slow Supabase authentication/reads and a concurrent-registration statement timeout. Lock scope was narrowed and realtime refreshes coalesced, but short acceptance checks cannot certify sustained load or response-time targets. Historical Vercel snapshot timeouts on the previous release remain operational evidence to investigate before a pilot.
 
-Final bed-release CI 44841263814: nine browser failures remain (intake acknowledgement and sign-in/workspace loading), despite all four bed scenarios and 69 database assertions passing. Their complete root cause is not established; prior provider timeouts do not prove every failure external. Do not treat this demo release as production technical readiness.
+Historical bed-release failures were followed by the portal release's successful full browser and database runs. See PORTAL_RELEASE.md and TECHNICAL_GAP_RELEASE.md for current evidence; the old failure does not represent the current test status.
+
+The patient-portal migrations and staff lifecycles are now deployed. The earlier in-progress portal checkpoint is superseded by PORTAL_UPGRADE_VERIFICATION.md. Hosted Supabase branching remains unavailable on the connected plan; no paid-plan change was made.
+
+Fourth portal: phone-camera QR instructions and opening generated QR URLs are covered; physical camera scanning across Android/iPhone models still requires device acceptance. The new entry point does not establish clinical protocol or translation validation. See FOUR_PORTAL_RELEASE.md.
+
+Patient Demo Mode is a browser-only presentation: refreshing clears it, and its simulated staff view does not connect to live queues. Scenario-selected categories are not medical assessments. Demo wording is English. No additional provider configuration is required for this isolated demonstration. See PATIENT_DEMO_MODE.md.
+
+## MediRoute rebrand
+
+Rebranding preserves existing deployment hostnames, repository/workspace names, historical migration/job identifiers, auth identities, cookie names and offline storage keys. These are compatibility identifiers, not visible product branding. No clinical behavior or approval status changed.
+
+MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
+
+## 27 November 2026 interface integration
+
+See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.

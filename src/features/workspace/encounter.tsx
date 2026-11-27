@@ -1,15 +1,28 @@
 "use client";
+import { ResourceRequests } from "./resource-requests";
+import { ClinicalBrief, DepartmentReferrals } from "./clinical-brief";
+import { canRegister } from "@/features/access/policy";
 import Link from "next/link";
 import { useState } from "react";
 import {
   ArrowLeft,
+  BedDouble,
   ClipboardPlus,
   History,
   QrCode,
   Activity,
 } from "lucide-react";
 import { useWorkspace } from "./context";
-import { Badge, Status, Modal, Field, time, Empty } from "@/components/ui";
+import {
+  Badge,
+  Status,
+  Modal,
+  Field,
+  time,
+  Empty,
+  normalizeIstIso,
+  toIstLocalInput,
+} from "@/components/ui";
 import { AssessmentForm } from "@/features/clinical/assessment-form";
 import { QRToken } from "@/features/registration/reception";
 import {
@@ -17,6 +30,7 @@ import {
   type FlowStatus,
   terminalStatuses,
 } from "@/features/flow/machine";
+
 export function Encounter({ id }: { id: string }) {
   const { data, command, busy } = useWorkspace();
   const [modal, setModal] = useState(""),
@@ -28,6 +42,11 @@ export function Encounter({ id }: { id: string }) {
       <Empty
         title="Encounter unavailable"
         description="It may belong to another hospital or be outside this view."
+        action={
+          <Link href="/queues" className="button">
+            Back to patient queue
+          </Link>
+        }
       />
     );
   const encounter = e;
@@ -36,6 +55,12 @@ export function Encounter({ id }: { id: string }) {
     data.membership.role,
   );
   const closed = terminalStatuses.includes(e.status);
+
+  function openModal(name: string) {
+    setError("");
+    setModal(name);
+  }
+
   async function formAction(
     event: React.FormEvent<HTMLFormElement>,
     action: string,
@@ -43,6 +68,9 @@ export function Encounter({ id }: { id: string }) {
     event.preventDefault();
     setError("");
     const f = Object.fromEntries(new FormData(event.currentTarget));
+    if (action === "follow_up" && typeof f.due_at === "string") {
+      f.due_at = normalizeIstIso(f.due_at);
+    }
     try {
       await command(action, {
         ...f,
@@ -54,27 +82,39 @@ export function Encounter({ id }: { id: string }) {
       setError(e instanceof Error ? e.message : "Action failed");
     }
   }
+
   async function rotate() {
+    setError("");
     try {
       const result = await command("token", { encounter_id: encounter.id });
       setToken(String(result.token));
       setModal("qr");
     } catch {}
   }
+
+  const assessments = data.assessments.filter((a) => a.encounter_id === id);
+  const vitals = data.vitals.filter((v) => v.encounter_id === id);
+  const notes = data.notes.filter((n) => n.encounter_id === id);
+  const events = data.events.filter((event) => event.encounter_id === id);
+
   return (
     <>
-      <Link href="/queues" className="back-link">
-        <ArrowLeft size={16} /> Patient queue
-      </Link>
-      {clinical && (
-        <Link className="button" href={`/beds/${e.id}`}>
-          Review bed placement
+      <div className="encounter-bar">
+        <Link href="/queues" className="back-link">
+          <ArrowLeft size={16} /> Patient queue
         </Link>
-      )}
+        {clinical && (
+          <Link className="button small" href={`/beds/${e.id}`}>
+            <BedDouble size={15} /> Review bed placement
+          </Link>
+        )}
+      </div>
+
       <div className="page-heading">
         <div>
           <p className="page-context">
-            {e.reference} · Arrived {time(e.arrived_at)}
+            <span className="mono">{e.reference}</span> · Arrived{" "}
+            {time(e.arrived_at)}
           </p>
           <h1>{patient?.name}</h1>
           <p>
@@ -88,13 +128,16 @@ export function Encounter({ id }: { id: string }) {
         <div className="button-row">
           {!closed && (
             <>
-              <button className="button" onClick={() => void rotate()}>
-                <QrCode size={16} /> New patient pass
-              </button>
+              {canRegister(data.membership.role) && (
+                <button className="button" onClick={() => void rotate()}>
+                  <QrCode size={16} /> New patient pass
+                </button>
+              )}
               {clinical && (
                 <button
+                  type="button"
                   className="button primary"
-                  onClick={() => setModal("assessment")}
+                  onClick={() => openModal("assessment")}
                 >
                   <ClipboardPlus size={16} /> Assess patient
                 </button>
@@ -103,6 +146,9 @@ export function Encounter({ id }: { id: string }) {
           )}
         </div>
       </div>
+      <ClinicalBrief encounterId={id} />
+      <DepartmentReferrals encounterId={id} />
+      <ResourceRequests encounterId={id} />
       <div className="encounter-status">
         <Badge category={e.category} />
         <Status value={e.status} />
@@ -112,6 +158,7 @@ export function Encounter({ id }: { id: string }) {
           </strong>
         )}
       </div>
+
       <div className="detail-grid">
         <div>
           <section className="panel detail-panel">
@@ -163,143 +210,161 @@ export function Encounter({ id }: { id: string }) {
               </details>
             )}
           </section>
+
           <section className="panel detail-panel spaced">
             <div className="section-title">
-              <h2>Observations & assessments</h2>
-              <Activity size={18} />
+              <h2>
+                <Activity size={18} /> Observations & assessments
+              </h2>
+              <span className="count-label">{assessments.length}</span>
             </div>
-            {data.assessments
-              .filter((a) => a.encounter_id === id)
-              .map((a) => (
-                <article className="history-item" key={a.id}>
-                  <div>
-                    <Badge category={a.confirmed_category} />
-                    <small>{time(a.created_at)}</small>
-                  </div>
-                  <p>{a.reason}</p>
-                  {a.input &&
-                    typeof a.input === "object" &&
-                    !Array.isArray(a.input) &&
-                    "medical_history" in a.input && (
-                      <details>
-                        <summary>Staff intake observations</summary>
-                        <dl>
-                          {Object.entries(a.input)
-                            .filter(([key]) =>
-                              [
-                                "arrival_method",
-                                "medical_history",
-                                "allergies",
-                                "staff_notes",
-                              ].includes(key),
-                            )
-                            .map(([key, value]) => (
-                              <div key={key}>
-                                <dt>{key.replaceAll("_", " ")}</dt>
-                                <dd>{String(value || "Not recorded")}</dd>
-                              </div>
-                            ))}
-                        </dl>
-                      </details>
-                    )}
-                  <small>
-                    Original recommendation: {a.proposed_category} ·{" "}
-                    {
-                      data.staff.find((s) => s.user_id === a.actor)
-                        ?.display_name
-                    }
-                  </small>
-                </article>
-              ))}
-            {!data.assessments.some((a) => a.encounter_id === id) && (
+            {assessments.map((a) => (
+              <article className="history-item" key={a.id}>
+                <div>
+                  <Badge category={a.confirmed_category} />
+                  <small>{time(a.created_at)}</small>
+                </div>
+                <p>{a.reason}</p>
+                {a.input &&
+                  typeof a.input === "object" &&
+                  !Array.isArray(a.input) &&
+                  "medical_history" in a.input && (
+                    <details>
+                      <summary>Staff intake observations</summary>
+                      <dl>
+                        {Object.entries(a.input)
+                          .filter(([key]) =>
+                            [
+                              "arrival_method",
+                              "medical_history",
+                              "allergies",
+                              "staff_notes",
+                            ].includes(key),
+                          )
+                          .map(([key, value]) => (
+                            <div key={key}>
+                              <dt>{key.replaceAll("_", " ")}</dt>
+                              <dd>{String(value || "Not recorded")}</dd>
+                            </div>
+                          ))}
+                      </dl>
+                    </details>
+                  )}
+                <small>
+                  Original recommendation: {a.proposed_category} ·{" "}
+                  {data.staff.find((s) => s.user_id === a.actor)?.display_name}
+                </small>
+              </article>
+            ))}
+            {!assessments.length && (
               <p className="muted">
                 No clinical assessment recorded. Human assessment required.
               </p>
             )}
-            {data.vitals
-              .filter((v) => v.encounter_id === id)
-              .map((v) => (
-                <div className="vitals-row" key={v.id}>
-                  <span>
-                    Pulse <strong>{v.pulse ?? "—"}</strong>
-                  </span>
-                  <span>
-                    SpO₂ <strong>{v.spo2 ?? "—"}%</strong>
-                  </span>
-                  <span>
-                    RR <strong>{v.respiratory_rate ?? "—"}</strong>
-                  </span>
-                  <span>
-                    BP <strong>{v.systolic ?? "—"}</strong>
-                  </span>
-                  <span>
-                    Temp <strong>{v.temperature ?? "—"}°</strong>
-                  </span>
-                </div>
-              ))}
+            {vitals.map((v) => (
+              <div className="vitals-row" key={v.id}>
+                <span>
+                  Pulse <strong>{v.pulse ?? "—"}</strong>
+                </span>
+                <span>
+                  SpO₂ <strong>{v.spo2 ?? "—"}%</strong>
+                </span>
+                <span>
+                  RR <strong>{v.respiratory_rate ?? "—"}</strong>
+                </span>
+                <span>
+                  BP <strong>{v.systolic ?? "—"}</strong>
+                </span>
+                <span>
+                  Temp <strong>{v.temperature ?? "—"}°</strong>
+                </span>
+              </div>
+            ))}
           </section>
+
           <section className="panel detail-panel spaced">
             <div className="section-title">
               <h2>Care notes & investigations</h2>
               {clinical && !closed && (
                 <button
+                  type="button"
                   className="button small"
-                  onClick={() => setModal("note")}
+                  onClick={() => openModal("note")}
                 >
                   Add note
                 </button>
               )}
             </div>
-            {data.notes
-              .filter((n) => n.encounter_id === id)
-              .map((n) => (
-                <article className="history-item" key={n.id}>
-                  <strong>{n.kind}</strong>
-                  <p>{n.note}</p>
-                  <small>
-                    {time(n.created_at)} ·{" "}
-                    {
-                      data.staff.find((s) => s.user_id === n.actor)
-                        ?.display_name
-                    }
-                  </small>
-                </article>
-              ))}
-            {!data.notes.some((n) => n.encounter_id === id) && (
-              <p className="muted">No care notes yet.</p>
-            )}
+            {notes.map((n) => (
+              <article className="history-item" key={n.id}>
+                <strong>{n.kind}</strong>
+                <p>{n.note}</p>
+                <small>
+                  {time(n.created_at)} ·{" "}
+                  {data.staff.find((s) => s.user_id === n.actor)?.display_name}
+                </small>
+              </article>
+            ))}
+            {!notes.length && <p className="muted">No care notes yet.</p>}
           </section>
         </div>
+
         <aside>
           <section className="panel detail-panel">
             <h2>Next step</h2>
-            {clinical && !closed && (
-              <div className="button-row">
+            {!closed && (
+              <div className="action-group">
                 <button
-                  className="button"
-                  onClick={() => setModal("reassessment")}
+                  type="button"
+                  className="button primary full"
+                  onClick={() => openModal("transition")}
                 >
-                  Report deterioration
+                  Update patient flow
                 </button>
-                <button
-                  className="button"
-                  onClick={() => setModal("subpriority")}
-                >
-                  Edit clinical subpriority
-                </button>
-                <button className="button" onClick={() => setModal("shortage")}>
-                  Record resource shortage
-                </button>
+                <p className="muted" style={{ fontSize: 12 }}>
+                  Validated transitions preserve the patient’s care history.
+                </p>
               </div>
             )}
-            {data.membership.role === "doctor" && (
-              <button
-                className="button spaced"
-                onClick={() => setModal("follow_up")}
-              >
-                Schedule follow-up
-              </button>
+
+            {clinical && !closed && (
+              <div className="action-group">
+                <span className="action-group-title">Clinical actions</span>
+                <div className="button-row">
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={() => openModal("reassessment")}
+                  >
+                    Report deterioration
+                  </button>
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={() => openModal("subpriority")}
+                  >
+                    Edit clinical subpriority
+                  </button>
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={() => openModal("shortage")}
+                  >
+                    Record resource shortage
+                  </button>
+                  {data.membership.role === "doctor" && (
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={() => openModal("follow_up")}
+                    >
+                      Schedule follow-up
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
+
             {data.reassessments
               .filter((r) => r.encounter_id === id)
               .map((r) => (
@@ -332,35 +397,31 @@ export function Encounter({ id }: { id: string }) {
                   <p>{r.instructions}</p>
                 </article>
               ))}
-            <p>Validated transitions preserve the patient’s care history.</p>
-            {!closed && (
-              <button
-                className="button primary full"
-                onClick={() => setModal("transition")}
-              >
-                Update patient flow
-              </button>
-            )}
-            {data.membership.role === "doctor" && !closed && (
-              <button
-                className="button full spaced"
-                onClick={() => setModal("referral")}
-              >
-                Initiate referral
-              </button>
-            )}
-            <Link className="button full spaced" href="/resources">
-              Review available resources
-            </Link>
+
+            <div className="action-group spaced">
+              <span className="action-group-title">Coordination</span>
+              {data.membership.role === "doctor" && !closed && (
+                <button
+                  type="button"
+                  className="button full"
+                  onClick={() => openModal("referral")}
+                >
+                  Initiate referral
+                </button>
+              )}
+              <Link className="button full" href="/resources">
+                Review available resources
+              </Link>
+            </div>
           </section>
+
           <section className="panel detail-panel spaced">
             <h2>
               <History size={18} /> Encounter timeline
             </h2>
-            <ol className="timeline">
-              {data.events
-                .filter((event) => event.encounter_id === id)
-                .map((event) => (
+            {events.length ? (
+              <ol className="timeline">
+                {events.map((event) => (
                   <li key={event.id}>
                     <strong>
                       {event.to_status.toLowerCase().replaceAll("_", " ")}
@@ -373,10 +434,14 @@ export function Encounter({ id }: { id: string }) {
                     </small>
                   </li>
                 ))}
-            </ol>
+              </ol>
+            ) : (
+              <p className="muted">No flow transitions recorded yet.</p>
+            )}
           </section>
         </aside>
       </div>
+
       {modal && (
         <Modal
           title={
@@ -454,11 +519,14 @@ export function Encounter({ id }: { id: string }) {
                     </Field>
                   )}
                   {modal === "follow_up" && (
-                    <Field label="Follow-up date and time (include timezone)">
+                    <Field label="Follow-up date and time (IST)">
                       <input
+                        type="datetime-local"
                         name="due_at"
                         required
-                        placeholder="2026-12-01T09:00:00+05:30"
+                        defaultValue={toIstLocalInput(
+                          new Date(Date.parse(data.loadedAt) + 86400000),
+                        )}
                       />
                     </Field>
                   )}
@@ -563,8 +631,8 @@ export function Encounter({ id }: { id: string }) {
                   {error}
                 </p>
               )}
-              <button disabled={busy} className="button primary">
-                Save to encounter
+              <button type="submit" disabled={busy} className="button primary">
+                {busy ? "Saving…" : "Save to encounter"}
               </button>
             </form>
           )}

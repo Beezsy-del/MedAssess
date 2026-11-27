@@ -1,4 +1,4 @@
-# MedCipher
+# MediRoute
 
 An integrated clinical triage and hospital-flow **prototype using synthetic data only**. Built with Next.js 16.4.6, React 19.3, strict TypeScript, Tailwind CSS and a live Supabase PostgreSQL/Auth backend.
 
@@ -59,10 +59,14 @@ This demo-only administrator operation archives encounters named `Synthetic …`
 
 ## Infrastructure
 
-Supabase project: **MedAssess**, reference `kkfqxlwwcwhnmhmsqitx`, Mumbai (`ap-south-1`). Five migrations are applied and all 28 public tables have RLS. Code is published to [GitHub MedAssess](https://github.com/Beezsy-del/MedAssess); the synthetic prototype is hosted at [MedCipher](https://medcipher-triage-platform.vercel.app). See [deployment status](docs/DEPLOYMENT_STATUS.md) and [master acceptance gaps](docs/MASTER_AUDIT.md). Full master-prompt acceptance remains incomplete.
+Supabase project: **MedAssess**, reference `kkfqxlwwcwhnmhmsqitx`, Mumbai (`ap-south-1`). Five migrations are applied and all 28 public tables have RLS. Code is published to [GitHub MedAssess](https://github.com/Beezsy-del/MedAssess); the synthetic prototype is hosted at [MediRoute](https://mediroute-triage-platform.vercel.app). See [deployment status](docs/DEPLOYMENT_STATUS.md) and [master acceptance gaps](docs/MASTER_AUDIT.md). Full master-prompt acceptance remains incomplete.
 
 ## Documentation
 
 [Architecture](docs/ARCHITECTURE.md) · [Database](docs/DATABASE_SCHEMA.md) · [API](docs/API.md) · [Permissions](docs/ROLE_PERMISSIONS.md) · [Clinical safety](docs/CLINICAL_SAFETY.md) · [Test results](docs/TEST_RESULTS.md) · [Security audit](docs/SECURITY_AUDIT.md) · [Demo guide](docs/DEMO_GUIDE.md) · [Limitations](docs/KNOWN_LIMITATIONS.md)
 
-GitHub repository: [MedAssess](https://github.com/Beezsy-del/MedAssess). Product brand: MedCipher.
+GitHub repository: [MedAssess](https://github.com/Beezsy-del/MedAssess). Product brand: MediRoute.
+
+Latest verified release: [technical-gap fixes and acceptance evidence](docs/TECHNICAL_GAP_RELEASE.md). The report separates implemented prototype workflows, unfinished technical scope, external provider configuration and required clinical review.
+
+Patient entry is available as the fourth option on `/login`, or directly at `/patient-portal`. Existing QR links remain compatible; newly generated passes use the new route. See [four-portal release verification](docs/FOUR_PORTAL_RELEASE.md).

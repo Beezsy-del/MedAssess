@@ -15,3 +15,5 @@ supabase/.temp/
 .demo-*
 
 output/
+
+.playwright-cli/

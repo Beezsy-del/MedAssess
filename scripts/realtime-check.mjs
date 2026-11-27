@@ -9,8 +9,8 @@ const db = createClient(
 assert.equal(
   (
     await db.auth.signInWithPassword({
-      email: process.env.DEMO_DOCTOR_EMAIL,
-      password: process.env.DEMO_DOCTOR_PASSWORD,
+      email: process.env.DEMO_NURSE_EMAIL,
+      password: process.env.DEMO_NURSE_PASSWORD,
     })
   ).error,
   null,
@@ -37,16 +37,20 @@ let resolveEvent;
 const received = new Promise((resolve) => {
   resolveEvent = resolve;
 });
-const channel = db.channel(`acceptance-${randomUUID()}`).on(
-  "postgres_changes",
-  {
-    event: "UPDATE",
-    schema: "public",
-    table: "patient_encounters",
-    filter: `id=eq.${registered.data.id}`,
-  },
-  (event) => resolveEvent(event),
-);
+const channel = db
+  .channel(`acceptance-${randomUUID()}`, {
+    config: { postgres_changes_options: { wait: true } },
+  })
+  .on(
+    "postgres_changes",
+    {
+      event: "UPDATE",
+      schema: "public",
+      table: "patient_encounters",
+      filter: `id=eq.${registered.data.id}`,
+    },
+    (event) => resolveEvent(event),
+  );
 let timer;
 try {
   await new Promise((resolve, reject) => {
@@ -88,6 +92,7 @@ try {
       );
     }),
   ]);
+  clearTimeout(timer);
   assert.equal(event.new.id, registered.data.id);
   assert.equal(event.new.sub_priority, 1);
   console.log(
@@ -100,16 +105,20 @@ try {
   const afterReconnect = new Promise((resolve) => {
     resolveReconnect = resolve;
   });
-  const reconnected = db.channel(`reconnect-${randomUUID()}`).on(
-    "postgres_changes",
-    {
-      event: "UPDATE",
-      schema: "public",
-      table: "patient_encounters",
-      filter: `id=eq.${registered.data.id}`,
-    },
-    (event) => resolveReconnect(event),
-  );
+  const reconnected = db
+    .channel(`reconnect-${randomUUID()}`, {
+      config: { postgres_changes_options: { wait: true } },
+    })
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "patient_encounters",
+        filter: `id=eq.${registered.data.id}`,
+      },
+      (event) => resolveReconnect(event),
+    );
   await new Promise((resolve, reject) => {
     const subscriptionTimer = setTimeout(
       () => reject(Error("Reconnect timed out")),

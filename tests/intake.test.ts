@@ -12,15 +12,12 @@ const valid = () => ({
   input: { ...emptyIntake(id).input, verified: true },
 });
 describe("nurse intake contract", () => {
-  it("routes only nursing roles to registration", () => {
+  it("routes roles to their permitted primary workspace", () => {
     for (const role of ["nurse", "triage_nurse"])
-      expect(landingForRole(role)).toBe("/registration");
-    for (const role of [
-      "doctor",
-      "hospital_admin",
-      "super_admin",
-      "resource_manager",
-    ])
+      expect(landingForRole(role)).toBe("/nurse");
+    expect(landingForRole("doctor")).toBe("/doctor");
+    expect(landingForRole("receptionist")).toBe("/reception");
+    for (const role of ["hospital_admin", "super_admin", "resource_manager"])
       expect(landingForRole(role)).toBe("/dashboard");
   });
   it("starts with no clinical category or assumed observations", () => {

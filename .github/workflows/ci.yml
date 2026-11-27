@@ -1,7 +1,7 @@
-name: Verify MedCipher
+name: Verify MediRoute
 on:
   push:
-    branches: [main]
+    branches: [main, feat/patient-portal-role-workflows]
   pull_request:
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
   # Database and browser suites use dedicated synthetic infrastructure.
   # Run only in a protected environment after review; never expose credentials to fork PRs.
   integration:
-    if: github.event_name == 'push' && vars.RUN_DEMO_INTEGRATION == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.RUN_DEMO_INTEGRATION == 'true'
     runs-on: ubuntu-latest
     environment: synthetic-demo
     steps:
@@ -56,3 +56,48 @@ jobs:
       - run: npm run test:e2e
         env:
           BASE_URL: ${{ vars.DEMO_PREVIEW_URL }}
+
+  local-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Start isolated synthetic Supabase
+        run: |
+          npx --yes supabase@3.2.0 start --exclude studio,edge-runtime,logflare,vector,supavisor,imgproxy,storage-api,mailpit > /tmp/supabase-start.log 2>&1
+          umask 077
+          npx --yes supabase@3.2.0 status -o env > /tmp/medcipher-local-supabase.env
+          node scripts/prepare-local.mjs
+      - name: Verify database workflows
+        run: |
+          node scripts/local-sql-check.mjs
+          node scripts/run-local.mjs scripts/integration-check.mjs
+          node scripts/run-local.mjs scripts/intake-check.mjs
+          node scripts/run-local.mjs scripts/bed-check.mjs
+          node scripts/run-local.mjs scripts/portal-check.mjs
+          node scripts/run-local.mjs scripts/local-load-check.mjs
+          node scripts/run-local.mjs scripts/realtime-check.mjs
+      - name: Build and start local application
+        run: |
+          node scripts/run-local.mjs node_modules/next/dist/bin/next build
+          node scripts/run-local.mjs node_modules/next/dist/bin/next start --port 3011 > /tmp/medcipher-app.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3011/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - run: npx playwright install --with-deps chromium
+      - name: Verify browser acceptance
+        run: node scripts/run-local.mjs node_modules/@playwright/test/cli.js test
+        env:
+          BASE_URL: http://localhost:3011
+      - name: Stop isolated Supabase
+        if: always()
+        run: npx --yes supabase@3.2.0 stop --no-backup

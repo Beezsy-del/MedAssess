@@ -29,9 +29,9 @@ test("staff demo, persisted registration, assessment and discharge", async ({
   page,
 }) => {
   await page.goto("/login");
-  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Nursing workspace" }),
   ).toBeVisible({ timeout: 15000 });
   await page.screenshot({
     path: "output/playwright/dashboard-desktop.png",
@@ -56,7 +56,7 @@ test("staff demo, persisted registration, assessment and discharge", async ({
   const href = await page
     .getByRole("link", { name: "Open intake" })
     .getAttribute("href");
-  expect(href).toContain("/patient/intake/");
+  expect(href).toContain("/patient-portal#");
   await page.getByRole("button", { name: "Close dialog" }).click();
   await page
     .getByRole("link", { name: new RegExp(name) })
@@ -82,6 +82,13 @@ test("staff demo, persisted registration, assessment and discharge", async ({
     );
   await page.getByRole("button", { name: "Save clinical assessment" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  const encounterUrl = page.url();
+  await page
+    .getByRole("button", { name: "Log out and clear local drafts" })
+    .click();
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(page).toHaveURL(/\/doctor$/);
+  await page.goto(encounterUrl);
   for (const status of [
     "WAITING",
     "STAFF_ASSIGNED",
@@ -93,9 +100,7 @@ test("staff demo, persisted registration, assessment and discharge", async ({
     await page.getByRole("button", { name: "Update patient flow" }).click();
     await page.getByLabel("Next status").selectOption(status);
     if (status === "STAFF_ASSIGNED")
-      await page
-        .getByLabel("Assign clinician")
-        .selectOption({ label: "Dr. Ananya Rao" });
+      await page.getByLabel("Assign clinician").selectOption({ index: 1 });
     await page
       .getByLabel("Handover / disposition")
       .fill(
@@ -119,7 +124,7 @@ test("patient emergency bypasses intake; secure status and language controls", a
   await page.goto("/login");
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Patient registration", exact: true }),
+    page.getByRole("heading", { name: "Nursing workspace", exact: true }),
   ).toBeVisible({ timeout: 15000 });
   await page.goto("/reception");
   await page
@@ -138,29 +143,31 @@ test("patient emergency bypasses intake; secure status and language controls", a
   const patient = await context.newPage();
   await patient.goto(href!);
   await expect(
-    patient.getByRole("heading", { name: "Your care starts here" }),
+    patient.getByRole("heading", { name: "Your care team’s updates" }),
   ).toBeVisible();
   await patient.getByLabel("Language", { exact: true }).selectOption("hi");
   await expect(
-    patient.getByRole("heading", { name: "आपकी देखभाल यहाँ शुरू होती है" }),
+    patient.getByRole("heading", { name: "आपके बारे में" }),
   ).toBeVisible();
-  await patient.getByLabel("भाषा", { exact: true }).selectOption("en");
+  await patient.getByLabel("Language", { exact: true }).selectOption("en");
   await patient
-    .getByRole("button", { name: "Request immediate staff assistance" })
+    .getByRole("button", { name: "Notify staff: I need immediate help" })
     .click();
   await expect(patient.getByRole("status")).toContainText(
-    "Assistance request recorded",
+    "Emergency request recorded",
   );
-  await patient
-    .getByLabel("What is troubling you?")
-    .fill("Synthetic severe breathing difficulty");
-  await patient.getByLabel("I understand this information").check();
-  await patient.getByRole("button", { name: "Send to care team" }).click();
   await expect(
-    patient.getByRole("heading", {
-      name: "Your information has been received",
-    }),
+    patient.getByRole("heading", { name: "RED — emergency assistance" }),
   ).toBeVisible();
+  await patient.getByRole("button", { name: "Save & continue" }).click();
+  await patient
+    .getByLabel("What is your main concern?")
+    .fill("Synthetic severe breathing difficulty");
+  for (let i = 1; i < 7; i++)
+    await patient.getByRole("button", { name: "Save & continue" }).click();
+  await patient.getByLabel("I reviewed my answers and consent").check();
+  await patient.getByRole("button", { name: "Send to care team" }).click();
+  await expect(patient.getByRole("status")).toContainText("Report recorded");
   await patient.setViewportSize({ width: 390, height: 844 });
   await patient.screenshot({
     path: "output/playwright/patient-mobile.png",
@@ -179,7 +186,7 @@ test("offline draft persists and syncs once on reconnect", async ({
   await page.goto("/login");
   await page.getByRole("button", { name: "Triage nurse", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Patient registration", exact: true }),
+    page.getByRole("heading", { name: "Nursing workspace", exact: true }),
   ).toBeVisible({ timeout: 15000 });
   await page.goto("/reception");
   await expect(
@@ -247,7 +254,7 @@ test("keyboard and responsive dashboard has no serious accessibility violations"
   await page.goto("/login");
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible({ timeout: 15000 });
   const desktop = await new AxeBuilder({ page }).analyze();
   expect(
@@ -311,7 +318,7 @@ test("hospital selection enforces membership and survives navigation", async ({
   await page.goto("/login");
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible({ timeout: 15000 });
   const result = await page.evaluate(async () => {
     const initial = await fetch("/api/snapshot").then((r) => r.json());
@@ -371,7 +378,7 @@ test("failed refresh and logout report errors without claiming success", async (
   await page.goto("/login");
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible({ timeout: 15000 });
   await page.route("**/api/snapshot?*", (route) =>
     route.fulfill({
@@ -383,7 +390,7 @@ test("failed refresh and logout report errors without claiming success", async (
   await page.getByRole("button", { name: "Refresh data", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Refresh failed");
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible({ timeout: 15000 });
   await page.route("**/api/auth", (route) =>
     route.fulfill({
@@ -396,7 +403,7 @@ test("failed refresh and logout report errors without claiming success", async (
     .getByRole("button", { name: "Log out and clear local drafts" })
     .click();
   await expect(page.getByRole("status")).toContainText("Sign-out failed");
-  await expect(page).toHaveURL(/dashboard/);
+  await expect(page).toHaveURL(/doctor/);
 });
 
 test("late snapshot responses cannot overwrite newer workspace data", async ({
@@ -405,7 +412,7 @@ test("late snapshot responses cannot overwrite newer workspace data", async ({
   await page.goto("/login");
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible({ timeout: 15000 });
   const snapshot = await page.evaluate(() =>
     fetch("/api/snapshot").then((r) => r.json()),
@@ -473,7 +480,7 @@ test("workspace themes persist and navigation supports keyboard dismissal", asyn
   await page.goto("/login");
   await page.getByRole("button", { name: "Doctor", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Hospital overview" }),
+    page.getByRole("heading", { name: "Clinical workspace" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Light theme: Switch to dark theme" })
@@ -504,4 +511,42 @@ test("workspace themes persist and navigation supports keyboard dismissal", asyn
     .getByRole("button", { name: "Dark theme: Switch to light theme" })
     .click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+});
+
+test("patient entry preserves the full demo and clinical track board quick peek", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await expect(
+    page.getByRole("heading", { name: "PATIENT PORTAL", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Enter Patient Portal", exact: true })
+    .click();
+  await page
+    .getByRole("link", { name: "Explore Demo Mode", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/patient-portal\/demo$/);
+  await expect(
+    page.getByText(
+      "DEMO MODE — SYNTHETIC PATIENT DATA — NOT FOR REAL CLINICAL USE",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Clinical workspace", exact: true }),
+  ).toBeVisible();
+  const peek = page.getByRole("button", { name: /^Quick peek / }).first();
+  await expect(peek).toBeVisible();
+  await peek.click();
+  await expect(
+    page.getByRole("region", { name: /Clinical quick brief for/i }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("region", { name: /Clinical quick brief for/i }),
+  ).toHaveCount(0);
+  await expect(peek).toBeFocused();
 });

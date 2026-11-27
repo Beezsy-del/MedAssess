@@ -1,12 +1,33 @@
 "use client";
-import Link from "next/link";
-import { CareMap } from "@/components/chrome";
-import { ArrowRight, Plus, Clock3, ShieldCheck, Activity } from "lucide-react";
+
+import NextLink from "next/link";
+import { canRegister, canVisit } from "@/features/access/policy";
+import { ArrowRight, Plus, Clock3 } from "lucide-react";
 import { useState } from "react";
 import { useWorkspace } from "./context";
 import { PatientTable } from "./patient-table";
 import { Metric, SectionTitle, Empty } from "@/components/ui";
 import { terminalStatuses } from "@/features/flow/machine";
+import {
+  AcuityShieldIcon,
+  BedBayIcon,
+  EmergencyBeaconIcon,
+  FlowJunctionIcon,
+  PatientIntakeIcon,
+  StethoscopeCrossIcon,
+} from "@/components/icons";
+
+function Link(props: React.ComponentProps<typeof NextLink>) {
+  const { data } = useWorkspace();
+  if (
+    typeof props.href === "string" &&
+    props.href !== "/patient-portal" &&
+    !canVisit(data.membership.role, props.href)
+  )
+    return null;
+  return <NextLink {...props} />;
+}
+
 export function Overview({
   queue = false,
   title = "Hospital overview",
@@ -17,14 +38,17 @@ export function Overview({
   initialQuery?: string;
 }) {
   const { data, online } = useWorkspace();
-  const [filter, setFilter] = useState("All patients"),
-    [search, setSearch] = useState(initialQuery),
-    [department, setDepartment] = useState(""),
-    [assignment, setAssignment] = useState("");
+  const [filter, setFilter] = useState("All patients");
+  const [search, setSearch] = useState(initialQuery);
+  const [department, setDepartment] = useState("");
+  const [assignment, setAssignment] = useState("");
+
   const active = data.encounters.filter(
     (e) => !terminalStatuses.includes(e.status),
   );
   const critical = active.filter((e) => e.category === "RED");
+  const urgent = active.filter((e) => e.category === "YELLOW");
+  const standard = active.filter((e) => e.category === "GREEN");
   const pending = active.filter((e) => e.category === "ASSESSMENT_REQUIRED");
   const overdue = active.filter(
     (e) =>
@@ -32,6 +56,16 @@ export function Overview({
       (e.reassessment_due !== null &&
         Date.parse(e.reassessment_due) < Date.parse(data.loadedAt)),
   );
+  const allBeds = data.resources.filter((r) => r.kind.includes("bed"));
+  const freeBeds = allBeds.filter((r) => r.status === "AVAILABLE");
+  const bedOccupancyPct = allBeds.length
+    ? Math.round(
+        (allBeds.filter((bed) => bed.status === "OCCUPIED").length /
+          allBeds.length) *
+          100,
+      )
+    : 0;
+
   const displayed = active.filter(
     (e) =>
       (filter === "All patients" ||
@@ -46,10 +80,22 @@ export function Overview({
           ? e.assigned_to === data.userId
           : e.assigned_to === null)) &&
       (!search ||
-        `${data.patients.find((p) => p.id === e.patient_id)?.name} ${e.reference} ${e.symptoms}`
+        `${data.patients.find((p) => p.id === e.patient_id)?.name ?? ""} ${e.reference} ${e.symptoms}`
           .toLowerCase()
           .includes(search.toLowerCase())),
   );
+
+  const hasFilters =
+    filter !== "All patients" || !!search || !!department || !!assignment;
+  function clearFilters() {
+    setFilter("All patients");
+    setSearch("");
+    setDepartment("");
+    setAssignment("");
+  }
+
+  const totalBar = Math.max(active.length, 1);
+
   const date = new Intl.DateTimeFormat("en-IN", {
     timeZone: "Asia/Kolkata",
     weekday: "long",
@@ -57,6 +103,7 @@ export function Overview({
     month: "long",
     year: "numeric",
   }).format(new Date(data.loadedAt));
+
   return (
     <>
       <div className="page-heading">
@@ -66,91 +113,173 @@ export function Overview({
             <span className="live-label">
               <span />{" "}
               {online
-                ? `Updated ${new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }).format(new Date(data.loadedAt))}`
-                : "Offline — last received data"}
+                ? `Synced ${new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }).format(new Date(data.loadedAt))}`
+                : "Offline — cached shift view"}
             </span>
           </p>
           <h1>{title}</h1>
-          <p>Review the queue, assess patients and coordinate the next step.</p>
+          <p>
+            Acuity-ranked track board, clinical handovers, and live ward
+            capacity.
+          </p>
         </div>
-        <Link href="/reception" className="button primary">
-          <Plus size={17} /> Register patient
-        </Link>
+        <div className="heading-actions">
+          <Link href="/patient-portal" className="button">
+            Patient self-intake
+          </Link>
+          {canRegister(data.membership.role) && (
+            <Link href="/reception" className="button primary">
+              <Plus size={17} /> Register patient
+            </Link>
+          )}
+        </div>
       </div>
+
       {!queue && (
-        <section className="coordination-hero">
-          <div className="hero-copy">
-            <p className="hero-kicker">Hospital coordination</p>
-            <h2>
-              Assess urgency.
-              <br />
-              Coordinate the next step.
-            </h2>
-            <p>
-              Review active encounters, reassessment tasks and available
-              resources across your hospital.
-            </p>
-            <div className="button-row">
-              <Link href="/triage" className="button hero-primary">
-                <Activity size={17} />
-                Open triage queue
-              </Link>
-              <Link href="/smartflow" className="button hero-secondary">
-                View patient flow
-                <ArrowRight size={16} />
-              </Link>
+        <section
+          className="command-pulse"
+          aria-label="Live acuity census and quick launches"
+        >
+          <div className="pulse-acuity-panel">
+            <div className="pulse-head">
+              <div>
+                <strong>Shift Acuity Census</strong>
+                <small>
+                  Click any priority tier to focus the track board · Emergency
+                  ranked first
+                </small>
+              </div>
+              <span className="pulse-bed-pill">
+                <BedBayIcon size={15} />
+                {freeBeds.length} / {allBeds.length} beds free (
+                {bedOccupancyPct}% occ)
+              </span>
+            </div>
+
+            <div
+              className="acuity-spectrum-bar"
+              role="img"
+              aria-label={`Acuity mix: ${critical.length} critical, ${urgent.length} urgent, ${standard.length} non-immediate, ${pending.length} awaiting triage`}
+            >
+              {critical.length > 0 && (
+                <span
+                  className="seg-red"
+                  style={{ width: `${(critical.length / totalBar) * 100}%` }}
+                />
+              )}
+              {urgent.length > 0 && (
+                <span
+                  className="seg-yellow"
+                  style={{ width: `${(urgent.length / totalBar) * 100}%` }}
+                />
+              )}
+              {pending.length > 0 && (
+                <span
+                  className="seg-unassessed"
+                  style={{ width: `${(pending.length / totalBar) * 100}%` }}
+                />
+              )}
+              {standard.length > 0 && (
+                <span
+                  className="seg-green"
+                  style={{ width: `${(standard.length / totalBar) * 100}%` }}
+                />
+              )}
+            </div>
+
+            <div className="acuity-chip-row">
+              <button
+                type="button"
+                className={`acuity-stat-chip chip-red ${filter === "RED" ? "active" : ""}`}
+                onClick={() =>
+                  setFilter((curr) => (curr === "RED" ? "All patients" : "RED"))
+                }
+              >
+                <span className="chip-dot" />
+                <strong>{critical.length}</strong>
+                <span>Critical (RED)</span>
+              </button>
+              <button
+                type="button"
+                className={`acuity-stat-chip chip-yellow ${filter === "YELLOW" ? "active" : ""}`}
+                onClick={() =>
+                  setFilter((curr) =>
+                    curr === "YELLOW" ? "All patients" : "YELLOW",
+                  )
+                }
+              >
+                <span className="chip-dot" />
+                <strong>{urgent.length}</strong>
+                <span>Urgent (YELLOW)</span>
+              </button>
+              <button
+                type="button"
+                className={`acuity-stat-chip chip-green ${filter === "GREEN" ? "active" : ""}`}
+                onClick={() =>
+                  setFilter((curr) =>
+                    curr === "GREEN" ? "All patients" : "GREEN",
+                  )
+                }
+              >
+                <span className="chip-dot" />
+                <strong>{standard.length}</strong>
+                <span>Standard (GREEN)</span>
+              </button>
+              <button
+                type="button"
+                className={`acuity-stat-chip chip-blue ${filter === "Awaiting triage" ? "active" : ""}`}
+                onClick={() =>
+                  setFilter((curr) =>
+                    curr === "Awaiting triage"
+                      ? "All patients"
+                      : "Awaiting triage",
+                  )
+                }
+              >
+                <span className="chip-dot" />
+                <strong>{pending.length}</strong>
+                <span>Awaiting triage</span>
+              </button>
             </div>
           </div>
-          <div className="hero-network">
-            <CareMap
-              counts={{
-                pending: active.filter((e) => e.status === "TRIAGE_PENDING")
-                  .length,
-                assessment: active.filter((e) => e.status === "ASSESSMENT")
-                  .length,
-                treatment: active.filter((e) => e.status === "TREATMENT")
-                  .length,
-              }}
-            />
-            <div className="hero-workspaces">
-              <Link href="/reception">
-                <span>01</span>
-                <div>
-                  <strong>Patient registration</strong>
-                  <small>Encounters and secure intake passes</small>
-                </div>
-                <ArrowRight size={15} />
-              </Link>
-              <Link href="/doctor">
-                <span>02</span>
-                <div>
-                  <strong>Clinical workspace</strong>
-                  <small>Assessments, care notes and decisions</small>
-                </div>
-                <ArrowRight size={15} />
-              </Link>
-              <Link href="/resources">
-                <span>03</span>
-                <div>
-                  <strong>Resource coordination</strong>
-                  <small>Beds, availability and handovers</small>
-                </div>
-                <ArrowRight size={15} />
-              </Link>
-            </div>
+
+          <div className="pulse-shortcuts">
+            <Link href="/registration" className="quick-tile">
+              <PatientIntakeIcon size={19} />
+              <div>
+                <strong>Nursing intake</strong>
+                <small>Vitals &amp; initial screen</small>
+              </div>
+              <ArrowRight size={14} />
+            </Link>
+            <Link href="/doctor" className="quick-tile">
+              <StethoscopeCrossIcon size={19} />
+              <div>
+                <strong>Clinical workspace</strong>
+                <small>Notes &amp; disposition</small>
+              </div>
+              <ArrowRight size={14} />
+            </Link>
+            <Link href="/resources" className="quick-tile">
+              <BedBayIcon size={19} />
+              <div>
+                <strong>Bed &amp; bay map</strong>
+                <small>Ward allocation &amp; holds</small>
+              </div>
+              <ArrowRight size={14} />
+            </Link>
+            <Link href="/smartflow" className="quick-tile">
+              <FlowJunctionIcon size={19} />
+              <div>
+                <strong>SmartFlow board</strong>
+                <small>Stage-by-stage journey</small>
+              </div>
+              <ArrowRight size={14} />
+            </Link>
           </div>
         </section>
       )}
-      <div className="demo-notice">
-        <ShieldCheck size={17} />
-        <span>
-          Synthetic demo only. Clinical use is disabled; the protocol is not
-          validated.
-        </span>
-        <Link href="/settings/triage-protocol">
-          View protocol <ArrowRight size={14} />
-        </Link>
-      </div>
+
       <div className="metrics">
         <Metric
           label="Active encounters"
@@ -165,7 +294,7 @@ export function Overview({
                 {critical.length.toString()}
               </span>
               <span className="metric-divider">/</span>
-              {active.filter((e) => e.category === "YELLOW").length.toString()}
+              {urgent.length.toString()}
             </>
           }
           detail="Red / yellow clinical categories"
@@ -177,17 +306,16 @@ export function Overview({
         />
         <Metric
           label="Available beds"
-          value={data.resources
-            .filter((r) => r.kind.includes("bed") && r.status === "AVAILABLE")
-            .length.toString()}
-          detail={`${data.resources.filter((r) => r.kind.includes("bed")).length} beds in registered inventory`}
+          value={freeBeds.length.toString()}
+          detail={`${allBeds.length} beds in registered inventory`}
         />
       </div>
+
       <div className={`overview-grid ${queue ? "full-width" : ""}`}>
         <section className="panel queue-panel">
           <SectionTitle title="Patient queue">
             <span className="count-label">
-              {active.length} active encounters
+              {active.length} active · click eye icon to quick-peek
             </span>
           </SectionTitle>
           <div className="tabs" role="group" aria-label="Filter patient queue">
@@ -200,8 +328,10 @@ export function Overview({
               "Reassessment due",
             ].map((x) => (
               <button
+                type="button"
                 key={x}
                 className={filter === x ? "selected" : ""}
+                aria-pressed={filter === x}
                 onClick={() => setFilter(x)}
               >
                 {x === "RED"
@@ -212,13 +342,16 @@ export function Overview({
                       ? "Non-immediate"
                       : x}
                 {x === "Awaiting triage" && <span>{pending.length}</span>}
+                {x === "Reassessment due" && overdue.length > 0 && (
+                  <span>{overdue.length}</span>
+                )}
               </button>
             ))}
           </div>
           <div className="table-toolbar">
             <input
               aria-label="Filter patients"
-              placeholder="Search name or encounter ID"
+              placeholder="Search name, complaint, or encounter ID"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -243,8 +376,20 @@ export function Overview({
               <option value="mine">Assigned to me</option>
               <option value="unassigned">Unassigned</option>
             </select>
+            {hasFilters && (
+              <button
+                type="button"
+                className="button small"
+                onClick={clearFilters}
+              >
+                Clear filters
+              </button>
+            )}
           </div>
-          <PatientTable encounters={displayed} />
+          <PatientTable
+            encounters={displayed}
+            onReset={hasFilters ? clearFilters : undefined}
+          />
           <div className="panel-foot">
             <span>
               {displayed.length} encounters · Clinical urgency always comes
@@ -255,12 +400,13 @@ export function Overview({
             </Link>
           </div>
         </section>
+
         {!queue && (
           <aside className="right-rail">
             <section className="attention-panel">
               <div className="section-title">
                 <h2>
-                  <Activity size={17} /> Review flags
+                  <EmergencyBeaconIcon size={18} /> Review flags
                 </h2>
                 <span className="count-label">
                   {critical.length + overdue.length}
@@ -313,8 +459,11 @@ export function Overview({
                 Open coordination centre <ArrowRight size={15} />
               </Link>
             </section>
+
             <section className="panel capacity-panel">
-              <SectionTitle title="Department capacity" />
+              <SectionTitle title="Department capacity">
+                <AcuityShieldIcon size={16} />
+              </SectionTitle>
               {data.departments.map((d) => {
                 const count = active.filter(
                   (e) => e.department_id === d.id,
@@ -344,10 +493,11 @@ export function Overview({
           </aside>
         )}
       </div>
+
       <section className="flow-summary">
         <div>
           <h2>Patient flow</h2>
-          <p>Encounters by recorded stage.</p>
+          <p>Live encounter progression across clinical stages.</p>
         </div>
         <div className="flow-steps">
           {[

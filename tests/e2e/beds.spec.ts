@@ -4,7 +4,11 @@ async function signIn(page: Page, role = "Triage nurse") {
   await page.goto("/login");
   await page.getByRole("button", { name: role, exact: true }).click();
   await expect(page).toHaveURL(
-    role === "Triage nurse" ? /\/registration$/ : /\/dashboard$/,
+    role === "Triage nurse"
+      ? /\/nurse$/
+      : role === "Doctor"
+        ? /\/doctor$/
+        : /\/dashboard$/,
   );
 }
 test("intake opens physical bed map; reviewed compatible allocation updates another session and releases through cleaning", async ({
@@ -12,6 +16,7 @@ test("intake opens physical bed map; reviewed compatible allocation updates anot
   browser,
 }) => {
   await signIn(page);
+  await page.goto("/registration");
   const name = `Synthetic bed browser ${Date.now()}`;
   await page.getByLabel("Full name", { exact: true }).fill(name);
   await page
@@ -55,7 +60,7 @@ test("intake opens physical bed map; reviewed compatible allocation updates anot
     .selectOption("BED_REQUIRED");
   await page
     .getByLabel("Clinically required ward / care level")
-    .selectOption({ label: "High acuity · RED/YELLOW" });
+    .selectOption({ label: "High acuity · YELLOW" });
   await page
     .getByRole("combobox", { name: "Required bed type", exact: true })
     .selectOption("Emergency bed");
@@ -157,6 +162,7 @@ test("physical map preserves coordinates, supports keyboard and responsive theme
   page,
 }) => {
   await signIn(page);
+  await page.goto("/registration");
   await page.goto("/resources");
   await expect(
     page.getByRole("heading", { name: "Hospital bed map" }),
@@ -210,6 +216,9 @@ test("administrator configures bed capabilities and maintenance lifecycle but ca
 }) => {
   await signIn(page, "Administrator");
   await page.goto("/resources");
+  await page
+    .getByText("Bed map, status and configuration", { exact: true })
+    .click();
   const snapshot = await (await page.request.get("/api/snapshot")).json();
   const bed = snapshot.resources.find(
     (b: { kind: string; status: string }) =>
@@ -281,6 +290,7 @@ test("lost placement acknowledgement keeps saved intake and retries the same ope
   page,
 }) => {
   await signIn(page);
+  await page.goto("/registration");
   const initial = await (await page.request.get("/api/snapshot")).json();
   const created = await page.request.post("/api/command", {
     headers: { origin: new URL(page.url()).origin },

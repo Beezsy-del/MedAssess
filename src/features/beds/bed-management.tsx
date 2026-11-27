@@ -277,7 +277,11 @@ export function BedManagement({
           disabled={locked}
         />
       )}
-      <div className="bed-census" aria-label="Hospital bed counts">
+      <div
+        className="bed-census"
+        role="region"
+        aria-label="Hospital bed counts"
+      >
         <div>
           <strong>{beds.length}</strong>
           <span>Total beds</span>
@@ -289,7 +293,7 @@ export function BedManagement({
           </div>
         ))}
       </div>
-      <div className="bed-legend" aria-label="Bed status legend">
+      <div className="bed-legend" role="region" aria-label="Bed status legend">
         {bedStatuses.map((s) => {
           const Icon = icons[s];
           return (
@@ -299,7 +303,7 @@ export function BedManagement({
             </span>
           );
         })}
-        <span className="form-note">Availability ≠ suitability</span>
+        <span className="bed-suitability-pill">Availability ≠ suitability</span>
       </div>
       <div className="bed-layout">
         <div className="bed-map-area">
@@ -438,6 +442,7 @@ export function BedManagement({
                       <div className="bed-grid-scroll">
                         <div
                           className="bed-grid"
+                          role="group"
                           style={{ "--bed-columns": columns } as CSSProperties}
                           aria-label={`${w.name} bed layout`}
                         >

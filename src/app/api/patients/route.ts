@@ -23,9 +23,7 @@ export async function POST(request: Request) {
     if (
       !s ||
       !membership ||
-      !["triage_nurse", "nurse", "doctor", "receptionist"].includes(
-        membership.role,
-      )
+      !["triage_nurse", "nurse", "receptionist"].includes(membership.role)
     )
       return Response.json(
         { error: "Patient lookup is not available for this role." },

@@ -1,5 +1,9 @@
 export function landingForRole(role: string) {
   return role === "triage_nurse" || role === "nurse"
-    ? "/registration"
-    : "/dashboard";
+    ? "/nurse"
+    : role === "doctor"
+      ? "/doctor"
+      : role === "receptionist"
+        ? "/reception"
+        : "/dashboard";
 }

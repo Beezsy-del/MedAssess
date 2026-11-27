@@ -1,5 +1,11 @@
 # Final acceptance matrix
 
+**Current portal specification:** See [MASTER_PROMPT_RECONCILIATION.md](MASTER_PROMPT_RECONCILIATION.md) and [PORTAL_UPGRADE_VERIFICATION.md](PORTAL_UPGRADE_VERIFICATION.md) for the deployed portal/role upgrade. The historical master-specification rows below retain earlier gaps; the newer report supersedes them for manual token entry, structured patient reports, department permissions, staff role editing, configurable protocol records and scheduled in-app reassessment. Clinical validation remains outstanding.
+
+**Hosted release update:** Deployment was subsequently authorized. See [PORTAL_RELEASE.md](PORTAL_RELEASE.md) for migration, deployment and live verification evidence; earlier deferral statements below are historical.
+
+**22 November local upgrade:** See [PORTAL_UPGRADE_VERIFICATION.md](PORTAL_UPGRADE_VERIFICATION.md) for the current patient-portal, role, resource, protocol and referral implementation. Hosted deployment was explicitly deferred by the user; older hosted-status statements below describe the previous release. The new local implementation supersedes older gaps for staff role editing, department RLS, adaptive history/medicines/allergies, internal referrals and scheduled reassessment. It does not establish clinical validation or production readiness.
+
 This is a working, database-backed **core prototype**. The complete master specification is **not fully implemented**. Vercel preview and production deployments exist; see DEPLOYMENT_STATUS.md. All rows below refer to synthetic demonstration workflows, not clinical validation.
 
 | Feature                                                  | Implementation status                 | Test status                                                                               | Database integration status                         | Deployment status     | Remaining limitation                                                                                        |
@@ -49,3 +55,46 @@ Nurse intake update: /registration is the nursing landing page, with identity se
 Visual bed allocation: implemented physical care-zone/ward grids, reviewed compatibility recommendations, automatic intake handoff, persistent alternative destinations, reservations, reassignment and cleaning lifecycle. Six additive migrations applied; database assertions and multi-role/tenant fixture passed. Four new preview browser scenarios passed; production is deployed and the physical map was smoke-tested. Full regression acceptance encountered provider authentication timeouts; see TEST_RESULTS.md. Synthetic clinical boundary remains unchanged. See BED_MANAGEMENT.md.
 
 Final bed-release CI: 72 unit and 69 hosted database assertions passed; all four new bed scenarios passed, but the complete browser suite has 8 passes and 9 timeout failures. Full acceptance is not green. See TEST_RESULTS.md and CI run 44841263814.
+
+## Patient portal upgrade — local foundation, not deployed
+
+Target confirmed: Beezsy-del/MedAssess and medcipher-triage-platform.vercel.app.
+
+| Feature                        | Current evidence                                                                                                                                               | Remaining work                                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Role separation                | Route and command policy tests; API/page guards; doctor registration/pass controls removed; local SQL rejects doctor registration and raw admin clinical reads | Full role browser coverage; remaining action visibility; operational directory integration            |
+| Adaptive report                | Eight English sections, conditional symptom questions, unknown defaults, medications/allergies, consent validation                                             | Complete review screen, translated wording, optional voice and accessibility acceptance               |
+| Patient session                | New `/patient/portal` and `/api/patient/session`; fragment/manual token exchange; HttpOnly same-site cookie; origin check; expiry/revocation checked in SQL    | Switch issued QR passes after isolated acceptance; verify hosting logs and browser lifecycle          |
+| Saved progress and history     | Local SQL confirms draft save/status, immutable report insertion and idempotent replay                                                                         | Hosted reload, concurrent-device conflicts, outage and reconnect acceptance                           |
+| Preliminary rules              | Reviewed-configuration-only evaluator and emergency override; unit assertions; no clinical rules seeded                                                        | Configuration review UI, SQL/TypeScript parity coverage, clinical review                              |
+| Emergency request              | Local SQL records RED override and one staff-assessment resource request; no false inventory-shortage claim                                                    | Staff resource-request acknowledgement and fulfillment UI; delivery tests                             |
+| Nurse, doctor, admin workflows | Schema foundations for department referral history and operational redaction                                                                                   | Transactional referral lifecycle, OPD gates, briefs, directory/resources and department assignment UI |
+| Deployment                     | Existing production preserved; no remote migration from this branch                                                                                            | Isolated Supabase staging, full preview acceptance, then production promotion                         |
+
+Checkpoint verification: formatting, lint, strict typecheck and 87 unit tests passed. The local database transaction fixture is `tests/sql/patient-portal.sql`; it runs after the draft migration and rolls back all synthetic fixtures. Local PostgreSQL does not test Supabase Auth, PostgREST, Realtime or Vercel. This is not completion of the master specification.
+
+## Current technical-gap release
+
+See [TECHNICAL_GAP_RELEASE.md](TECHNICAL_GAP_RELEASE.md): individual-staff credential changes, patient reconnect/race safety, localized patient workflow messages and verbatim answer review are implemented. Static checks, 94 unit tests and all database workflow suites pass; new browser regressions pass. The report distinguishes historical test evidence, current deployment verification and unfinished technical scope.
+
+## Fourth login portal
+
+The login now includes Administrator, Doctor, Triage Nurse and Patient Portal options. `/patient-portal` reuses existing secure questionnaire, assessments, staff notifications and database workflows. New QR passes target that route. See FOUR_PORTAL_RELEASE.md for test/deployment evidence and device/clinical-review limitations.
+
+## Isolated patient demonstration
+
+`/patient-portal/demo` provides a token-free, interactive fictional patient journey. Presentation scenarios select simulated outcomes; they are not clinical rules. All demo state stays in memory, and no real patient APIs or alerts are used. The separate Real Patient Access option retains existing capability validation. See PATIENT_DEMO_MODE.md.
+
+Patient Demo Mode release verified: source `fd580e6`, production `/patient-portal/demo`, 102 unit tests and 28 local/CI browser tests passed; both hosted demo tests and nine real-workflow acceptance groups passed on preview and production. See PATIENT_DEMO_MODE.md for URLs, deployment IDs and limits.
+
+## MediRoute rebrand
+
+MediRoute is the current product brand. Product copy and installable-app metadata have been updated. Existing MedAssess repository/Supabase and MedCipher deployment addresses remain connected to the same application.
+
+Rebrand release verified: source commit `45b1ba8385871a3e30f94c811bb6c7fa1eb2627d`; Vercel production `dpl_BjDrjRfnHh1Y1Y9LXRevt5c8HY8h` is READY at the existing canonical URL. Formatting, lint, strict type checks, 102 unit tests and production build passed. Both demo browser tests passed locally and on production. Production checks confirmed MediRoute text on all public portal pages, page titles, manifest, offline fallback and the three staff workspaces. The bounded runtime error/fatal query returned no rows.
+
+MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
+
+## 27 November 2026 interface integration
+
+See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.
