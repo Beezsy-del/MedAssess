@@ -58,9 +58,11 @@ test("intake opens physical bed map; reviewed compatible allocation updates anot
   await page
     .getByRole("combobox", { name: "Placement decision", exact: true })
     .selectOption("BED_REQUIRED");
-  await page
-    .getByLabel("Clinically required ward / care level")
-    .selectOption({ label: "High acuity · YELLOW" });
+  const ward = page.getByLabel("Clinically required ward / care level");
+  // Hospitals can accept multiple urgency categories in the same physical ward.
+  const highAcuity = ward.getByRole("option", { name: /^High acuity ·/ });
+  await expect(highAcuity).toBeEnabled();
+  await ward.selectOption((await highAcuity.getAttribute("value"))!);
   await page
     .getByRole("combobox", { name: "Required bed type", exact: true })
     .selectOption("Emergency bed");

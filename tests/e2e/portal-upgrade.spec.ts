@@ -16,6 +16,21 @@ test("patient manual access, adaptive report, saved progress, staff brief and dy
   const landing = await login(page, "nurse");
   await page.goto(landing);
   const snapshot = await (await page.request.get("/api/snapshot")).json();
+  // GREEN/YELLOW fixture rules are installed only in the isolated local suite.
+  // Hosted draft protocols must retain an explicit unknown classification.
+  const activeProtocols = snapshot.protocols.filter(
+    (p: { status: string }) => p.status === "active",
+  );
+  const fixtureProtocol = activeProtocols.some(
+    (p: { configuration: { rules: { id: string }[] } }) =>
+      ["fixture_green", "fixture_yellow"].every((id) =>
+        p.configuration.rules.some((r) => r.id === id),
+      ),
+  );
+  if (["localhost", "127.0.0.1"].includes(new URL(baseURL!).hostname))
+    expect(fixtureProtocol).toBe(true);
+  else if (!fixtureProtocol) expect(activeProtocols).toHaveLength(0);
+
   const createdResponse = await page.request.post("/api/command", {
     headers: { origin: baseURL! },
     data: {
@@ -113,7 +128,11 @@ test("patient manual access, adaptive report, saved progress, staff brief and dy
     .getByRole("button", { name: "Send to care team", exact: true })
     .click();
   await expect(
-    patient.getByRole("heading", { name: "GREEN — non-immediate care" }),
+    patient.getByRole("heading", {
+      name: fixtureProtocol
+        ? "GREEN — non-immediate care"
+        : "Human assessment required",
+    }),
   ).toBeVisible();
   await expect(patient.getByRole("status")).toContainText("Report recorded");
   await page.goto(`/encounters/${created.id}`);
@@ -137,11 +156,19 @@ test("patient manual access, adaptive report, saved progress, staff brief and dy
     .getByRole("button", { name: "Send to care team", exact: true })
     .click();
   await expect(
-    patient.getByRole("heading", { name: "YELLOW — prompt assessment" }),
+    patient.getByRole("heading", {
+      name: fixtureProtocol
+        ? "YELLOW — prompt assessment"
+        : "Human assessment required",
+    }),
   ).toBeVisible();
   await page.bringToFront();
   await expect(
-    page.getByRole("heading", { name: "Preliminary assessment: YELLOW" }),
+    page.getByRole("heading", {
+      name: fixtureProtocol
+        ? "Preliminary assessment: YELLOW"
+        : "Preliminary assessment: ASSESSMENT_REQUIRED",
+    }),
   ).toBeVisible({ timeout: 35000 });
   await patient
     .getByRole("button", { name: "Notify staff: I need immediate help" })
