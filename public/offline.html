@@ -3,73 +3,111 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>MediRoute — offline</title>
+    <title>MediRoute — Offline</title>
     <style>
+      :root {
+        color-scheme: light;
+      }
       body {
-        font: 16px/1.7 system-ui;
-        background: #f5f7fb;
-        color: #172033;
+        font:
+          15px/1.65 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background: #f5f6f8;
+        color: #252634;
+        margin: 0;
+        padding: 32px 20px;
+      }
+      main {
         max-width: 600px;
-        margin: 50px auto;
-        padding: 24px;
+        margin: 24px auto;
+        background: #ffffff;
+        border: 1px solid #d5d9e2;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 6px 20px rgb(37 38 52 / 6%);
+      }
+      .brand-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 18px;
+        color: #252634;
       }
       h1 {
-        color: #920942;
+        color: #651d38;
+        margin: 0 0 14px;
+        font-size: 28px;
+        letter-spacing: -0.02em;
       }
-      a,
-      button {
-        color: #920942;
-      }
-      button,
-      input,
-      textarea {
-        font: inherit;
-        padding: 12px;
-        border: 1px solid #ced8e4;
-        border-radius: 10px;
-      }
-      input,
-      textarea {
-        display: block;
-        width: 90%;
-        margin: 8px 0 20px;
+      p {
+        color: #565b6c;
+        margin: 12px 0;
       }
       .notice {
         padding: 16px;
-        background: #fff4d5;
-        border-radius: 8px;
-      }
-      label {
-        display: block;
+        background: #fdf0f2;
+        border: 1px solid #eabcc5;
+        color: #a81c34;
+        border-radius: 10px;
+        font-weight: 600;
       }
       button {
+        margin-top: 16px;
+        font: inherit;
+        font-weight: 600;
+        padding: 11px 20px;
+        border: 0;
+        border-radius: 9px;
         cursor: pointer;
-        background: white;
+        color: #ffffff;
+        background: linear-gradient(
+          135deg,
+          #651d38 0%,
+          #713b63 55%,
+          #8b6b91 100%
+        );
+      }
+      .foot {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #e6e9f0;
+        font-size: 12px;
+        color: #565b6c;
       }
     </style>
   </head>
   <body>
-    <img src="/icon.svg" alt="" width="48" height="48" />
-    <h1>You’re offline.</h1>
-    <p class="notice">
-      For emergency assistance, contact nearby staff directly. This device
-      cannot notify other devices without a connection.
-    </p>
-    <p>
-      Previously saved registration drafts remain on this device. In a
-      still-open Patient Registration screen, use “Save device draft” to
-      preserve an incomplete assessment.
-    </p>
-    <p>
-      After a full offline refresh, staff authentication cannot be verified.
-      This public fallback does not collect patient information.
-    </p>
-    <p>
-      Reconnect and sign in. Open Patient Registration to resume, review and
-      confirm nursing drafts. Legacy Reception drafts use “Sync now”.
-      Unconfirmed triage drafts are never assigned automatically.
-    </p>
-    <button onclick="location.reload()">Try reconnecting</button>
-    <p>MediRoute · Synthetic demonstration only</p>
+    <main>
+      <div class="brand-row">
+        <img src="/icon.svg" alt="" width="36" height="36" />
+        <span>MediRoute</span>
+      </div>
+      <h1>You’re offline.</h1>
+      <p class="notice">
+        For emergency assistance, contact nearby staff directly. This device
+        cannot notify other devices without a connection.
+      </p>
+      <p>
+        Previously saved registration drafts remain on this device. In a
+        still-open Patient Registration screen, use “Save device draft” to
+        preserve an incomplete assessment.
+      </p>
+      <p>
+        After a full offline refresh, staff authentication cannot be verified.
+        This public fallback does not collect patient information.
+      </p>
+      <p>
+        Reconnect and sign in. Open Patient Registration to resume, review and
+        confirm nursing drafts. Legacy Reception drafts use “Sync now”.
+        Unconfirmed triage drafts are never assigned automatically.
+      </p>
+      <button onclick="location.reload()">Try reconnecting</button>
+      <p class="foot">MediRoute · Synthetic demonstration only</p>
+    </main>
   </body>
 </html>

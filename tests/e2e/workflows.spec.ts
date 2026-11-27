@@ -512,3 +512,41 @@ test("workspace themes persist and navigation supports keyboard dismissal", asyn
     .click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
+
+test("patient entry preserves the full demo and clinical track board quick peek", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await expect(
+    page.getByRole("heading", { name: "PATIENT PORTAL", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Enter Patient Portal", exact: true })
+    .click();
+  await page
+    .getByRole("link", { name: "Explore Demo Mode", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/patient-portal\/demo$/);
+  await expect(
+    page.getByText(
+      "DEMO MODE — SYNTHETIC PATIENT DATA — NOT FOR REAL CLINICAL USE",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Doctor", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Clinical workspace", exact: true }),
+  ).toBeVisible();
+  const peek = page.getByRole("button", { name: /^Quick peek / }).first();
+  await expect(peek).toBeVisible();
+  await peek.click();
+  await expect(
+    page.getByRole("region", { name: /Clinical quick brief for/i }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("region", { name: /Clinical quick brief for/i }),
+  ).toHaveCount(0);
+  await expect(peek).toBeFocused();
+});

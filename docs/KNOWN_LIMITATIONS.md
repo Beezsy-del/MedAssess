@@ -62,3 +62,7 @@ Patient Demo Mode is a browser-only presentation: refreshing clears it, and its 
 Rebranding preserves existing deployment hostnames, repository/workspace names, historical migration/job identifiers, auth identities, cookie names and offline storage keys. These are compatibility identifiers, not visible product branding. No clinical behavior or approval status changed.
 
 MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
+
+## 27 November 2026 interface integration
+
+See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.

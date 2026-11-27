@@ -21,6 +21,7 @@ import {
   type OutboxItem,
   clearOutbox,
 } from "@/features/offline/outbox";
+
 export function QRToken({
   token,
   reference,
@@ -47,10 +48,11 @@ export function QRToken({
         ),
       );
   }, [url]);
+
   return (
     <div className="qr-token">
       <h3>Patient entry pass</h3>
-      <p>{reference}</p>
+      <p className="mono">{reference}</p>
       {image && (
         <Image
           unoptimized
@@ -69,10 +71,11 @@ export function QRToken({
       <p>Enter this private token at /patient/start. Keep this pass private.</p>
       {qrError && <p role="alert">{qrError}</p>}
       <div className="button-row">
-        <button className="button" onClick={() => window.print()}>
+        <button type="button" className="button" onClick={() => window.print()}>
           <Printer size={16} /> Print pass
         </button>
         <button
+          type="button"
           className="button"
           onClick={() =>
             void navigator.clipboard
@@ -95,6 +98,7 @@ export function QRToken({
     </div>
   );
 }
+
 export function Reception() {
   const operation = useRef<string | null>(null);
   const { data, command, busy, online, setMessage, refresh } = useWorkspace();
@@ -106,6 +110,7 @@ export function Reception() {
     [outbox, setOutbox] = useState<OutboxItem[]>([]),
     [syncing, setSyncing] = useState(false),
     [error, setError] = useState("");
+
   const load = useCallback(
     () =>
       listOutbox(data.userId, data.hospital.id).then((items) =>
@@ -113,6 +118,7 @@ export function Reception() {
       ),
     [data.userId, data.hospital.id],
   );
+
   useEffect(() => {
     void load().catch(() =>
       setError(
@@ -120,7 +126,8 @@ export function Reception() {
       ),
     );
   }, [load]);
-  async function sync() {
+
+  const sync = useCallback(async () => {
     setSyncing(true);
     try {
       const result = await syncOutbox(data.userId, data.hospital.id);
@@ -136,12 +143,14 @@ export function Reception() {
     } finally {
       setSyncing(false);
     }
-  }
+  }, [data.userId, data.hospital.id, load, refresh, setMessage]);
+
   useEffect(() => {
     const onOnline = () => void sync();
     window.addEventListener("online", onOnline);
     return () => window.removeEventListener("online", onOnline);
-  });
+  }, [sync]);
+
   async function register(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -187,11 +196,13 @@ export function Reception() {
       setError(e instanceof Error ? e.message : "Registration failed");
     }
   }
+
   const filtered = data.encounters.filter((e) =>
-    `${e.reference} ${data.patients.find((p) => p.id === e.patient_id)?.name}`
+    `${e.reference} ${data.patients.find((p) => p.id === e.patient_id)?.name ?? ""}`
       .toLowerCase()
       .includes(search.toLowerCase()),
   );
+
   return (
     <>
       <div className="page-heading">
@@ -200,10 +211,18 @@ export function Reception() {
           <h1>Reception</h1>
           <p>One patient record. A new encounter for every visit.</p>
         </div>
-        <button className="button primary" onClick={() => setOpen(true)}>
+        <button
+          type="button"
+          className="button primary"
+          onClick={() => {
+            setError("");
+            setOpen(true);
+          }}
+        >
           <Plus size={17} /> Register patient
         </button>
       </div>
+
       <div className="info-strip">
         <UserPlus size={20} />
         <span>
@@ -212,6 +231,7 @@ export function Reception() {
         </span>
         <Link href="/emergency">Emergency instructions</Link>
       </div>
+
       <section className="panel">
         <div className="section-title">
           <h2>Registered encounters</h2>
@@ -222,14 +242,19 @@ export function Reception() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <PatientTable encounters={filtered} />
+        <PatientTable
+          encounters={filtered}
+          onReset={search ? () => setSearch("") : undefined}
+        />
       </section>
+
       <section className="panel spaced">
         <div className="section-title">
           <h2>
             <CloudUpload size={18} /> Device synchronization
           </h2>
           <button
+            type="button"
             className="button"
             onClick={() => void sync()}
             disabled={!online || syncing}
@@ -253,19 +278,29 @@ export function Reception() {
           </div>
         ))}
         {outbox.length > 0 && (
-          <button
-            className="button"
-            onClick={() => {
-              if (confirm("Delete all unsynchronized drafts on this device?"))
-                void clearOutbox().then(load);
-            }}
-          >
-            Delete local drafts
-          </button>
+          <div className="panel-copy">
+            <button
+              type="button"
+              className="button"
+              onClick={() => {
+                if (confirm("Delete all unsynchronized drafts on this device?"))
+                  void clearOutbox().then(load);
+              }}
+            >
+              Delete local drafts
+            </button>
+          </div>
         )}
       </section>
+
       {open && (
-        <Modal title="Register a patient" onClose={() => setOpen(false)}>
+        <Modal
+          title="Register a patient"
+          onClose={() => {
+            setOpen(false);
+            setError("");
+          }}
+        >
           <form onSubmit={register} className="stack-form">
             <p className="form-note">
               Synthetic data only. For an emergency, alert staff immediately
@@ -349,7 +384,7 @@ export function Reception() {
                 {error}
               </p>
             )}
-            <button disabled={busy} className="button primary">
+            <button type="submit" disabled={busy} className="button primary">
               {busy
                 ? "Saving…"
                 : online

@@ -94,3 +94,7 @@ MediRoute is the current product brand. Product copy and installable-app metadat
 Rebrand release verified: source commit `45b1ba8385871a3e30f94c811bb6c7fa1eb2627d`; Vercel production `dpl_BjDrjRfnHh1Y1Y9LXRevt5c8HY8h` is READY at the existing canonical URL. Formatting, lint, strict type checks, 102 unit tests and production build passed. Both demo browser tests passed locally and on production. Production checks confirmed MediRoute text on all public portal pages, page titles, manifest, offline fallback and the three staff workspaces. The bounded runtime error/fatal query returned no rows.
 
 MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
+
+## 27 November 2026 interface integration
+
+See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.

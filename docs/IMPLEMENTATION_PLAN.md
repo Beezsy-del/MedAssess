@@ -78,3 +78,7 @@ Added two entry choices inside the existing Patient Portal. The token-free demo 
 Renamed the product to MediRoute across visible UI, page metadata, manifest, offline fallback, CSV export, demo QR label, package metadata, CI name and documentation. Existing service identifiers, URLs, session cookies and device storage keys are retained for compatibility.
 
 MediRoute URL: `https://mediroute-triage-platform.vercel.app` is now attached to the existing Vercel production project. The previous MedCipher hostname remains available for old links. This changes no application routes, database records or credentials.
+
+## 27 November 2026 interface integration
+
+See [Afnan integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for the combined version, executed checks, preserved security controls and remaining release/clinical limits.
