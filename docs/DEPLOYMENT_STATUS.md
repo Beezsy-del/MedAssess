@@ -46,3 +46,7 @@ Source `0a5a5ff` passed GitHub [run 44783771333](https://github.com/Beezsy-del/M
 ## Patient portal and role-workflow release — 22 November 2026
 
 The user explicitly authorized the previously deferred hosted upgrade. Application commit `1eddbb9` is now READY on https://medcipher-triage-platform.vercel.app/, production deployment `dpl_FLZiRSZmm68HwkCAg5SUhfJQr8AP`. Both pending migrations were applied to the existing MedAssess project; 40/40 public tables have RLS and the scheduler ran successfully. Preview and canonical-production acceptance each passed eight real hosted groups; all 33 hosted core database assertions passed. Full evidence, remaining staff-provisioning secret configuration, security-advisor context and monitoring limits: [PORTAL_RELEASE.md](PORTAL_RELEASE.md).
+
+## MediRoute interface integration — 27 November 2026
+
+Merged contributor interface improvements with the current secure patient/staff workflows through PR #2. Production app commit `a7835b3` is READY on https://mediroute-triage-platform.vercel.app, deployment `dpl_EzSWqHHf2uWvkMpdSTvsR6EgJpdy`. Preview and canonical-production browser smoke checks passed. No database migration was needed. See [integration release evidence](AFNAN_INTEGRATION_RELEASE.md) for tests and independent-review timeout limitation. GitHub now resolves the existing repository as https://github.com/Beezsy-del/MediRoute; its repository ID/history are unchanged.
