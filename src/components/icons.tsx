@@ -13,7 +13,7 @@ const baseProps = (size: number, className?: string) => ({
   className: className ? `mc-icon ${className}` : "mc-icon",
 });
 
-/** Bespoke geometric MedCipher emblem: cipher shield + clinical cross + live pulse node. */
+/** Bespoke geometric MedCipher emblem: concentric cipher dial + central clinical cross. */
 export function MedCipherLogo({
   size = 24,
   className,
@@ -23,35 +23,76 @@ export function MedCipherLogo({
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox="0 0 100 100"
       fill="none"
       aria-hidden="true"
       className={className ? `mc-logo-svg ${className}` : "mc-logo-svg"}
       {...rest}
     >
+      {/* Outer ring: 4 cardinal-split quadrants alternating burgundy and crimson */}
       <path
-        d="M16 2.5L27 6.8V15.4C27 22.4 22.3 27.6 16 29.8C9.7 27.6 5 22.4 5 15.4V6.8L16 2.5Z"
-        fill="currentColor"
-        fillOpacity="0.14"
-        stroke="currentColor"
-        strokeOpacity="0.45"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
+        d="M53.62 8.66 A41.5 41.5 0 0 1 91.34 46.38"
+        stroke="#D92B22"
+        strokeWidth="6.4"
       />
       <path
-        d="M14 8.5H18V14H23.5V18H18V23.5H14V18H8.5V14H14V8.5Z"
-        fill="currentColor"
-        fillOpacity="0.18"
+        d="M91.34 53.62 A41.5 41.5 0 0 1 53.62 91.34"
+        stroke="#7E122F"
+        strokeWidth="6.4"
       />
       <path
-        d="M5.5 16.2H10.2L12.6 10.2L16.2 22.2L19.1 14.3L21.3 16.2H26.5"
-        stroke="#FFFFFF"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M46.38 91.34 A41.5 41.5 0 0 1 8.66 53.62"
+        stroke="#D92B22"
+        strokeWidth="6.4"
       />
-      <circle cx="21.4" cy="16.2" r="2.2" fill="#E3C482" />
-      <circle cx="21.4" cy="16.2" r="0.85" fill="#651D38" />
+      <path
+        d="M8.66 46.38 A41.5 41.5 0 0 1 46.38 8.66"
+        stroke="#7E122F"
+        strokeWidth="6.4"
+      />
+
+      {/* Middle ring: diagonal-split arcs */}
+      <path
+        d="M30.74 24.44 A32 32 0 0 1 69.26 24.44"
+        stroke="#7E122F"
+        strokeWidth="6"
+      />
+      <path
+        d="M75.56 30.74 A32 32 0 0 1 75.56 69.26"
+        stroke="#7E122F"
+        strokeWidth="6"
+      />
+      <path
+        d="M69.26 75.56 A32 32 0 0 1 30.74 75.56"
+        stroke="#7E122F"
+        strokeWidth="6"
+      />
+      <path
+        d="M24.44 69.26 A32 32 0 0 1 24.44 30.74"
+        stroke="#D92B22"
+        strokeWidth="6"
+      />
+
+      {/* Inner crimson ring with dark burgundy cardinal ticks & diagonal bridges */}
+      <circle cx="50" cy="50" r="22.8" stroke="#D92B22" strokeWidth="5.4" />
+      <path
+        d="M47.22 27.37 A22.8 22.8 0 0 1 52.78 27.37 M72.63 47.22 A22.8 22.8 0 0 1 72.63 52.78 M52.78 72.63 A22.8 22.8 0 0 1 47.22 72.63 M27.37 52.78 A22.8 22.8 0 0 1 27.37 47.22"
+        stroke="#651226"
+        strokeWidth="5.6"
+      />
+      <path
+        d="M66.1 33.9 L74 26 M66.1 66.1 L74 74 M33.9 66.1 L26 74 M33.9 33.9 L26 26"
+        stroke="#D92B22"
+        strokeWidth="5.2"
+        strokeLinecap="butt"
+      />
+
+      {/* Center burgundy disc and medical cross */}
+      <circle cx="50" cy="50" r="19.5" fill="#7E122F" />
+      <path
+        d="M45.2 36.8 H54.8 V45.2 H63.2 V54.8 H54.8 V63.2 H45.2 V54.8 H36.8 V45.2 H45.2 Z"
+        fill="#FFFFFF"
+      />
     </svg>
   );
 }

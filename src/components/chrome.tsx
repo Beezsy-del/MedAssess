@@ -13,7 +13,7 @@ export function Brand({ href = "/" }: { href?: string }) {
   return (
     <Link className="brand" href={href}>
       <span className="brand-symbol" aria-hidden="true">
-        <MedCipherLogo size={24} />
+        <MedCipherLogo size={28} />
       </span>
       <span className="brand-wordmark">
         <strong>MedCipher</strong>
